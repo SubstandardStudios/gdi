@@ -1,0 +1,284 @@
+body {
+    /*background-color:LightGray;*/
+    background: url(http://piskel-imgstore-b.appspot.com/img/1c118591-e431-11e6-8a51-b98bdf48deb5.gif);
+		font-family: 'Aclonica';
+		
+}
+h1 {
+    margin: 0 auto;
+    margin-bottom: 25px;
+    margin-top: 25px;
+    display: table;
+		font-family: 'Press Start 2P';
+}
+
+.rightSideText {
+  float:right;
+  font-size: 12px;
+  font-weight:bold;
+  
+}
+
+.generatorText{
+    text-align:center;
+    width:100%;
+    
+    margin-top:3px;
+    margin-bottom:0px;
+    
+    font-weight:bold;
+    font-size:12px;
+    
+    
+}
+
+.subtitle {
+	
+    position:absolute;
+	  left:300px;
+	
+    font-size: 12px;
+}
+
+.nextSectionButton {
+	position:absolute;
+	left:625px;
+	
+	width:40px;
+	height:20px;
+}
+
+.woodenButton {
+	float:right;
+	width:40px;
+	height:20px;
+}
+
+#characterSubTitle {
+	margin:0;
+	text-align:center;
+	font-weight: bold;
+}
+
+#characterSubText {
+	font-size:14px;
+}
+.raceButton {
+	
+    margin: auto;
+    margin-top: 30px;
+    display: block;
+  
+	width:160px;
+	height:20px;
+  
+    background:url(http://piskel-imgstore-b.appspot.com/img/1c118591-e431-11e6-8a51-b98bdf48deb5.gif);
+    
+    border-radius:7px;
+    border:2px solid black;
+    font-weight:bold;
+}
+
+#animationTitleBar {
+	font-size:30px;
+}
+
+.generatorBox {
+ 
+  border: 2px solid black;
+  margin-left: 50px;
+  margin-top: -35px;
+  float: right;
+  
+  width: 300px;
+  height: 350px;
+  
+  border-radius: 20px;
+  
+  position:relative;
+  
+  background: url(http://piskel-imgstore-b.appspot.com/img/845625e8-ea80-11e6-859d-f146104365e4.gif)  
+}
+
+.titleBox{
+  border: 2px solid black;
+  border-radius: 25px;
+  
+  background:url(http://piskel-imgstore-b.appspot.com/img/be5d630f-e430-11e6-a821-b98bdf48deb5.gif);
+  
+  height:25px;
+  width:325px;
+  
+  display:table;
+  margin: 0 auto;
+  margin-bottom: 15px;
+  margin-top:15px;
+  
+}
+
+.inner {
+    margin: 0 auto;
+    margin-bottom: 15px;
+    border: 2px solid black;
+    border-radius: 25px;
+    display: table;
+    overflow:hidden;
+    height: 250px;
+    width: 200px;
+    padding: 10px;
+    /*background-color:Burlywood;*/
+    background:url(http://piskel-imgstore-b.appspot.com/img/be5d630f-e430-11e6-a821-b98bdf48deb5.gif);
+}
+.outer {
+    margin: auto;
+  
+    /*margin-top: 50px; */
+    border: 2px solid black;
+    border-radius: 25px;
+    display: table;
+    width: 700px;
+    
+    padding: 15px;
+    /*background-color:LightGray;*/
+    background:url(http://piskel-imgstore-b.appspot.com/img/1c118591-e431-11e6-8a51-b98bdf48deb5.gif);
+}
+.outermost {
+    margin: auto;
+    margin-top:50px;
+    border: 2px solid black;
+    border-radius: 25px;
+    display: table;
+    width:740px;
+    padding: 20px;
+    padding-bottom:0px;
+    /*background-color:Burlywood;*/
+    background:url(http://piskel-imgstore-b.appspot.com/img/be5d630f-e430-11e6-a821-b98bdf48deb5.gif);
+}
+
+#canvasCan {
+}
+
+#vertical {
+    width: 2px;
+    height: 100%;
+    background:black;
+    border:0;
+}
+#lastrow {
+    margin-bottom: 0;
+}
+#maintext {
+    margin: 0 auto;
+    display: table;
+    padding-bottom: 10px;
+    font-weight:bold;
+    font-size:17px;
+}
+#descriptor {
+    padding-bottom: 10px;
+    font-size: 15px;
+    font-weight:bold;
+    /*
+    height:194px;
+    overflow-y:scroll;
+    */
+}
+#storyBox {
+	position:relative;
+	
+    margin: 0 auto;
+    margin-bottom: 15px;
+	
+    border: 2px solid black;
+    border-radius: 25px;
+	
+    display: table;
+    overflow:scroll;
+	
+    height: 200px;
+    width: 675px;
+	
+    padding: 10px;
+	
+    /*background-color:Burlywood;*/
+    background:url(http://piskel-imgstore-b.appspot.com/img/be5d630f-e430-11e6-a821-b98bdf48deb5.gif);
+}
+
+#thinHr {
+	border:1px solid black;
+	margin-top:0px;
+	margin-bottom:10px;
+}
+
+#characterBox {
+	margin: 0 auto;
+  margin-bottom: 15px;
+	
+	border: 3px solid black;
+  border-radius: 25px;
+	
+	height: 85px;
+  width: 150px;
+	
+	padding:5px;	
+}
+
+#animationBox {
+	
+	border: 3px solid black;
+  border-radius: 25px;
+	
+	height: 70px;
+  width: 125px;
+	
+	text-align:center;
+}
+
+#mainhr {
+    /*margin-bottom:35px;*/
+    background:black;
+    height:1px;
+    border:0;
+    margin:0;
+}
+
+#gameCanvas {
+	
+	display:block;
+	margin:auto;
+	
+  background-color:DarkGrey;
+	-ms-interpolation-mode: nearest-neighbor;
+	image-rendering: -webkit-optimize-contrast;
+	image-rendering: -webkit-crisp-edges;
+	image-rendering: -moz-crisp-edges;
+	image-rendering: -o-crisp-edges;
+	image-rendering: pixelated;
+}
+
+
+.verticalLine {
+    border-left: thick solid #ff0000;
+}
+
+::-webkit-scrollbar 
+{
+ width: 15px;
+}
+::-webkit-scrollbar-track 
+{
+ -webkit-box-shadow: inset 0 0 10px rgba(0,0,0,0.3);
+ border-radius:10px;
+}
+body::-webkit-scrollbar-track {
+    background:url(http://piskel-imgstore-b.appspot.com/img/be5d630f-e430-11e6-a821-b98bdf48deb5.gif);
+    border-radius:10px;
+    border: 2px solid black;
+}
+::-webkit-scrollbar-thumb
+{
+ background:url(http://piskel-imgstore-b.appspot.com/img/1c118591-e431-11e6-8a51-b98bdf48deb5.gif);
+ border-radius:10px;
+ border: 2px solid black;
+}
+

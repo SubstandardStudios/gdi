@@ -672,25 +672,25 @@ function gameLoad(ctx, cnv){
 	
 	//Cedric's basic playermodel images
 	var syntheticArmLower = new Image();
-	syntheticArmLower.src = 'http://piskel-imgstore-b.appspot.com/img/c46121f0-0449-11e7-80d2-9d214acfe1e9.gif'
+	syntheticArmLower.src = 'imgs/ArmLowerSynthetic.gif';//'http://piskel-imgstore-b.appspot.com/img/c46121f0-0449-11e7-80d2-9d214acfe1e9.gif'
 	
 	var syntheticArmUpperRi = new Image();
-	syntheticArmUpperRi.src = 'http://piskel-imgstore-b.appspot.com/img/5820852b-0533-11e7-9bb3-59d2b040d17b.gif';
+	syntheticArmUpperRi.src = 'imgs/ArmUpperRightSynthetic.gif';
 	
 	var syntheticArmUpperLe = new Image();
-	syntheticArmUpperLe.src = 'http://piskel-imgstore-b.appspot.com/img/502b9d1e-0533-11e7-978a-59d2b040d17b.gif';
+	syntheticArmUpperLe.src = 'imgs/ArmUpperLeftSynthetic.gif';//'http://piskel-imgstore-b.appspot.com/img/502b9d1e-0533-11e7-978a-59d2b040d17b.gif';
 	
 	var syntheticHand = new Image();
-	syntheticHand.src = 'http://piskel-imgstore-b.appspot.com/img/1b55b091-05a1-11e7-925b-1756e446e1a5.gif';
+	syntheticHand.src = 'imgs/HandSynthetic.gif';//'http://piskel-imgstore-b.appspot.com/img/1b55b091-05a1-11e7-925b-1756e446e1a5.gif';
 	
 	var syntheticTorsoFront = new Image();
-	syntheticTorsoFront.src = 'http://piskel-imgstore-b.appspot.com/img/e8a45987-0516-11e7-9191-4f4fc7e31569.gif';
+	syntheticTorsoFront.src = 'imgs/TorsoFrontSynthetic.gif';//'http://piskel-imgstore-b.appspot.com/img/e8a45987-0516-11e7-9191-4f4fc7e31569.gif';
 	
 	var syntheticHeadFront = new Image();
-	syntheticHeadFront.src = 'http://piskel-imgstore-b.appspot.com/img/0d64b930-0449-11e7-96b2-9d214acfe1e9.gif';
+	syntheticHeadFront.src = 'imgs/HeadFrontSynthetic.gif';//'http://piskel-imgstore-b.appspot.com/img/0d64b930-0449-11e7-96b2-9d214acfe1e9.gif';
 	
 	var syntheticLegFront = new Image();
-	syntheticLegFront.src = 'http://piskel-imgstore-b.appspot.com/img/220fea1c-0449-11e7-b65f-9d214acfe1e9.gif';
+	syntheticLegFront.src = 'imgs/LegsFrontSynthetic.gif';//'http://piskel-imgstore-b.appspot.com/img/220fea1c-0449-11e7-b65f-9d214acfe1e9.gif';
 	//End of Cedric's player models
 	
 	

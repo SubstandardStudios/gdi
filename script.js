@@ -628,7 +628,7 @@ function character(parts){
 		
 		if(animation === 'none'){//This one runs if no other animation is called!
 			parts.forEach(function(element){
-				if(element.type === 'torsoFront')element.draw(true, true, canvasContext);
+				element.draw(true, true, canvasContext);
 			});
 		}
 		

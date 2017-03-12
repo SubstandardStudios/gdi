@@ -551,7 +551,7 @@ function part(type, img, parent) {//parent should be torso, unless you're using 
 	
 	this.draw = function(drawLeft, drawRight, canvasContext){//Also, remember, drawLeft and drawRight decide whether or not to draw those arms!  :D
 		
-		console.log(this.type + ' ' + this.width + ' ' + this.height + ' ' + this.x + ' ' + this.y);
+		console.log(this.type + ' ' + this.image.width + ' ' + this.image.height + ' ' + this.x + ' ' + this.y);
 		
 		if(this.type !== 'armUpper' && this.type !== 'armLower' && this.type !== 'hand')canvasContext.drawImage(this.image, this.x, this.y);
 		

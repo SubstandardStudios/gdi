@@ -487,9 +487,10 @@ function part(type, img, parent) {//parent should be torso, unless you're using 
 	this.image = img[0];
 	this.width = this.image.width;
 	this.height = this.image.height;
-	this.parent = parent;
 	
 	this.type = type;
+	
+	if(this.type !== 'torso')this.parent = parent;
 	
 	if(this.type === 'torsoFront'){
 		this.x = 300 - this.width/2;

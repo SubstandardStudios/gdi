@@ -494,7 +494,7 @@ function part(type, img, parent) {//parent should be torso, unless you're using 
 	if(this.type === 'torsoFront'){
 		this.x = 300 - this.width/2;
 		this.y = 300 - this.height/2;
-		alert(this.width + this.height + this.x + this.y);
+		alert(this.width + ' ' + this.height + ' ' + this.x + ' ' + this.y);
 	}
 	
 	else if(this.type === 'legsFront'){
@@ -657,7 +657,7 @@ function character(parts){
 
 //MAIN FUNCTION FOR STARTING UP GAME ENGINE! :D
 function startGame(){
-	$('#canvasCan').html('<canvas id="gameCanvas" width="600" height="600">Your browser is too old: get a new one!</canvas>');
+	$('#gameCanvas').html('<canvas id="gameCanvas" width="600" height="600">Your browser is too old: get a new one!</canvas>');
 		
 	var cnv = document.getElementById('gameCanvas');
 	var ctx = cnv.getContext('2d');

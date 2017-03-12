@@ -670,6 +670,7 @@ function character(parts){
 function startGame(){
 	$('#gameCanvas').html('<canvas id="gameCanvas" width="600" height="600">Your browser is too old: get a new one!</canvas>');
 	
+	/*
 	console.log = (function (old_function, div_log) { 
     return function (text) {
         old_function(text);
@@ -677,7 +678,7 @@ function startGame(){
     };
 	} (console.log.bind(console), document.getElementById("error-log")));
 	
-	console.log('Test!');
+	console.log('Test!');*/
 	
 	var cnv = document.getElementById('gameCanvas');
 	var ctx = cnv.getContext('2d');

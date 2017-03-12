@@ -485,8 +485,8 @@ var animationCounter = 0;
 function part(type, img, parent) {//parent should be torso, unless you're using a lower arm or hand! In that case, use upperarm or lowerarm, respectively Also, arm upper is the only one that needs two images, put them in the way we read: left to right :D
 	
 	this.image = img[0];
-	while(width === 0)this.width = this.image.width;
-	while(height === 0)this.height = this.image.height;
+	while(this.image.width === 0)this.width = this.image.width;
+	while(this.image.height === 0)this.height = this.image.height;
 	console.log('Width is: ' + this.width);
 	console.log('Height is: ' + this.height);
 	

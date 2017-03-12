@@ -668,7 +668,7 @@ function character(parts){
 
 //MAIN FUNCTION FOR STARTING UP GAME ENGINE! :D
 function startGame(){
-	$('#gameCanvas').html('<canvas id="gameCanvas" width="600" height="600">Your browser is too old: get a new one!</canvas>');
+	$('#canvasCan').html('<canvas id="gameCanvas" width="600" height="600">Your browser is too old: get a new one!</canvas>');
 	
 	/*
 	console.log = (function (old_function, div_log) { 

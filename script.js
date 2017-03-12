@@ -494,6 +494,7 @@ function part(type, img, parent) {//parent should be torso, unless you're using 
 	if(this.type === 'torsoFront'){
 		this.x = 300 - this.width/2;
 		this.y = 300 - this.height/2;
+		alert('Torso Drawn!');
 	}
 	
 	else if(this.type === 'legsFront'){

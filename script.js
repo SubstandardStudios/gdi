@@ -485,75 +485,80 @@ var animationCounter = 0;
 function part(type, img, parent) {//parent should be torso, unless you're using a lower arm or hand! In that case, use upperarm or lowerarm, respectively Also, arm upper is the only one that needs two images, put them in the way we read: left to right :D
 	
 	this.image = img[0];
-	while(this.image.width === 0)this.width = this.image.width;
-	while(this.image.height === 0)this.height = this.image.height;
-	console.log('Width is: ' + this.width);
-	console.log('Height is: ' + this.height);
+	this.width = this.image.width;
+	this.height = this.image.height;
 	
 	this.type = type;
 	
 	if(this.type !== 'torsoFront')this.parent = parent;
 	
-	if(this.type === 'torsoFront'){
-		this.x = 300 - this.width/2;
-		this.y = 300 - this.height/2;
-	}
-	
-	else if(this.type === 'legsFront'){
-		this.x = parent.x;
-		this.y = parent.y + parent.width;
-	}
-	
-	else if(this.type === 'headFront'){
-		this.x = parent.x + (parent.width - this.width)/2;
-		this.y = parent.y - this.height;
-	}
-	
-	else if(this.type === 'armUpper'){
-		this.leftX = parent.x - this.width;
-		this.positionValueLeftX = 6;
-		
-		this.leftY = parent.y  - 6;
-		
-		this.rightX = parent.x + parent.width;
-		this.positionValueRightX = -6;
-		
-		this.rightY = parent.y - 6;
-	}
-	
-	else if(this.type === 'armLower'){
-		this.leftX = parent.leftX + parent.positionValueLeftX;
-		this.positionValueLeftX = 0;
-		
-		this.leftY = parent.leftY + parent.height;
-		this.positionValueLeftY = -6;
-		
-		this.rightX = parent.rightX;
-		this.positionValueRightX = 0;
-		
-		this.rightY = parent.rightY + parent.height;
-		this.positionValueRightY = -6;
-	}
-	
-	else if(this.type === 'hand'){
-		this.leftX = parent.leftX;
-		this.positionValueLeftX = parent.positionValueLeftX;
-		
-		this.leftY = parent.leftY + parent.height;
-		this.positionValueLeftY = -9;
-		
-		this.rightX = parent.rightX;
-		this.positionValueRightX = 0;
-		
-		this.rightY = parent.rightY + parent.height;
-		this.positionValueRightY = -9;
+	this.getPosition = function() {
+		if(this.type === 'torsoFront'){
+			this.x = 300 - this.width/2;
+			this.y = 300 - this.height/2;
+		}
+
+		else if(this.type === 'legsFront'){
+			this.x = parent.x;
+			this.y = parent.y + parent.width;
+		}
+
+		else if(this.type === 'headFront'){
+			this.x = parent.x + (parent.width - this.width)/2;
+			this.y = parent.y - this.height;
+		}
+
+		else if(this.type === 'armUpper'){
+			this.leftX = parent.x - this.width;
+			this.positionValueLeftX = 6;
+
+			this.leftY = parent.y  - 6;
+
+			this.rightX = parent.x + parent.width;
+			this.positionValueRightX = -6;
+
+			this.rightY = parent.y - 6;
+		}
+
+		else if(this.type === 'armLower'){
+			this.leftX = parent.leftX + parent.positionValueLeftX;
+			this.positionValueLeftX = 0;
+
+			this.leftY = parent.leftY + parent.height;
+			this.positionValueLeftY = -6;
+
+			this.rightX = parent.rightX;
+			this.positionValueRightX = 0;
+
+			this.rightY = parent.rightY + parent.height;
+			this.positionValueRightY = -6;
+		}
+
+		else if(this.type === 'hand'){
+			this.leftX = parent.leftX;
+			this.positionValueLeftX = parent.positionValueLeftX;
+
+			this.leftY = parent.leftY + parent.height;
+			this.positionValueLeftY = -9;
+
+			this.rightX = parent.rightX;
+			this.positionValueRightX = 0;
+
+			this.rightY = parent.rightY + parent.height;
+			this.positionValueRightY = -9;
+		}
 	}
 	
 	console.log(this.type + ' ' + this.width + ' ' + this.height + ' ' + this.x + ' ' + this.y);
 	
 	this.draw = function(drawLeft, drawRight, canvasContext){//Also, remember, drawLeft and drawRight decide whether or not to draw those arms!  :D
 		
-		//console.log(this.type + ' ' + this.image.width + ' ' + this.image.height + ' ' + this.x + ' ' + this.y);
+		if(this.width === 0 || this.height === 0){
+			this.width = this.image.width;
+			this.height = this.image.height;
+			this.getPosition();
+			console.log(this.type + ' ' + this.width + ' ' + this.height + ' ' + this.x + ' ' + this.y);
+		}
 		
 		if(this.type !== 'armUpper' && this.type !== 'armLower' && this.type !== 'hand')canvasContext.drawImage(this.image, this.x, this.y);
 		

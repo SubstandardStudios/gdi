@@ -617,7 +617,7 @@ function character(parts){
 		
 		if(animation === 'none'){//This one runs if no other animation is called!
 			parts.forEach(function(element){
-				element.draw(true, true, canvasContext);
+				if(element.type === 'torsoFront')element.draw(true, true, canvasContext);
 			});
 		}
 		
@@ -658,7 +658,16 @@ function character(parts){
 //MAIN FUNCTION FOR STARTING UP GAME ENGINE! :D
 function startGame(){
 	$('#gameCanvas').html('<canvas id="gameCanvas" width="600" height="600">Your browser is too old: get a new one!</canvas>');
-		
+	
+	console.log = (function (old_function, div_log) { 
+    return function (text) {
+        old_function(text);
+        div_log.value += text;
+    };
+	} (console.log.bind(console), document.getElementById("error-log")));
+	
+	console.log('Test!');
+	
 	var cnv = document.getElementById('gameCanvas');
 	var ctx = cnv.getContext('2d');
 	setpixelated(ctx);

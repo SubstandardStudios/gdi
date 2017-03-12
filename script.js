@@ -587,7 +587,7 @@ function character(parts){
 	this.animationType = 'none';
 	
 	
-	
+	/*
 	function getWholeArm(){
 		var topPart;
 		var middlePart;
@@ -609,9 +609,9 @@ function character(parts){
 		bottomPart.draw(false, true, ctx);
 		
 		return c.toDataURL("image/gif");
-	}
+	}*/
 	
-	this.wholeArm = getWholeArm();
+	//this.wholeArm = getWholeArm();
 	
 	this.drawAll = function(animation, counter, canvasContext){
 		

@@ -532,8 +532,6 @@ function part(type, img, parent) {//parent should be torso, unless you're using 
 			this.positionValueRightX = -6;
 
 			this.rightY = parent.y - 6;
-			
-			console.log('armUpper position code has been called');
 		}
 
 		else if(this.type === 'armLower'){
@@ -579,6 +577,9 @@ function part(type, img, parent) {//parent should be torso, unless you're using 
 		if(this.type !== 'armUpper' && this.type !== 'armLower' && this.type !== 'hand')canvasContext.drawImage(this.image, this.x, this.y);
 		
 		else if(this.type === 'armUpper'){
+			
+			console.log('armUpper drawing code has been called');
+			
 			this.imageRi = img[1];
 			//REMEMBER! this.image = img[0];
 			if(drawRight)canvasContext.drawImage(this.imageRi, this.rightX + this.positionValueRightX, this.rightY);

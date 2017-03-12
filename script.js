@@ -485,8 +485,10 @@ var animationCounter = 0;
 function part(type, img, parent) {//parent should be torso, unless you're using a lower arm or hand! In that case, use upperarm or lowerarm, respectively Also, arm upper is the only one that needs two images, put them in the way we read: left to right :D
 	
 	this.image = img[0];
-	this.width = this.image.width;
-	this.height = this.image.height;
+	while(width === 0)this.width = this.image.width;
+	while(height === 0)this.height = this.image.height;
+	console.log('Width is: ' + this.width);
+	console.log('Height is: ' + this.height);
 	
 	this.type = type;
 	
@@ -551,7 +553,7 @@ function part(type, img, parent) {//parent should be torso, unless you're using 
 	
 	this.draw = function(drawLeft, drawRight, canvasContext){//Also, remember, drawLeft and drawRight decide whether or not to draw those arms!  :D
 		
-		console.log(this.type + ' ' + this.image.width + ' ' + this.image.height + ' ' + this.x + ' ' + this.y);
+		//console.log(this.type + ' ' + this.image.width + ' ' + this.image.height + ' ' + this.x + ' ' + this.y);
 		
 		if(this.type !== 'armUpper' && this.type !== 'armLower' && this.type !== 'hand')canvasContext.drawImage(this.image, this.x, this.y);
 		

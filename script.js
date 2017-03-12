@@ -703,17 +703,7 @@ function gameLoad(ctx, cnv){
 	
 	var syntheticLegFront = new Image();
 	syntheticLegFront.src = 'imgs/LegsFrontSynthetic.gif';//'http://piskel-imgstore-b.appspot.com/img/220fea1c-0449-11e7-b65f-9d214acfe1e9.gif';
-	//End of Cedric's player models
-	
-	var torso = new part('torsoFront', [syntheticTorsoFront]);
-	var legsFront = new part('legsFront', [syntheticLegFront], torso);
-	var headFront = new part('headFront', [syntheticHeadFront], torso);
-	var armUpper = new part('armUpper', [syntheticArmUpperLe, syntheticArmUpperRi], torso);
-	var armLower = new part('armLower', [syntheticArmLower], armUpper);
-	var hand = new part('hand', [syntheticHand], armLower);
-	
-	player = new character([hand, armLower, armUpper, torso, headFront, legsFront]);
-	
+	//End of Cedric's playermodels
 	
 	var imagesInAnArray = [syntheticArmLower, syntheticArmUpperRi, syntheticHand, syntheticTorsoFront, syntheticHeadFront, syntheticLegFront];
 	
@@ -726,14 +716,23 @@ function gameLoad(ctx, cnv){
 		function incrementCounter() {
 			counter++;
 			if ( counter === len ) {
-        //console.log( 'All images loaded!' );
-				
-				if(syntheticTorsoFront.complete)alert('Torso image loaded!');
-				else {alert('Torso image not loaded');}
-				
 				gameUpdate(ctx, cnv);
 			}
 		}
+	
+	imagesInAnArray.forEach(function(element){
+		ctx.drawImage(element, 0, 0);
+	});
+	
+	var torso = new part('torsoFront', [syntheticTorsoFront]);
+	var legsFront = new part('legsFront', [syntheticLegFront], torso);
+	var headFront = new part('headFront', [syntheticHeadFront], torso);
+	var armUpper = new part('armUpper', [syntheticArmUpperLe, syntheticArmUpperRi], torso);
+	var armLower = new part('armLower', [syntheticArmLower], armUpper);
+	var hand = new part('hand', [syntheticHand], armLower);
+	
+	player = new character([hand, armLower, armUpper, torso, headFront, legsFront]);
+	
 }
 
 function gameUpdate(ctx, cnv){

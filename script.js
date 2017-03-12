@@ -685,7 +685,7 @@ function gameLoad(ctx, cnv){
 	syntheticHand.src = 'imgs/HandSynthetic.gif';//'http://piskel-imgstore-b.appspot.com/img/1b55b091-05a1-11e7-925b-1756e446e1a5.gif';
 	
 	var syntheticTorsoFront = new Image();
-	syntheticTorsoFront.src = '/imgs/TorsoFrontSynthetic.gif';//'http://piskel-imgstore-b.appspot.com/img/e8a45987-0516-11e7-9191-4f4fc7e31569.gif';
+	syntheticTorsoFront.src = 'imgs/TorsoFrontSynthetic.gif';//'http://piskel-imgstore-b.appspot.com/img/e8a45987-0516-11e7-9191-4f4fc7e31569.gif';
 	
 	var syntheticHeadFront = new Image();
 	syntheticHeadFront.src = 'imgs/HeadFrontSynthetic.gif';//'http://piskel-imgstore-b.appspot.com/img/0d64b930-0449-11e7-96b2-9d214acfe1e9.gif';
@@ -693,7 +693,6 @@ function gameLoad(ctx, cnv){
 	var syntheticLegFront = new Image();
 	syntheticLegFront.src = 'imgs/LegsFrontSynthetic.gif';//'http://piskel-imgstore-b.appspot.com/img/220fea1c-0449-11e7-b65f-9d214acfe1e9.gif';
 	//End of Cedric's player models
-	
 	
 	var torso = new part('torsoFront', [syntheticTorsoFront]);
 	var legsFront = new part('legsFront', [syntheticLegFront], torso);
@@ -717,6 +716,10 @@ function gameLoad(ctx, cnv){
 			counter++;
 			if ( counter === len ) {
         //console.log( 'All images loaded!' );
+				
+				if(syntheticTorsoFront.complete)alert('Torso image loaded!');
+				else {alert('Torso image not loaded');}
+				
 				gameUpdate(ctx, cnv);
 			}
 		}

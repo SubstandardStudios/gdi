@@ -532,6 +532,11 @@ function part(type, img, parent) {//parent should be torso, unless you're using 
 			this.positionValueRightX = -6;
 
 			this.rightY = parent.y - 6;
+
+			console.log(this.parent.width)
+			console.log(this.parent.height)
+			console.log(this.width)
+			console.log(this.height)
 		}
 
 		else if(this.type === 'armLower'){
@@ -578,7 +583,7 @@ function part(type, img, parent) {//parent should be torso, unless you're using 
 		
 		else if(this.type === 'armUpper'){
 			
-			console.log('armUpper drawing code has been called');
+			//console.log('Right X & Y' + this.rightX + ' ' + this.rightY + 'Left X & Y' + this.leftX + ' ' + this.leftY);
 			
 			this.imageRi = img[1];
 			//REMEMBER! this.image = img[0];
@@ -758,7 +763,7 @@ function gameLoad(ctx, cnv){
 	var armLower = new part('armLower', [syntheticArmLower], armUpper);
 	var hand = new part('hand', [syntheticHand], armLower);
 	
-	player = new character([hand, armLower, armUpper, torso, headFront, legsFront]);
+	player = new character([torso, armUpper, armLower, hand, headFront, legsFront]);
 	
 }
 

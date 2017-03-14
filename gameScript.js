@@ -281,7 +281,6 @@ function part(type, img, parent) {//parent should be torso, unless you're using 
 		if(this.type !== 'armUpper' && this.type !== 'armLower' && this.type !== 'hand')canvasContext.drawImage(this.image, this.x, this.y);
 		
 		else if(this.type === 'armUpper'){
-			console.log(typeof this.imageRi);
 			if(drawRight)canvasContext.drawImage(this.imageRi, this.rightX + this.positionValueRightX, this.rightY);
 			if(drawLeft)canvasContext.drawImage(this.image, this.leftX + this.positionValueLeftX, this.leftY);
 		}
@@ -293,7 +292,6 @@ function part(type, img, parent) {//parent should be torso, unless you're using 
 	
 	this.drawRotated = function(fromX, fromY, rotateby, drawLeft, drawRight, canvasContext){
 		if(this.type === 'armUpper'){
-			console.log(typeof this.imageRi);
 			drawRotatedFromCenter(rotateby, this.imageRi, canvasContext, fromX, fromY, this.rightX, this.rightY);
 			drawRotatedFromCenter(rotateby, this.image, canvasContext, fromX, fromY, this.leftX, this.leftY);
 		}

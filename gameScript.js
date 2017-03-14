@@ -103,21 +103,21 @@ function setpixelated(context){
 
 function drawRotatedFromCenter(degrees, image, context, axisX, axisY, positionX, positionY){
     context.clearRect(0,0,600,600);
-
+	
     // save the unrotated context of the canvas so we can restore it later
     // the alternative is to untranslate & unrotate after drawing
     context.save();
-
+	
     // move to the center of the canvas
     context.translate(axisX, axisY);
-
+	
     // rotate the canvas to the specified degrees
     context.rotate(degrees*Math.PI/180);
-
+	
     // draw the image
     // since the context is rotated, the image will be rotated also
     context.drawImage(image,-image.width/2 + positionX,-image.height/2 + positionY);
-
+	
     // we’re done with the rotating so restore the unrotated context
     context.restore();
 }
@@ -213,6 +213,7 @@ function part(type, img, parent) {//parent should be torso, unless you're using 
 	
 	if(this.type !== 'torsoFront')this.parent = parent;
 	
+	if(this.type === 'armUpper')this.imageRi = img[1];
 	
 	this.getPosition = function() {
 		if(this.type === 'torsoFront'){
@@ -280,9 +281,7 @@ function part(type, img, parent) {//parent should be torso, unless you're using 
 		if(this.type !== 'armUpper' && this.type !== 'armLower' && this.type !== 'hand')canvasContext.drawImage(this.image, this.x, this.y);
 		
 		else if(this.type === 'armUpper'){
-			
-			this.imageRi = img[1];
-			//REMEMBER! this.image = img[0];
+			console.log(typeof this.imageRi);
 			if(drawRight)canvasContext.drawImage(this.imageRi, this.rightX + this.positionValueRightX, this.rightY);
 			if(drawLeft)canvasContext.drawImage(this.image, this.leftX + this.positionValueLeftX, this.leftY);
 		}
@@ -290,6 +289,31 @@ function part(type, img, parent) {//parent should be torso, unless you're using 
 			if(drawLeft)canvasContext.drawImage(this.image, this.leftX + this.positionValueLeftX, this.leftY + this.positionValueLeftY);
 			if(drawRight)canvasContext.drawImage(this.image, this.rightX + this.positionValueRightX, this.rightY + this.positionValueRightY);
 		}
+	}
+	
+	this.drawRotated = function(fromX, fromY, rotateby, drawLeft, drawRight, canvasContext){
+		if(this.type === 'armUpper'){
+			console.log(typeof this.imageRi);
+			drawRotatedFromCenter(rotateby, this.imageRi, canvasContext, fromX, fromY, this.rightX, this.rightY);
+			drawRotatedFromCenter(rotateby, this.image, canvasContext, fromX, fromY, this.leftX, this.leftY);
+		}
+		/*
+		 if(element.type === 'armLower'){
+			drawRotatedFromCenter(counter, element.image, canvasContext, parent.leftX, parent.leftY, parent.leftX - element.leftX, parent.leftY - element.leftY);
+			drawRotatedFromCenter(counter, element.image, canvasContext, parent.rightX, parent.rightY, parent.rightX - element.rightX, parent.rightY - element.rightY);
+		}
+
+		else if(element.type === 'hand'){
+			drawRotatedFromCenter(counter, element.image, canvasContext, parent.parent.leftX, parent.parent.leftY, parent.parent.leftX - element.leftX, parent.parent.leftY - element.leftY);
+			drawRotatedFromCenter(counter, element.image, canvasContext, parent.parent.rightX, parent.parent.rightY, parent.parent.leftX - element.leftX, parent.parent.leftY - element.leftY);
+		}
+		*/
+		else if(this.type === 'hand' || this.type === 'armLower'){
+			drawRotatedFromCenter(rotateby, this.image, canvasContext, fromX, fromY, parent.leftX, parent.leftY);
+			drawRotatedFromCenter(rotateby, this.image, canvasContext, fromX, fromY, parent.rightX, parent.rightY);
+		}
+		
+		else drawRotatedFromCenter(rotateby, this.image, canvasContext, fromX, fromY, parent.X, parent.Y);
 	}
 }
 
@@ -314,25 +338,9 @@ function character(parts){
 			
 			parts.forEach(function(element){
 				if(element.type === 'armUpper' || element.type === 'armLower' || element.type === 'hand'){
-
-					if(element.type = 'armUpper'){
-						drawRotatedFromCenter(counter, element.image, canvasContext, element.leftX, element.leftY, 0, 0);
-						drawRotatedFromCenter(counter, element.imageRi, canvasContext, element.rightX, element.rightY, 0, 0)
-					}
-
-					else if(element.type = 'armLower'){
-						drawRotatedFromCenter(counter, element.image, canvasContext, parent.leftX, parent.leftY, parent.leftX - element.leftX, parent.leftY - element.leftY);
-						drawRotatedFromCenter(counter, element.image, canvasContext, parent.rightX, parent.rightY, parent.rightX - element.rightX, parent.rightY - element.rightY)
-					}
-
-					else if(element.type = 'armLower'){
-						drawRotatedFromCenter(counter, element.image, canvasContext, parent.parent.leftX, parent.parent.leftY, parent.parent.leftX - element.leftX, parent.parent.leftY - element.leftY);
-						drawRotatedFromCenter(counter, element.image, canvasContext, parent.parent.rightX, parent.parent.rightY, parent.parent.leftX - element.leftX, parent.parent.leftY - element.leftY)
-					}
+					if(element.type === 'armUpper')element.drawRotated(0, 0, counter, false, true, canvasContext);
 				}
-				else{
-					element.draw(true, false, canvasContext);
-				}
+				element.draw(true, false, canvasContext);
 			});
 
 			if(counter === 0)this.animationType = 'none';

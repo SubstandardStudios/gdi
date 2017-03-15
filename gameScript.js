@@ -323,6 +323,7 @@ function part(type, img, parent) {//parent should be torso, unless you're using 
 function character(parts){
 	this.animationType = 'none';
 	
+	
 	this.drawAll = function(animation, counter, canvasContext){
 		
 		if(animation === 'none'){//This one runs if no other animation is called!
@@ -392,6 +393,38 @@ function gameLoad(ctx, cnv){
 	syntheticLegFront.src = 'imgs/LegsFrontSynthetic.gif';//'http://piskel-imgstore-b.appspot.com/img/220fea1c-0449-11e7-b65f-9d214acfe1e9.gif';
 	//End of Cedric's playermodels
 	
+	//Beginning of Riley's Fiend Playermodel Images
+	var redFiendArmLowerRi = new Image();
+	redFiendArmLowerRi.src = 'imgs/Red_Fiend_Arm_Lower_Right.gif';
+	
+	var redFiendArmLowerLe = new Image();
+	redFiendArmLowerLe.src = 'imgs/Red_Fiend_Arm_Lower_Left.gif';
+	
+	var redFiendArmUpperRi = new Image();
+	redFiendArmUpperRi.src = 'imgs/Fiend_Shoulder_Right.gif';
+	
+	var redFiendArmUpperLe = new Image();
+	redFiendArmUpperLe.src = 'imgs/Fiend_Shoulder_Left.gif';
+	
+	var redFiendHandRi =     new Image();
+	redFiendHandRi.src =     'imgs/Red_Fiend_Hand_Right.gif';
+	
+	var redFiendHandLe =     new Image();
+	redFiendHandLe.src =     'imgs/Red_Fiend_Hand_Left.gif';
+	
+	var redFiendTorsoFront = new Image();
+	redFiendTorsoFront.src = 'imgs/Red_Fiend_Torso_Front.gif';
+	
+	var redFiendHeadFront =  new Image();
+	redFiendHeadFront.src =  'imgs/Red_Fiend_Head.gif';
+	
+	var redFiendLegFront =   new Image();
+	redFiendLegFront.src =   'imgs/Hell_Dweller_Jeans_Legs_Front.gif';
+	
+	
+	//End of Riley's Fiend Playermodel Images
+	
+	
 	var imagesInAnArray = [syntheticArmLower, syntheticArmUpperRi, syntheticHand, syntheticTorsoFront, syntheticHeadFront, syntheticLegFront];
 	
 	var imgs = imagesInAnArray, len = imgs.length, counter = 0;
@@ -403,8 +436,8 @@ function gameLoad(ctx, cnv){
 		function incrementCounter() {
 			counter++;
 			if ( counter === len ) {
-				var torso = new part('torsoFront', [syntheticTorsoFront]);
-				var legsFront = new part('legsFront', [syntheticLegFront], torso);
+				var torso = new part('torsoFront', chooseFrom([[syntheticTorsoFront],[redFiendTorsoFront]]));
+				var legsFront = new part('legsFront', chooseFrom([[syntheticLegFront],[redFiendLegFront]]), torso);
 				var headFront = new part('headFront', [syntheticHeadFront], torso);
 				var armUpper = new part('armUpper', [syntheticArmUpperLe, syntheticArmUpperRi], torso);
 				var armLower = new part('armLower', [syntheticArmLower], armUpper);

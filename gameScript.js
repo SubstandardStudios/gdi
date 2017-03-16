@@ -213,17 +213,17 @@ function part(type, img, parent) {//parent should be torso, unless you're using 
 	
 	if(this.type !== 'torsoFront')this.parent = parent;
 	
-	if(this.type === 'armUpper')this.imageRi = img[1];
+	if(this.type === 'armUpper' || this.type === 'armLower' || this.type === 'hand')this.imageRi = img[1];
 	
 	this.getPosition = function() {
 		if(this.type === 'torsoFront'){
-			this.x = 300 - this.width/2;
+			this.x = 300 - (((this.image.width/2)%2 === 0) ? this.image.width/2 : Math.round(this.image.width/2));
 			this.y = 300 - this.height/2;
 		}
 
 		else if(this.type === 'legsFront'){
-			this.x = parent.x;
-			this.y = parent.y + parent.width;
+			this.x = parent.x + (parent.width - this.width)/2;
+			this.y = parent.y + parent.height - 3;
 		}
 
 		else if(this.type === 'headFront'){
@@ -233,42 +233,42 @@ function part(type, img, parent) {//parent should be torso, unless you're using 
 
 		else if(this.type === 'armUpper'){
 			this.leftX = parent.x - this.width;
-			this.positionValueLeftX = 6;
+			this.positionValueLeftX = 0;
 
-			this.leftY = parent.y  - 6;
+			this.leftY = parent.y;
 
 			this.rightX = parent.x + parent.width;
-			this.positionValueRightX = -6;
+			this.positionValueRightX = 0;
 
-			this.rightY = parent.y - 6;
+			this.rightY = parent.y;
 		}
 		
 		else if(this.type === 'armLower'){
-			this.leftX = parent.leftX + parent.positionValueLeftX;
+			this.leftX = parent.leftX;
 			this.positionValueLeftX = 0;
 
 			this.leftY = parent.leftY + parent.height;
-			this.positionValueLeftY = -6;
+			this.positionValueLeftY = 0;
 
-			this.rightX = parent.rightX;
+			this.rightX = parent.rightX + parent.width - this.width;
 			this.positionValueRightX = 0;
 
 			this.rightY = parent.rightY + parent.height;
-			this.positionValueRightY = -6;
+			this.positionValueRightY = 0;
 		}
 
 		else if(this.type === 'hand'){
-			this.leftX = parent.leftX;
+			this.leftX = parent.leftX + (parent.width - this.width)/2;
 			this.positionValueLeftX = parent.positionValueLeftX;
 
 			this.leftY = parent.leftY + parent.height;
-			this.positionValueLeftY = -9;
+			this.positionValueLeftY = 0;
 
 			this.rightX = parent.rightX;
-			this.positionValueRightX = 0;
+			this.positionValueRightX = 0 + (parent.width - this.width)/2;
 
 			this.rightY = parent.rightY + parent.height;
-			this.positionValueRightY = -9;
+			this.positionValueRightY = 0;
 		}
 	}
 	
@@ -286,7 +286,7 @@ function part(type, img, parent) {//parent should be torso, unless you're using 
 		}
 		else{
 			if(drawLeft)canvasContext.drawImage(this.image, this.leftX + this.positionValueLeftX, this.leftY + this.positionValueLeftY);
-			if(drawRight)canvasContext.drawImage(this.image, this.rightX + this.positionValueRightX, this.rightY + this.positionValueRightY);
+			if(drawRight)canvasContext.drawImage(this.imageRi, this.rightX + this.positionValueRightX, this.rightY + this.positionValueRightY);
 		}
 	}
 	
@@ -380,11 +380,17 @@ function gameLoad(ctx, cnv){
 	var syntheticArmUpperLe = new Image();
 	syntheticArmUpperLe.src = 'imgs/ArmUpperLeftSynthetic.gif';//'http://piskel-imgstore-b.appspot.com/img/502b9d1e-0533-11e7-978a-59d2b040d17b.gif';
 	
-	var syntheticHand = new Image();
-	syntheticHand.src = 'imgs/HandSynthetic.gif';//'http://piskel-imgstore-b.appspot.com/img/1b55b091-05a1-11e7-925b-1756e446e1a5.gif';
+	var syntheticHandLeft = new Image();
+	syntheticHandLeft.src = 'imgs/HandLeftSynthetic.gif';//'http://piskel-imgstore-b.appspot.com/img/1b55b091-05a1-11e7-925b-1756e446e1a5.gif';
+	
+	var syntheticHandRight = new Image();
+	syntheticHandRight.src = 'imgs/HandRightSynthetic.gif';
 	
 	var syntheticTorsoFront = new Image();
 	syntheticTorsoFront.src = 'imgs/TorsoFrontSynthetic.gif';//'http://piskel-imgstore-b.appspot.com/img/e8a45987-0516-11e7-9191-4f4fc7e31569.gif';
+	
+	var syntheticTorsoFront2 = new Image();
+	syntheticTorsoFront2.src = 'imgs/TorsoFrontSynthetic2.gif'
 	
 	var syntheticHeadFront = new Image();
 	syntheticHeadFront.src = 'imgs/HeadFrontSynthetic.gif';//'http://piskel-imgstore-b.appspot.com/img/0d64b930-0449-11e7-96b2-9d214acfe1e9.gif';
@@ -424,8 +430,7 @@ function gameLoad(ctx, cnv){
 	
 	//End of Riley's Fiend Playermodel Images
 	
-	
-	var imagesInAnArray = [syntheticArmLower, syntheticArmUpperRi, syntheticHand, syntheticTorsoFront, syntheticHeadFront, syntheticLegFront];
+	var imagesInAnArray = [syntheticArmLower, syntheticArmUpperRi, syntheticHandLeft, syntheticHandRight, syntheticTorsoFront, syntheticTorsoFront2, syntheticHeadFront, syntheticLegFront, redFiendArmLowerRi, redFiendArmLowerLe, redFiendArmUpperRi, redFiendHandRi, redFiendHandLe, redFiendTorsoFront, redFiendHeadFront, redFiendLegFront];
 	
 	var imgs = imagesInAnArray, len = imgs.length, counter = 0;
 
@@ -436,14 +441,27 @@ function gameLoad(ctx, cnv){
 		function incrementCounter() {
 			counter++;
 			if ( counter === len ) {
-				var torso = new part('torsoFront', chooseFrom([[syntheticTorsoFront],[redFiendTorsoFront]]));
-				var legsFront = new part('legsFront', chooseFrom([[syntheticLegFront],[redFiendLegFront]]), torso);
-				var headFront = new part('headFront', [syntheticHeadFront], torso);
-				var armUpper = new part('armUpper', [syntheticArmUpperLe, syntheticArmUpperRi], torso);
-				var armLower = new part('armLower', [syntheticArmLower], armUpper);
-				var hand = new part('hand', [syntheticHand], armLower);
+				var whichType = chooseFrom(['fiend', 'syntheticHuman']);
 				
-				player = new character([headFront, hand, armLower, armUpper, torso, legsFront]);
+				if(whichType === 'syntheticHuman'){
+					var torso = new part('torsoFront', chooseFrom([[syntheticTorsoFront],[syntheticTorsoFront2]]));
+					var legsFront = new part('legsFront', [syntheticLegFront], torso);
+					var headFront = new part('headFront', [syntheticHeadFront], torso);
+					var armUpper = new part('armUpper', [syntheticArmUpperLe, syntheticArmUpperRi], torso);
+					var armLower = new part('armLower', [syntheticArmLower, syntheticArmLower], armUpper);
+					var hand = new part('hand', [syntheticHandLeft, syntheticHandRight], armLower);
+				}
+				
+				else if(whichType === 'fiend'){
+					var torso = new part('torsoFront', [redFiendTorsoFront]);
+					var legsFront = new part('legsFront', [redFiendLegFront], torso);
+					var headFront = new part('headFront', [redFiendHeadFront], torso);
+					var armUpper = new part('armUpper', [redFiendArmUpperLe, redFiendArmUpperRi], torso);
+					var armLower = new part('armLower', [redFiendArmLowerLe, redFiendArmLowerRi], armUpper);
+					var hand = new part('hand', [redFiendHandLe, redFiendHandRi], armLower);
+				}
+					
+				player = new character([headFront, hand, armLower, armUpper, legsFront, torso]);
 				
 				gameUpdate(ctx, cnv);
 			}

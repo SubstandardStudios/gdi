@@ -290,10 +290,10 @@ function part(type, img, parent) {//parent should be torso, unless you're using 
 		}
 	}
 	
-	this.drawRotated = function(fromX, fromY, rotateby, drawLeft, drawRight, canvasContext){
-		if(this.type === 'armUpper'){
-			drawRotatedFromCenter(rotateby, this.imageRi, canvasContext, fromX, fromY, this.rightX, this.rightY);
-			drawRotatedFromCenter(rotateby, this.image, canvasContext, fromX, fromY, this.leftX, this.leftY);
+	this.drawRotated = function(fromX, fromY, rotateby, xWhere, yWhere, drawLeft, drawRight, canvasContext){
+		if(this.type === 'armUpper' || this.type === 'hand' || this.type === 'armLower'){
+			if(drawLeft)drawRotatedFromCenter(rotateby, this.imageRi, canvasContext, fromX, fromY, xWhere, yWhere);
+			if(drawRight)drawRotatedFromCenter(rotateby, this.image, canvasContext, fromX, fromY, xWhere, yWhere);
 		}
 		/*
 		 if(element.type === 'armLower'){
@@ -306,10 +306,6 @@ function part(type, img, parent) {//parent should be torso, unless you're using 
 			drawRotatedFromCenter(counter, element.image, canvasContext, parent.parent.rightX, parent.parent.rightY, parent.parent.leftX - element.leftX, parent.parent.leftY - element.leftY);
 		}
 		*/
-		else if(this.type === 'hand' || this.type === 'armLower'){
-			drawRotatedFromCenter(rotateby, this.image, canvasContext, fromX, fromY, parent.leftX, parent.leftY);
-			drawRotatedFromCenter(rotateby, this.image, canvasContext, fromX, fromY, parent.rightX, parent.rightY);
-		}
 		
 		else drawRotatedFromCenter(rotateby, this.image, canvasContext, fromX, fromY, parent.X, parent.Y);
 	}
@@ -335,14 +331,23 @@ function character(parts){
 		
 		else if(animation === 'wave'){
 			
+			var rotationAmount;// This will be an integer that we will use to rotate the arm.
+			
+			if(counter < 30){//If the counter is above 30, then we are still moving the arm into place.
+				rotationAmount = (counter*3) + 90;
+				//console.log(rotationAmount);
+			}
+			else rotationAmount = -180;
+			
 			parts.forEach(function(element){
 				if(element.type === 'armUpper' || element.type === 'armLower' || element.type === 'hand'){
-					if(element.type === 'armUpper')element.drawRotated(0, 0, counter, false, true, canvasContext);
+					if(element.type === 'armUpper')element.drawRotated(element.rightX + element.width/2, element.rightY + element.height/2, rotationAmount, 0, 0, false, true, canvasContext);
+					else if(element.type === 'armLower')element.drawRotated(parent.rightX + parent.width/2, parent.rightY + parent.height/2, rotationAmount, 0, 0, false, true, canvasContext)
 				}
 				element.draw(true, false, canvasContext);
 			});
 
-			if(counter === 0)this.animationType = 'none';
+			if(counter === 50)this.animationType = 'none';
 			
 		}
 		
@@ -473,13 +478,13 @@ function gameUpdate(ctx, cnv){
 	ctx.clearRect(0, 0, cnv.width, cnv.height);
 	
 	if(!(canvasListenerOut)){
-		cnv.addEventListener('click', function(){player.animationType = 'wave';animationCounter = 50;});
+		cnv.addEventListener('click', function(){player.animationType = 'wave';animationCounter = 0;});
 		canvasListenerOut = true;
 	}
 	
 	player.drawAll(player.animationType, animationCounter, ctx);
 	
-	if(animationCounter !== 0)animationCounter--;
+	if(animationCounter < 51)animationCounter++;
 	
 	setTimeout(function(){gameUpdate(ctx, cnv);}, 50);
 }

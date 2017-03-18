@@ -356,6 +356,38 @@ function character(parts){
 	
 }
 
+function tile(image, x, y){
+	
+	ctx.drawImage(image, 0, 0)
+	
+	this.image = image;
+	
+	this.image.height = 32;
+	this.image.width = 32
+	
+	this.x = x;
+	this.y = y;
+	
+	this.draw = function(canvasContext){
+		canvasContext.drawImage(this.image, this.x, this.y)
+	}
+}
+
+function gameMap(tileImage1, tileImage2, size){
+	
+	this.tileImage1 = tileImage1;
+	this.tileImage2 = tileImage2;
+	
+	this.makeTiles = function(canvasContext){
+		for(var columns = 0; columns < size; columns++){
+			for(var rows = 0; rows < size; rows++){
+				var newTile = new tile((Math.round(Math.random()*5) !== 1) ? this.tileImage1 : this.tileImage2, rows*32, columns*32);
+				newTile.draw(canvasContext);
+			}
+		}
+	}
+}
+
 //End of assisting functions section! :D
 
 
@@ -431,11 +463,17 @@ function gameLoad(ctx, cnv){
 	
 	var redFiendLegFront =   new Image();
 	redFiendLegFront.src =   'imgs/Hell_Dweller_Jeans_Legs_Front.gif';
-	
-	
 	//End of Riley's Fiend Playermodel Images
 	
-	var imagesInAnArray = [syntheticArmLower, syntheticArmUpperRi, syntheticHandLeft, syntheticHandRight, syntheticTorsoFront, syntheticTorsoFront2, syntheticHeadFront, syntheticLegFront, redFiendArmLowerRi, redFiendArmLowerLe, redFiendArmUpperRi, redFiendHandRi, redFiendHandLe, redFiendTorsoFront, redFiendHeadFront, redFiendLegFront];
+	//Start of Riley's amazing tile images
+	var hellTerrain0 = new Image();
+	hellTerrain0.src = 'imgs/Hell_Terrain_1.gif';
+	
+	var magmaTerrain0 = new Image();
+	magmaTerrain0.src = 'imgs/Magma_Terrain_1.gif';
+	//End of Riley's amazing tile images
+	
+	var imagesInAnArray = [hellTerrain0, magmaTerrain0, syntheticArmLower, syntheticArmUpperRi, syntheticHandLeft, syntheticHandRight, syntheticTorsoFront, syntheticTorsoFront2, syntheticHeadFront, syntheticLegFront, redFiendArmLowerRi, redFiendArmLowerLe, redFiendArmUpperRi, redFiendHandRi, redFiendHandLe, redFiendTorsoFront, redFiendHeadFront, redFiendLegFront];
 	
 	var imgs = imagesInAnArray, len = imgs.length, counter = 0;
 
@@ -465,8 +503,10 @@ function gameLoad(ctx, cnv){
 					var armLower = new part('armLower', [redFiendArmLowerLe, redFiendArmLowerRi], armUpper);
 					var hand = new part('hand', [redFiendHandLe, redFiendHandRi], armLower);
 				}
-					
+				
 				player = new character([headFront, hand, armLower, armUpper, legsFront, torso]);
+				
+				worldMap = new gameMap(hellTerrain0, magmaTerrain0, 18);
 				
 				gameUpdate(ctx, cnv);
 			}
@@ -482,6 +522,7 @@ function gameUpdate(ctx, cnv){
 		canvasListenerOut = true;
 	}
 	
+	worldMap.makeTiles(ctx);
 	player.drawAll(player.animationType, animationCounter, ctx);
 	
 	if(animationCounter < 51)animationCounter++;

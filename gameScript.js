@@ -378,13 +378,26 @@ function gameMap(tileImage1, tileImage2, size){
 	this.tileImage1 = tileImage1;
 	this.tileImage2 = tileImage2;
 	
-	this.makeTiles = function(canvasContext){
+	this.arrayForMap = [];
+	
+	this.makeTiles = function(){
 		for(var columns = 0; columns < size; columns++){
+			this.arrayForMap.push([])
 			for(var rows = 0; rows < size; rows++){
 				var newTile = new tile((Math.round(Math.random()*5) !== 1) ? this.tileImage1 : this.tileImage2, rows*32, columns*32);
-				newTile.draw(canvasContext);
+				this.arrayForMap[columns].push(newTile);
 			}
 		}
+	}
+	
+	this.makeTiles();
+	
+	this.drawTiles = function(canvasContext){
+		this.arrayForMap.forEach(function(element){
+			element.forEach(function(element){
+				element.draw(canvasContext);
+			});
+		});
 	}
 }
 
@@ -522,7 +535,7 @@ function gameUpdate(ctx, cnv){
 		canvasListenerOut = true;
 	}
 	
-	worldMap.makeTiles(ctx);
+	worldMap.drawTiles(ctx);
 	player.drawAll(player.animationType, animationCounter, ctx);
 	
 	if(animationCounter < 51)animationCounter++;

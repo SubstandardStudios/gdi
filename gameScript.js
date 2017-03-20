@@ -358,18 +358,18 @@ function character(parts){
 
 function tile(image, x, y){
 	
-	ctx.drawImage(image, 0, 0)
+	ctx.drawImage(image, 0, 0);
 	
 	this.image = image;
 	
-	this.image.height = 32;
-	this.image.width = 32
+	this.image.height = 25;
+	this.image.width = 25;
 	
 	this.x = x;
 	this.y = y;
 	
 	this.draw = function(canvasContext){
-		canvasContext.drawImage(this.image, this.x, this.y)
+		canvasContext.drawImage(this.image, this.x, this.y);
 	}
 }
 
@@ -382,9 +382,9 @@ function gameMap(tileImage1, tileImage2, size){
 	
 	this.makeTiles = function(){
 		for(var columns = 0; columns < size; columns++){
-			this.arrayForMap.push([])
+			this.arrayForMap.push([]);
 			for(var rows = 0; rows < size; rows++){
-				var newTile = new tile((Math.round(Math.random()*5) !== 1) ? this.tileImage1 : this.tileImage2, rows*32, columns*32);
+				var newTile = new tile((Math.round(Math.random()*15) !== 1) ? this.tileImage1 : this.tileImage2, rows*25, columns*25);
 				this.arrayForMap[columns].push(newTile);
 			}
 		}
@@ -519,7 +519,7 @@ function gameLoad(ctx, cnv){
 				
 				player = new character([headFront, hand, armLower, armUpper, legsFront, torso]);
 				
-				worldMap = new gameMap(hellTerrain0, magmaTerrain0, 18);
+				worldMap = new gameMap(hellTerrain0, magmaTerrain0, 24);
 				
 				gameUpdate(ctx, cnv);
 			}

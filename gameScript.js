@@ -384,7 +384,7 @@ function gameMap(tileImage1, tileImage2, size){
 		for(var columns = 0; columns < size; columns++){
 			this.arrayForMap.push([]);
 			for(var rows = 0; rows < size; rows++){
-				var newTile = new tile((Math.round(Math.random()*15) !== 1) ? this.tileImage1 : this.tileImage2, rows*25, columns*25);
+				var newTile = new tile((Math.round(Math.random()*100) !== 1) ? this.tileImage1 : this.tileImage2, rows*25, columns*25);
 				this.arrayForMap[columns].push(newTile);
 			}
 		}
@@ -421,72 +421,75 @@ function gameLoad(ctx, cnv){
 	var allLoaded = false;
 	
 	//Cedric's basic playermodel images
-	var syntheticArmLower = new Image();
-	syntheticArmLower.src = 'imgs/ArmLowerSynthetic.gif';//'http://piskel-imgstore-b.appspot.com/img/c46121f0-0449-11e7-80d2-9d214acfe1e9.gif'
+	var syntheticArmLowerLeft = new Image();
+	syntheticArmLowerLeft.src = 'imgs/Sprites/Synthetic/ArmLowerLeftSynthetic.gif';//'http://piskel-imgstore-b.appspot.com/img/c46121f0-0449-11e7-80d2-9d214acfe1e9.gif'
+	
+	var syntheticArmLowerRight = new Image();
+	syntheticArmLowerRight.src = 'imgs/Sprites/Synthetic/ArmLowerRightSynthetic.gif';//'http://piskel-imgstore-b.appspot.com/img/c46121f0-0449-11e7-80d2-9d214acfe1e9.gif'
 	
 	var syntheticArmUpperRi = new Image();
-	syntheticArmUpperRi.src = 'imgs/ArmUpperRightSynthetic.gif';
+	syntheticArmUpperRi.src = 'imgs/Sprites/Synthetic/ArmUpperRightSynthetic.gif';
 	
 	var syntheticArmUpperLe = new Image();
-	syntheticArmUpperLe.src = 'imgs/ArmUpperLeftSynthetic.gif';//'http://piskel-imgstore-b.appspot.com/img/502b9d1e-0533-11e7-978a-59d2b040d17b.gif';
+	syntheticArmUpperLe.src = 'imgs/Sprites/Synthetic/ArmUpperLeftSynthetic.gif';//'http://piskel-imgstore-b.appspot.com/img/502b9d1e-0533-11e7-978a-59d2b040d17b.gif';
 	
 	var syntheticHandLeft = new Image();
-	syntheticHandLeft.src = 'imgs/HandLeftSynthetic.gif';//'http://piskel-imgstore-b.appspot.com/img/1b55b091-05a1-11e7-925b-1756e446e1a5.gif';
+	syntheticHandLeft.src = 'imgs/Sprites/Synthetic/handSynthetic.gif';//'http://piskel-imgstore-b.appspot.com/img/1b55b091-05a1-11e7-925b-1756e446e1a5.gif';
 	
 	var syntheticHandRight = new Image();
-	syntheticHandRight.src = 'imgs/HandRightSynthetic.gif';
+	syntheticHandRight.src = 'imgs/Sprites/Synthetic/handSynthetic.gif';
 	
 	var syntheticTorsoFront = new Image();
-	syntheticTorsoFront.src = 'imgs/TorsoFrontSynthetic.gif';//'http://piskel-imgstore-b.appspot.com/img/e8a45987-0516-11e7-9191-4f4fc7e31569.gif';
+	syntheticTorsoFront.src = 'imgs/Sprites/Synthetic/TorsoFrontSynthetic.gif';//'http://piskel-imgstore-b.appspot.com/img/e8a45987-0516-11e7-9191-4f4fc7e31569.gif';
 	
 	var syntheticTorsoFront2 = new Image();
-	syntheticTorsoFront2.src = 'imgs/TorsoFrontSynthetic2.gif'
+	syntheticTorsoFront2.src = 'imgs/Sprites/Synthetic/TorsoFrontSynthetic2.gif'
 	
 	var syntheticHeadFront = new Image();
-	syntheticHeadFront.src = 'imgs/HeadFrontSynthetic.gif';//'http://piskel-imgstore-b.appspot.com/img/0d64b930-0449-11e7-96b2-9d214acfe1e9.gif';
+	syntheticHeadFront.src = 'imgs/Sprites/Synthetic/HeadFrontSynthetic.gif';//'http://piskel-imgstore-b.appspot.com/img/0d64b930-0449-11e7-96b2-9d214acfe1e9.gif';
 	
 	var syntheticLegFront = new Image();
-	syntheticLegFront.src = 'imgs/LegsFrontSynthetic.gif';//'http://piskel-imgstore-b.appspot.com/img/220fea1c-0449-11e7-b65f-9d214acfe1e9.gif';
+	syntheticLegFront.src = 'imgs/Sprites/Synthetic/LegsFrontSynthetic.gif';//'http://piskel-imgstore-b.appspot.com/img/220fea1c-0449-11e7-b65f-9d214acfe1e9.gif';
 	//End of Cedric's playermodels
 	
 	//Beginning of Riley's Fiend Playermodel Images
 	var redFiendArmLowerRi = new Image();
-	redFiendArmLowerRi.src = 'imgs/Red_Fiend_Arm_Lower_Right.gif';
+	redFiendArmLowerRi.src = 'imgs/Sprites/Fiend/Red_Fiend_Arm_Lower_Right.gif';
 	
 	var redFiendArmLowerLe = new Image();
-	redFiendArmLowerLe.src = 'imgs/Red_Fiend_Arm_Lower_Left.gif';
+	redFiendArmLowerLe.src = 'imgs/Sprites/Fiend/Red_Fiend_Arm_Lower_Left.gif';
 	
 	var redFiendArmUpperRi = new Image();
-	redFiendArmUpperRi.src = 'imgs/Fiend_Shoulder_Right.gif';
+	redFiendArmUpperRi.src = 'imgs/Sprites/Fiend/Fiend_Shoulder_Right.gif';
 	
 	var redFiendArmUpperLe = new Image();
-	redFiendArmUpperLe.src = 'imgs/Fiend_Shoulder_Left.gif';
+	redFiendArmUpperLe.src = 'imgs/Sprites/Fiend/Fiend_Shoulder_Left.gif';
 	
 	var redFiendHandRi =     new Image();
-	redFiendHandRi.src =     'imgs/Red_Fiend_Hand_Right.gif';
+	redFiendHandRi.src =     'imgs/Sprites/Fiend/Red_Fiend_Hand_Right.gif';
 	
 	var redFiendHandLe =     new Image();
-	redFiendHandLe.src =     'imgs/Red_Fiend_Hand_Left.gif';
+	redFiendHandLe.src =     'imgs/Sprites/Fiend/Red_Fiend_Hand_Left.gif';
 	
 	var redFiendTorsoFront = new Image();
-	redFiendTorsoFront.src = 'imgs/Red_Fiend_Torso_Front.gif';
+	redFiendTorsoFront.src = 'imgs/Sprites/Fiend/Red_Fiend_Torso_Front.gif';
 	
 	var redFiendHeadFront =  new Image();
-	redFiendHeadFront.src =  'imgs/Red_Fiend_Head.gif';
+	redFiendHeadFront.src =  'imgs/Sprites/Fiend/Red_Fiend_Head.gif';
 	
 	var redFiendLegFront =   new Image();
-	redFiendLegFront.src =   'imgs/Hell_Dweller_Jeans_Legs_Front.gif';
+	redFiendLegFront.src =   'imgs/Sprites/Fiend/Hell_Dweller_Jeans_Legs_Front.gif';
 	//End of Riley's Fiend Playermodel Images
 	
 	//Start of Riley's amazing tile images
 	var hellTerrain0 = new Image();
-	hellTerrain0.src = 'imgs/Hell_Terrain_1.gif';
+	hellTerrain0.src = 'imgs/Tiles/Hell_Terrain_1.gif';
 	
 	var magmaTerrain0 = new Image();
-	magmaTerrain0.src = 'imgs/Magma_Terrain_1.gif';
+	magmaTerrain0.src = 'imgs/Tiles/Magma_Terrain_1.gif';
 	//End of Riley's amazing tile images
 	
-	var imagesInAnArray = [hellTerrain0, magmaTerrain0, syntheticArmLower, syntheticArmUpperRi, syntheticHandLeft, syntheticHandRight, syntheticTorsoFront, syntheticTorsoFront2, syntheticHeadFront, syntheticLegFront, redFiendArmLowerRi, redFiendArmLowerLe, redFiendArmUpperRi, redFiendHandRi, redFiendHandLe, redFiendTorsoFront, redFiendHeadFront, redFiendLegFront];
+	var imagesInAnArray = [hellTerrain0, magmaTerrain0, syntheticArmLowerLeft, syntheticArmLowerRight, syntheticArmUpperRi, syntheticHandLeft, syntheticHandRight, syntheticTorsoFront, syntheticTorsoFront2, syntheticHeadFront, syntheticLegFront, redFiendArmLowerRi, redFiendArmLowerLe, redFiendArmUpperRi, redFiendHandRi, redFiendHandLe, redFiendTorsoFront, redFiendHeadFront, redFiendLegFront];
 	
 	var imgs = imagesInAnArray, len = imgs.length, counter = 0;
 
@@ -504,7 +507,7 @@ function gameLoad(ctx, cnv){
 					var legsFront = new part('legsFront', [syntheticLegFront], torso);
 					var headFront = new part('headFront', [syntheticHeadFront], torso);
 					var armUpper = new part('armUpper', [syntheticArmUpperLe, syntheticArmUpperRi], torso);
-					var armLower = new part('armLower', [syntheticArmLower, syntheticArmLower], armUpper);
+					var armLower = new part('armLower', [syntheticArmLowerLeft, syntheticArmLowerRight], armUpper);
 					var hand = new part('hand', [syntheticHandLeft, syntheticHandRight], armLower);
 				}
 				
@@ -519,7 +522,7 @@ function gameLoad(ctx, cnv){
 				
 				player = new character([headFront, hand, armLower, armUpper, legsFront, torso]);
 				
-				worldMap = new gameMap(hellTerrain0, magmaTerrain0, 24);
+				worldMap = new gameMap(magmaTerrain0, hellTerrain0, 24);
 				
 				gameUpdate(ctx, cnv);
 			}

@@ -258,14 +258,14 @@ function part(type, img, parent) {//parent should be torso, unless you're using 
 		}
 
 		else if(this.type === 'hand'){
-			this.leftX = parent.leftX + (parent.width - this.width)/2;
-			this.positionValueLeftX = parent.positionValueLeftX;
+			this.leftX = parent.leftX;
+			this.positionValueLeftX = 0;
 
 			this.leftY = parent.leftY + parent.height;
 			this.positionValueLeftY = 0;
 
-			this.rightX = parent.rightX;
-			this.positionValueRightX = 0 + (parent.width - this.width)/2;
+			this.rightX = parent.rightX + parent.width - this.width;
+			this.positionValueRightX = 0;
 
 			this.rightY = parent.rightY + parent.height;
 			this.positionValueRightY = 0;
@@ -380,11 +380,38 @@ function gameMap(tileImage1, tileImage2, size){
 	
 	this.arrayForMap = [];
 	
+	this.addIsland = function(x,y){
+		var storedTile = this.arrayForMap[y][x];
+		
+		this.arrayForMap[y][x] = new tile(this.tileImage2, storedTile.x, storedTile.y);
+		
+		this.addThis = function(counter, changeXOrY, addToCounter, addToX){
+			if(changeXOrY)storedTile = this.arrayForMap[y][x-counter];
+			else storedTile = this.arrayForMap[y-counter][x+addToX];
+			
+			if(changeXOrY){
+				this.arrayForMap[y][x-counter] = new tile(this.tileImage2, storedTile.x, storedTile.y);
+				this.addThis(1, false, 1, counter);
+				this.addThis(-1, false, -1, counter);
+			}
+			
+			else this.arrayForMap[y-counter][x+addToX] = new tile(this.tileImage2, storedTile.x, storedTile.y);
+			
+			if(Math.round(Math.random()*Math.abs(counter)) === 1)this.addThis(counter+addToCounter, changeXOrY, addToCounter, addToX);
+		}
+		
+		this.addThis(1, true, 1, 0);
+		this.addThis(1, false, 1, 0);
+		this.addThis(-1, true, -1, 0);
+		this.addThis(-1, false, -1, 0)
+		
+	}
+	
 	this.makeTiles = function(){
 		for(var columns = 0; columns < size; columns++){
 			this.arrayForMap.push([]);
 			for(var rows = 0; rows < size; rows++){
-				var newTile = new tile((Math.round(Math.random()*100) !== 1) ? this.tileImage1 : this.tileImage2, rows*25, columns*25);
+				var newTile = new tile(this.tileImage1, rows*25, columns*25);//var newTile = new tile((Math.round(Math.random()*100) !== 1) ? this.tileImage1 : this.tileImage2, rows*25, columns*25);
 				this.arrayForMap[columns].push(newTile);
 			}
 		}
@@ -500,10 +527,10 @@ function gameLoad(ctx, cnv){
 		function incrementCounter() {
 			counter++;
 			if ( counter === len ) {
-				var whichType = chooseFrom(['fiend', 'syntheticHuman']);
+				var whichType = 'syntheticHuman';//var whichType = chooseFrom(['fiend', 'syntheticHuman']);
 				
 				if(whichType === 'syntheticHuman'){
-					var torso = new part('torsoFront', chooseFrom([[syntheticTorsoFront],[syntheticTorsoFront2]]));
+					var torso = new part('torsoFront', [syntheticTorsoFront]);//var torso = new part('torsoFront', chooseFrom([[syntheticTorsoFront],[syntheticTorsoFront2]]));
 					var legsFront = new part('legsFront', [syntheticLegFront], torso);
 					var headFront = new part('headFront', [syntheticHeadFront], torso);
 					var armUpper = new part('armUpper', [syntheticArmUpperLe, syntheticArmUpperRi], torso);
@@ -523,6 +550,7 @@ function gameLoad(ctx, cnv){
 				player = new character([headFront, hand, armLower, armUpper, legsFront, torso]);
 				
 				worldMap = new gameMap(magmaTerrain0, hellTerrain0, 24);
+				worldMap.addIsland(12, 12);
 				
 				gameUpdate(ctx, cnv);
 			}

@@ -380,7 +380,7 @@ function gameMap(tileImage1, tileImage2, size){
 	
 	this.arrayForMap = [];
 	
-	this.addIsland = function(x,y){
+	this.addIsland = function(x, y, size){
 		var storedTile = this.arrayForMap[y][x];
 		
 		this.arrayForMap[y][x] = new tile(this.tileImage2, storedTile.x, storedTile.y);
@@ -397,7 +397,9 @@ function gameMap(tileImage1, tileImage2, size){
 			
 			else this.arrayForMap[y-counter][x+addToX] = new tile(this.tileImage2, storedTile.x, storedTile.y);
 			
-			if(Math.round(Math.random()*Math.abs(counter)) === 1)this.addThis(counter+addToCounter, changeXOrY, addToCounter, addToX);
+			console.log(Math.round(Math.random()*Math.abs(counter)))
+			
+			if(Math.round(Math.random()*Math.abs(counter)) < 1*size)this.addThis(counter+addToCounter, changeXOrY, addToCounter, addToX);
 		}
 		
 		this.addThis(1, true, 1, 0);
@@ -550,7 +552,7 @@ function gameLoad(ctx, cnv){
 				player = new character([headFront, hand, armLower, armUpper, legsFront, torso]);
 				
 				worldMap = new gameMap(magmaTerrain0, hellTerrain0, 24);
-				worldMap.addIsland(12, 12);
+				worldMap.addIsland(12, 12, 5);
 				
 				gameUpdate(ctx, cnv);
 			}

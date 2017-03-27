@@ -397,8 +397,6 @@ function gameMap(tileImage1, tileImage2, size){
 			
 			else this.arrayForMap[y-counter][x+addToX] = new tile(this.tileImage2, storedTile.x, storedTile.y);
 			
-			console.log(Math.round(Math.random()*Math.abs(counter)))
-			
 			if(Math.round(Math.random()*Math.abs(counter)) < 1*size)this.addThis(counter+addToCounter, changeXOrY, addToCounter, addToX);
 		}
 		

@@ -6,7 +6,7 @@
     var old = console.log;
     var logger = document.getElementById('log');
     console.log = function () {
-      for (var i = 0; i < arguments.length; i++) {
+		for (var i = 0; i < arguments.length; i++) {
         if (typeof arguments[i] == 'object') {
             logger.innerHTML += (JSON && JSON.stringify ? JSON.stringify(arguments[i], undefined, 2) : arguments[i]) + '<br />';
         } else {
@@ -120,6 +120,10 @@ function drawRotatedFromCenter(degrees, image, context, axisX, axisY, positionX,
 	
     // we’re done with the rotating so restore the unrotated context
     context.restore();
+}
+
+function fillArrayUpTo(anArray, upTo, filler){//The purpose of this function is to create an array full of empty arrays up to the specified number. This function is used in the map system.
+	while(anArray.length !== upTo)anArray.push(filler);
 }
 
 //End of function dictionary
@@ -372,6 +376,9 @@ function tile(image, x, y){
 		canvasContext.drawImage(this.image, this.x, this.y);
 	}
 }
+/*
+
+*/
 
 function gameMap(tileImage1, tileImage2, size){
 	
@@ -385,25 +392,43 @@ function gameMap(tileImage1, tileImage2, size){
 		
 		this.arrayForMap[y][x] = new tile(this.tileImage2, storedTile.x, storedTile.y);
 		
-		this.addThis = function(counter, changeXOrY, addToCounter, addToX){
-			if(changeXOrY)storedTile = this.arrayForMap[y][x-counter];
-			else storedTile = this.arrayForMap[y-counter][x+addToX];
+		this.addThis = function(counter, changeXOrY, addToCounter, makeX){
 			
 			if(changeXOrY){
-				this.arrayForMap[y][x-counter] = new tile(this.tileImage2, storedTile.x, storedTile.y);
-				this.addThis(1, false, 1, counter);
-				this.addThis(-1, false, -1, counter);
+				this.arrayForMap[y][x-counter] = new tile(this.tileImage2, (x-counter)*25, y*25);
+				this.addThis(1, false, 1, x-counter);
+				this.addThis(-1, false, -1, x-counter);
 			}
 			
-			else this.arrayForMap[y-counter][x+addToX] = new tile(this.tileImage2, storedTile.x, storedTile.y);
+			else{
+				if(typeof this.arrayForMap[y-counter] === 'undefined'){
+					console.log("Tile outside of bounds, instantiating new tile & row");
+					this.arrayForMap[y-counter] = [];
+					
+					fillArrayUpTo(this.arrayForMap[y-counter], makeX ? makeX : x, new tile(this.tileImage1, this.arrayForMap[y-counter].length, y-counter));
+					var i = 0;
+					
+					this.arrayForMap[y-counter].forEach(function(element){
+						i++;
+						element.x = i*25;
+					});
+					/*
+					for(var i =  makeX ? makeX : x - this.arrayForMap[y-counter].length; makeX ? makeX : x !== this.arrayForMap[y-counter].length;i++){
+						this.arrayForMap[y-counter].push(new tile(this.tileImage1, this.arrayForMap[y-counter].length, y-counter));
+					}*/
+					console.log(this.arrayForMap[y-counter]);
+				}
+				
+				this.arrayForMap[y-counter][makeX ? makeX : x] = new tile(this.tileImage2, (makeX ? makeX : x)*25, (y-counter)*25);
+			}
 			
-			if(Math.round(Math.random()*Math.abs(counter)) < 1*size)this.addThis(counter+addToCounter, changeXOrY, addToCounter, addToX);
+			if(Math.round(Math.random()*Math.abs(counter)) < 1*size)this.addThis(counter+addToCounter, changeXOrY, addToCounter, makeX);
 		}
 		
-		this.addThis(1, true, 1, 0);
-		this.addThis(1, false, 1, 0);
-		this.addThis(-1, true, -1, 0);
-		this.addThis(-1, false, -1, 0)
+		this.addThis(1, true, 1, false);
+		this.addThis(1, false, 1, false);
+		this.addThis(-1, true, -1, false);
+		this.addThis(-1, false, -1, false)
 		
 	}
 	
@@ -433,7 +458,7 @@ function gameMap(tileImage1, tileImage2, size){
 
 //MAIN FUNCTION FOR STARTING UP GAME ENGINE! :D
 function startGame(){
-	$('#canvasCan').html('<canvas id="gameCanvas" width="600" height="600">Your browser is too old: get a new one!</canvas>');
+	$('#canvasCan').html('<canvas id="gameCanvas" width="650" height="650">Your browser is too old: get a new one!</canvas>');
 	
 	var cnv = document.getElementById('gameCanvas');
 	var ctx = cnv.getContext('2d');

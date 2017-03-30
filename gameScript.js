@@ -460,11 +460,18 @@ function gameMap(tileImage1, tileImage2, size){
 	this.makeTiles();
 	
 	this.drawTiles = function(canvasContext){
+		for(var x = 0; x < this.x; x++){
+			for(var y = 0; y < this.y;y++){
+				this.arrayForMap[x][y].draw();
+			}
+		}
+		/*
 		this.arrayForMap.forEach(function(element){
 			element.forEach(function(element){
 				element.draw(canvasContext);
 			});
 		});
+		*/
 	}
 }
 

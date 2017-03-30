@@ -376,16 +376,32 @@ function tile(image, x, y){
 		canvasContext.drawImage(this.image, this.x, this.y);
 	}
 }
-/*
-
-*/
 
 function gameMap(tileImage1, tileImage2, size){
-	
 	this.tileImage1 = tileImage1;
 	this.tileImage2 = tileImage2;
 	
+	this.x = size;
+	this.y = size;
+	
 	this.arrayForMap = [];
+	
+	this.addColumn = function(front){
+		this.arrayForMap.push([])
+		for(var i = 0; i < this.y; i++){
+			if(front)this.arrayForMap[this.arrayForMap.length-1].push(new tile(this.tileImage1, this.x*25, i*25));
+			else if(!front)this.arrayForMap[this.arrayForMap.length-1].unshift(new tile(this.tileImage1, this.x*25, i*25));
+		}
+		this.x = this.x + 1;
+	}
+	
+	
+	this.addRow = function(front){
+		for(i = 0; i < this.arrayForMap.length;i++){
+			if(front)this.arrayForMap[i].push(new tile(this.tileImage1, i*25, this.arrayForMap[i].length*25));
+			else if(!front)this.arrayForMap[i].unshift(new tile(this.tileImage1, i*25, this.arrayForMap[i].length*25));
+		}
+	}
 	
 	this.addIsland = function(x, y, size){
 		var storedTile = this.arrayForMap[y][x];
@@ -402,21 +418,12 @@ function gameMap(tileImage1, tileImage2, size){
 			
 			else{
 				if(typeof this.arrayForMap[y-counter] === 'undefined'){
-					console.log("Tile outside of bounds, instantiating new tile & row");
-					this.arrayForMap[y-counter] = [];
+					//console.log("Tile outside of bounds, instantiating new tile & row");
 					
-					fillArrayUpTo(this.arrayForMap[y-counter], makeX ? makeX : x, new tile(this.tileImage1, this.arrayForMap[y-counter].length, y-counter));
-					var i = 0;
+					this.addRow(true);
+					this.addColumn(true);
 					
-					this.arrayForMap[y-counter].forEach(function(element){
-						i++;
-						element.x = i*25;
-					});
-					/*
-					for(var i =  makeX ? makeX : x - this.arrayForMap[y-counter].length; makeX ? makeX : x !== this.arrayForMap[y-counter].length;i++){
-						this.arrayForMap[y-counter].push(new tile(this.tileImage1, this.arrayForMap[y-counter].length, y-counter));
-					}*/
-					console.log(this.arrayForMap[y-counter]);
+					//console.log(this.arrayForMap[y-counter]);
 				}
 				
 				this.arrayForMap[y-counter][makeX ? makeX : x] = new tile(this.tileImage2, (makeX ? makeX : x)*25, (y-counter)*25);

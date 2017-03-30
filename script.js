@@ -301,8 +301,8 @@ function placeContent() {
 //END OF CHARACTER SELECTION SCREEN CODE!--------------------------------------------------------------------------------------------
 
 
-startUpdate();
-//startGame();
+//startUpdate();
+startGame();
 
 
 //          LIST OF COOL GOOGLE FONTS

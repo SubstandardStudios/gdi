@@ -401,6 +401,7 @@ function gameMap(tileImage1, tileImage2, size){
 			if(front)this.arrayForMap[i].push(new tile(this.tileImage1, i*25, this.arrayForMap[i].length*25));
 			else if(!front)this.arrayForMap[i].unshift(new tile(this.tileImage1, i*25, this.arrayForMap[i].length*25));
 		}
+		this.y = this.y+1;
 	}
 	
 	this.addIsland = function(x, y, size){
@@ -411,6 +412,7 @@ function gameMap(tileImage1, tileImage2, size){
 		this.addThis = function(counter, changeXOrY, addToCounter, makeX){
 			
 			if(changeXOrY){
+				if(x-counter > this.x)this.addRow();
 				this.arrayForMap[y][x-counter] = new tile(this.tileImage2, (x-counter)*25, y*25);
 				this.addThis(1, false, 1, x-counter);
 				this.addThis(-1, false, -1, x-counter);
@@ -418,12 +420,17 @@ function gameMap(tileImage1, tileImage2, size){
 			
 			else{
 				if(typeof this.arrayForMap[y-counter] === 'undefined'){
-					//console.log("Tile outside of bounds, instantiating new tile & row");
-					
-					this.addRow(true);
-					this.addColumn(true);
-					
-					//console.log(this.arrayForMap[y-counter]);
+					while(typeof this.arrayForMap[y-counter] === 'undefined'){
+						if(y-counter > 0){
+							this.addRow(true);
+							this.addColumn(true);
+						}
+						
+						else if(y-counter < 0){
+							this.addRow(false);
+							this.addColumn(false);
+						}
+					}
 				}
 				
 				this.arrayForMap[y-counter][makeX ? makeX : x] = new tile(this.tileImage2, (makeX ? makeX : x)*25, (y-counter)*25);

@@ -419,20 +419,21 @@ function gameMap(tileImage1, tileImage2, size){
 			}
 			
 			else{
-				if(typeof this.arrayForMap[y-counter] === 'undefined'){
-					while(typeof this.arrayForMap[y-counter] === 'undefined'){
-						if(y-counter > 0){
-							this.addRow(true);
-							this.addColumn(true);
-						}
-						
-						else if(y-counter < 0){
-							this.addRow(false);
-							this.addColumn(false);
-						}
+				this.addSome = function(){
+					if(y-counter > 0){
+						this.addRow(true);
+						this.addColumn(true);
 					}
+					
+					else if(y-counter < 0){
+						this.addRow(false);
+						this.addColumn(false);
+					}
+					if(typeof this.arrayForMap[y-counter] === 'undefined')this.addSome();
 				}
 				
+				if(typeof this.arrayForMap[y-counter] === 'undefined')this.addSome()
+			
 				this.arrayForMap[y-counter][makeX ? makeX : x] = new tile(this.tileImage2, (makeX ? makeX : x)*25, (y-counter)*25);
 			}
 			

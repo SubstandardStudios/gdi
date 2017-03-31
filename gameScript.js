@@ -448,11 +448,11 @@ function gameMap(tileImage1, tileImage2, size){
 	}
 	
 	this.makeTiles = function(){
-		for(var columns = 0; columns < size; columns++){
+		for(var rows = 0; rows < size; rows++){
 			this.arrayForMap.push([]);
-			for(var rows = 0; rows < size; rows++){
+			for(var columns = 0; columns < size; columns++){
 				var newTile = new tile(this.tileImage1, rows*25, columns*25);//var newTile = new tile((Math.round(Math.random()*100) !== 1) ? this.tileImage1 : this.tileImage2, rows*25, columns*25);
-				this.arrayForMap[columns].push(newTile);
+				this.arrayForMap[rows].push(newTile);
 			}
 		}
 	}
@@ -460,13 +460,6 @@ function gameMap(tileImage1, tileImage2, size){
 	this.makeTiles();
 	
 	this.drawTiles = function(canvasContext){
-		/*
-		for(var x = 0; x < this.x; x++){
-			for(var y = 0; y < this.y;y++){
-				this.arrayForMap[x][y].draw();
-			}
-		}
-		*/
 		this.arrayForMap.forEach(function(element){
 			element.forEach(function(element){
 				element.draw(canvasContext);

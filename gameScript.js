@@ -405,36 +405,36 @@ function gameMap(tileImage1, tileImage2, size){
 	}
 	
 	this.addIsland = function(x, y, size){
-		var storedTile = this.arrayForMap[y][x];
+		var storedTile = this.arrayForMap[x][y];
 		
-		this.arrayForMap[y][x] = new tile(this.tileImage2, storedTile.x, storedTile.y);
+		this.arrayForMap[x][y] = new tile(this.tileImage2, storedTile.x, storedTile.y);
 		
 		this.addThis = function(counter, changeXOrY, addToCounter, makeX){
 			
 			if(changeXOrY){
 				if(x-counter > this.x)this.addRow();
-				this.arrayForMap[y][x-counter] = new tile(this.tileImage2, (x-counter)*25, y*25);
+				this.arrayForMap[x-counter][y] = new tile(this.tileImage2, (x-counter)*25, y*25);
 				this.addThis(1, false, 1, x-counter);
 				this.addThis(-1, false, -1, x-counter);
 			}
 			
 			else{
 				this.addSome = function(){
-					if(y-counter > 0){
+					if(x-counter > 0){
 						this.addRow(true);
 						this.addColumn(true);
 					}
 					
-					else if(y-counter < 0){
+					else if(x-counter < 0){
 						this.addRow(false);
 						this.addColumn(false);
 					}
-					if(typeof this.arrayForMap[y-counter] === 'undefined')this.addSome();
+					if(typeof this.arrayForMap[x-counter] === 'undefined')this.addSome();
 				}
 				
-				if(typeof this.arrayForMap[y-counter] === 'undefined')this.addSome()
+				if(typeof this.arrayForMap[x-counter] === 'undefined')this.addSome()
 			
-				this.arrayForMap[y-counter][makeX ? makeX : x] = new tile(this.tileImage2, (makeX ? makeX : x)*25, (y-counter)*25);
+				this.arrayForMap[makeX ? makeX : x][y-counter] = new tile(this.tileImage2, (makeX ? makeX : x)*25, (y-counter)*25);
 			}
 			
 			if(Math.round(Math.random()*Math.abs(counter)) < 1*size)this.addThis(counter+addToCounter, changeXOrY, addToCounter, makeX);

@@ -386,17 +386,19 @@ function gameMap(tileImage1, tileImage2, size){
 	
 	this.arrayForMap = [];
 	
-	this.addColumn = function(front){
-		this.arrayForMap.push([])
+	this.addRow = function(front){
+		if(front)this.arrayForMap.push([]);
+		else if(!front)this.arrayForMap.unshift([]);
+		
 		for(var i = 0; i < this.y; i++){
 			if(front)this.arrayForMap[this.arrayForMap.length-1].push(new tile(this.tileImage1, this.x*25, i*25));
-			else if(!front)this.arrayForMap[this.arrayForMap.length-1].unshift(new tile(this.tileImage1, this.x*25, i*25));
+			else if(!front)this.arrayForMap[0].push(new tile(this.tileImage1, this.x*25, i*25));
 		}
 		this.x = this.x + 1;
 	}
 	
 	
-	this.addRow = function(front){
+	this.addColumn = function(front){
 		for(i = 0; i < this.arrayForMap.length;i++){
 			if(front)this.arrayForMap[i].push(new tile(this.tileImage1, i*25, this.arrayForMap[i].length*25));
 			else if(!front)this.arrayForMap[i].unshift(new tile(this.tileImage1, i*25, this.arrayForMap[i].length*25));
@@ -412,7 +414,7 @@ function gameMap(tileImage1, tileImage2, size){
 		this.addThis = function(counter, changeXOrY, addToCounter, makeX){
 			
 			if(changeXOrY){
-				if(x-counter > this.x)this.addRow();
+				if(x-counter > this.x)this.addRow(x-counter > 0 ? true : false);
 				this.arrayForMap[x-counter][y] = new tile(this.tileImage2, (x-counter)*25, y*25);
 				this.addThis(1, false, 1, x-counter);
 				this.addThis(-1, false, -1, x-counter);
@@ -420,15 +422,9 @@ function gameMap(tileImage1, tileImage2, size){
 			
 			else{
 				this.addSome = function(){
-					if(x-counter > 0){
-						this.addRow(true);
-						this.addColumn(true);
-					}
+					this.addRow(x-counter > 0 ? true : false);
+					this.addColumn(x-counter > 0 ? true : false);
 					
-					else if(x-counter < 0){
-						this.addRow(false);
-						this.addColumn(false);
-					}
 					if(typeof this.arrayForMap[x-counter] === 'undefined')this.addSome();
 				}
 				

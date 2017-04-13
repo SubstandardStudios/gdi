@@ -383,17 +383,17 @@ function gameMap(tileImage1, tileImage2, size){
 	this.addRow = function(x){
 		var fillUpTo = this.arrayForMap[0].length;
 		
-		this.arrayForMap.splice(x>0?x:0, 0, []);
+		this.arrayForMap.splice(x>-1?x:0, 0, []);
 		
 		for(var i = 0; i < fillUpTo; i++){
-			this.arrayForMap[x>0?x:0].push(new tile(this.tileImage1));
+			this.arrayForMap[x>-1?x:0].push(new tile(this.tileImage1));
 		}
 	}
 	
 	
 	this.addColumn = function(y){
 		for(i = 0; i < this.arrayForMap.length;i++){
-			this.arrayForMap[i].splice(y>0?y:0, 0, new tile(this.tileImage1, i*25, (y+1)*25));
+			this.arrayForMap[i].splice(y>-1?y:0, 0, new tile(this.tileImage1, i*25, (y+1)*25));
 		}
 	}
 	

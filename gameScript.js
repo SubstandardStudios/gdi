@@ -413,7 +413,7 @@ function gameMap(tileImage1, tileImage2, size){
 			}
 			
 			else{
-				if(typeof this.arrayForMap[0][y-counter] === 'undefined')this.addColumn(y-counter);
+				if(typeof this.arrayForMap[((makeX ? makeX : x) > 0 ? (makeX ? makeX : x) : 0)][y-counter] === 'undefined')this.addColumn(y-counter);
 				
 				this.arrayForMap[((makeX ? makeX : x) > 0 ? (makeX ? makeX : x) : 0)][y-counter] = new tile(this.tileImage2);
 			}

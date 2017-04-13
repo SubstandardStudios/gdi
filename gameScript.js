@@ -393,7 +393,7 @@ function gameMap(tileImage1, tileImage2, size){
 	
 	this.addColumn = function(y){
 		for(i = 0; i < this.arrayForMap.length;i++){
-			this.arrayForMap[i].splice(y>-1?y:0, 0, new tile(this.tileImage1, i*25, (y+1)*25));
+			this.arrayForMap[i].splice(y>-1?y:0, 0, new tile(this.tileImage1, i*25, y*25));
 		}
 	}
 	

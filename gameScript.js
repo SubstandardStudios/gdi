@@ -413,8 +413,8 @@ function gameMap(tileImage1, tileImage2, size){
 			}
 			
 			else{
-				if(typeof this.arrayForMap[((makeX ? makeX : x) > 0 ? (makeX ? makeX : x) : 0)][y-counter] === 'undefined')this.addColumn((makeX ? makeX : x));
-			
+				if(typeof this.arrayForMap[0][y-counter] === 'undefined')this.addColumn(y-counter);
+				
 				this.arrayForMap[((makeX ? makeX : x) > 0 ? (makeX ? makeX : x) : 0)][y-counter] = new tile(this.tileImage2);
 			}
 			
@@ -573,7 +573,7 @@ function gameLoad(ctx, cnv){
 				player = new character([headFront, hand, armLower, armUpper, legsFront, torso]);
 				
 				worldMap = new gameMap(magmaTerrain0, hellTerrain0, 24);
-				worldMap.addIsland(0, 0, 6);
+				worldMap.addIsland(12, 12, 6);
 				//worldMap.addColumn(5);
 				//worldMap.addRow(-1);
 				

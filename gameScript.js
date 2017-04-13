@@ -369,11 +369,8 @@ function tile(image, x, y){
 	this.image.height = 25;
 	this.image.width = 25;
 	
-	this.x = x;
-	this.y = y;
-	
-	this.draw = function(canvasContext){
-		canvasContext.drawImage(this.image, this.x, this.y);
+	this.draw = function(canvasContext, x, y){
+		canvasContext.drawImage(this.image, x, y);
 	}
 }
 
@@ -381,29 +378,23 @@ function gameMap(tileImage1, tileImage2, size){
 	this.tileImage1 = tileImage1;
 	this.tileImage2 = tileImage2;
 	
-	this.x = size;
-	this.y = size;
-	
 	this.arrayForMap = [];
 	
-	this.addRow = function(front){
-		if(front)this.arrayForMap.push([]);
-		else if(!front)this.arrayForMap.unshift([]);
+	this.addRow = function(x){
+		var fillUpTo = this.arrayForMap[0].length;
 		
-		for(var i = 0; i < this.y; i++){
-			if(front)this.arrayForMap[this.arrayForMap.length-1].push(new tile(this.tileImage1, this.x*25, i*25));
-			else if(!front)this.arrayForMap[0].push(new tile(this.tileImage1, this.x*25, i*25));
+		this.arrayForMap.splice(x>0?x:0, 0, []);
+		
+		for(var i = 0; i < fillUpTo; i++){
+			this.arrayForMap[x>0?x:0].push(new tile(this.tileImage1));
 		}
-		this.x = this.x + 1;
 	}
 	
 	
-	this.addColumn = function(front){
+	this.addColumn = function(y){
 		for(i = 0; i < this.arrayForMap.length;i++){
-			if(front)this.arrayForMap[i].push(new tile(this.tileImage1, i*25, this.arrayForMap[i].length*25));
-			else if(!front)this.arrayForMap[i].unshift(new tile(this.tileImage1, i*25, this.arrayForMap[i].length*25));
+			this.arrayForMap[i].splice(y>0?y:0, 0, new tile(this.tileImage1, i*25, (y+1)*25));
 		}
-		this.y = this.y+1;
 	}
 	
 	this.addIsland = function(x, y, size){
@@ -414,23 +405,17 @@ function gameMap(tileImage1, tileImage2, size){
 		this.addThis = function(counter, changeXOrY, addToCounter, makeX){
 			
 			if(changeXOrY){
-				if(x-counter > this.x)this.addRow(x-counter > 0 ? true : false);
-				this.arrayForMap[x-counter][y] = new tile(this.tileImage2, (x-counter)*25, y*25);
+				if(typeof this.arrayForMap[x-counter] === 'undefined')this.addRow(x-counter);
+				
+				this.arrayForMap[x-counter > 0 ? x-counter : 0][y] = new tile(this.tileImage2);
 				this.addThis(1, false, 1, x-counter);
 				this.addThis(-1, false, -1, x-counter);
 			}
 			
 			else{
-				this.addSome = function(){
-					this.addRow(x-counter > 0 ? true : false);
-					this.addColumn(x-counter > 0 ? true : false);
-					
-					if(typeof this.arrayForMap[x-counter] === 'undefined')this.addSome();
-				}
-				
-				if(typeof this.arrayForMap[x-counter] === 'undefined')this.addSome()
+				if(typeof this.arrayForMap[((makeX ? makeX : x) > 0 ? (makeX ? makeX : x) : 0)][y-counter] === 'undefined')this.addColumn((makeX ? makeX : x));
 			
-				this.arrayForMap[makeX ? makeX : x][y-counter] = new tile(this.tileImage2, (makeX ? makeX : x)*25, (y-counter)*25);
+				this.arrayForMap[((makeX ? makeX : x) > 0 ? (makeX ? makeX : x) : 0)][y-counter] = new tile(this.tileImage2);
 			}
 			
 			if(Math.round(Math.random()*Math.abs(counter)) < 1*size)this.addThis(counter+addToCounter, changeXOrY, addToCounter, makeX);
@@ -456,9 +441,10 @@ function gameMap(tileImage1, tileImage2, size){
 	this.makeTiles();
 	
 	this.drawTiles = function(canvasContext){
-		this.arrayForMap.forEach(function(element){
-			element.forEach(function(element){
-				element.draw(canvasContext);
+		this.arrayForMap.forEach(function(element, index){
+			var xIndex = index;
+			element.forEach(function(element, index){
+				element.draw(canvasContext, xIndex*25, index*25);
 			});
 		});
 	}
@@ -469,11 +455,12 @@ function gameMap(tileImage1, tileImage2, size){
 
 //MAIN FUNCTION FOR STARTING UP GAME ENGINE! :D
 function startGame(){
-	$('#canvasCan').html('<canvas id="gameCanvas" width="650" height="650">Your browser is too old: get a new one!</canvas>');
+	$('#canvasCan').html('<canvas id="gameCanvas" width="650" height="650">This human\'s web browser is incapable of using the graphical deity interface I have created...</canvas>');
 	
 	var cnv = document.getElementById('gameCanvas');
 	var ctx = cnv.getContext('2d');
 	setpixelated(ctx);
+	//ctx.translate(25, 25);
 	
 	gameLoad(ctx, cnv);
 }
@@ -586,7 +573,9 @@ function gameLoad(ctx, cnv){
 				player = new character([headFront, hand, armLower, armUpper, legsFront, torso]);
 				
 				worldMap = new gameMap(magmaTerrain0, hellTerrain0, 24);
-				worldMap.addIsland(12, 12, 5);
+				worldMap.addIsland(0, 0, 6);
+				//worldMap.addColumn(5);
+				//worldMap.addRow(-1);
 				
 				gameUpdate(ctx, cnv);
 			}

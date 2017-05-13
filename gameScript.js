@@ -444,7 +444,9 @@ function gameMap(tileImage1, tileImage2, size){
 		this.arrayForMap.forEach(function(element, index){
 			var xIndex = index;
 			element.forEach(function(element, index){
-				element.draw(canvasContext, xIndex*25, index*25);
+                var yValue = (((index*23+xIndex*23)/2) % 1 !== 0.5) ? ((index*23+xIndex*23)/2) : ((index*23+xIndex*23)/2)+0.5;
+                //console.log(yValue);
+				element.draw(canvasContext, xIndex*20-index*20, yValue);
 			});
 		});
 	}
@@ -533,10 +535,10 @@ function gameLoad(ctx, cnv){
 	
 	//Start of Riley's amazing tile images
 	var hellTerrain0 = new Image();
-	hellTerrain0.src = 'imgs/Tiles/Hell_Terrain_1.gif';
+	hellTerrain0.src = 'imgs/Tiles/Water3DNeedsDetail.png';
 	
 	var magmaTerrain0 = new Image();
-	magmaTerrain0.src = 'imgs/Tiles/Magma_Terrain_1.gif';
+	magmaTerrain0.src = 'imgs/Tiles/TileGrass.png';
 	//End of Riley's amazing tile images
 	
 	var imagesInAnArray = [hellTerrain0, magmaTerrain0, syntheticArmLowerLeft, syntheticArmLowerRight, syntheticArmUpperRi, syntheticHandLeft, syntheticHandRight, syntheticTorsoFront, syntheticTorsoFront2, syntheticHeadFront, syntheticLegFront, redFiendArmLowerRi, redFiendArmLowerLe, redFiendArmUpperRi, redFiendHandRi, redFiendHandLe, redFiendTorsoFront, redFiendHeadFront, redFiendLegFront];
@@ -573,7 +575,7 @@ function gameLoad(ctx, cnv){
 				player = new character([headFront, hand, armLower, armUpper, legsFront, torso]);
 				
 				worldMap = new gameMap(magmaTerrain0, hellTerrain0, 24);
-				worldMap.addIsland(12, 12, 6);
+				//worldMap.addIsland(24, 24, 6);
 				//worldMap.addColumn(5);
 				//worldMap.addRow(-1);
 				

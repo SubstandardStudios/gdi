@@ -432,7 +432,7 @@ function gameMap(tileImage1, tileImage2, size){
 		for(var rows = 0; rows < size; rows++){
 			this.arrayForMap.push([]);
 			for(var columns = 0; columns < size; columns++){
-				var newTile = new tile(this.tileImage1, rows*25, columns*25);//var newTile = new tile((Math.round(Math.random()*100) !== 1) ? this.tileImage1 : this.tileImage2, rows*25, columns*25);
+				var newTile = new tile(this.tileImage1, rows*20, columns*23);//var newTile = new tile((Math.round(Math.random()*100) !== 1) ? this.tileImage1 : this.tileImage2, rows*25, columns*25);
 				this.arrayForMap[rows].push(newTile);
 			}
 		}
@@ -444,9 +444,7 @@ function gameMap(tileImage1, tileImage2, size){
 		this.arrayForMap.forEach(function(element, index){
 			var xIndex = index;
 			element.forEach(function(element, index){
-                var yValue = (((index*23+xIndex*23)/2) % 1 !== 0.5) ? ((index*23+xIndex*23)/2) : ((index*23+xIndex*23)/2)+0.5;
-                //console.log(yValue);
-				element.draw(canvasContext, xIndex*20-index*20, yValue);
+				element.draw(canvasContext, (xIndex-index)*32, ((index+xIndex)/2)*32);
 			});
 		});
 	}
@@ -538,7 +536,7 @@ function gameLoad(ctx, cnv){
 	hellTerrain0.src = 'imgs/Tiles/Water3DNeedsDetail.png';
 	
 	var magmaTerrain0 = new Image();
-	magmaTerrain0.src = 'imgs/Tiles/TileGrass.png';
+	magmaTerrain0.src = 'imgs/Tiles/BarebonesTile.png';
 	//End of Riley's amazing tile images
 	
 	var imagesInAnArray = [hellTerrain0, magmaTerrain0, syntheticArmLowerLeft, syntheticArmLowerRight, syntheticArmUpperRi, syntheticHandLeft, syntheticHandRight, syntheticTorsoFront, syntheticTorsoFront2, syntheticHeadFront, syntheticLegFront, redFiendArmLowerRi, redFiendArmLowerLe, redFiendArmUpperRi, redFiendHandRi, redFiendHandLe, redFiendTorsoFront, redFiendHeadFront, redFiendLegFront];

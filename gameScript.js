@@ -536,7 +536,7 @@ function gameLoad(ctx, cnv){
 	hellTerrain0.src = 'imgs/Tiles/WaterNeedsDetail.png';
 	//
 	var magmaTerrain0 = new Image();
-	magmaTerrain0.src = 'imgs/Tiles/TileInclusGrassGreen.png';
+	magmaTerrain0.src = 'imgs/Tiles/TileGrass.png';
 	//End of Riley's amazing tile images
 	
 	var imagesInAnArray = [hellTerrain0, magmaTerrain0, syntheticArmLowerLeft, syntheticArmLowerRight, syntheticArmUpperRi, syntheticHandLeft, syntheticHandRight, syntheticTorsoFront, syntheticTorsoFront2, syntheticHeadFront, syntheticLegFront, redFiendArmLowerRi, redFiendArmLowerLe, redFiendArmUpperRi, redFiendHandRi, redFiendHandLe, redFiendTorsoFront, redFiendHeadFront, redFiendLegFront];

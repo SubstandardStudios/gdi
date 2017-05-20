@@ -38,9 +38,24 @@ function drawPlayButton() {
 	ctx.strokeRect(275, 400, 150, 50);
 	ctx.closePath();
 }
+
 function startScreen() {
-	
-	//Background tile beginning
+  
+  var gameCanvas = document.getElementById("gameCanvas");
+  
+  gameCanvas.width = $(window).width();
+  gameCanvas.height = $(window).height();
+  
+  $('body').css('overflow', 'hidden');
+  $('html').css('overflow', 'hidden');
+  
+  window.addEventListener('resize', function(){
+    var gameCanvas = document.getElementById("gameCanvas");
+    gameCanvas.width = $(window).width();
+    gameCanvas.height = $(window).height()-15;
+  });
+  
+  //Background tile beginning
   for(var green = 0;green < 35;green++){
     for(var red = 0;red < 35;red++){
       var size = 20;
@@ -301,8 +316,8 @@ function placeContent() {
 //END OF CHARACTER SELECTION SCREEN CODE!--------------------------------------------------------------------------------------------
 
 
-//startUpdate();
-startGame();
+startUpdate();
+//startGame();
 
 
 //          LIST OF COOL GOOGLE FONTS

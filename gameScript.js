@@ -195,17 +195,17 @@ http://piskel-imgstore-b.appspot.com/img/85bd4557-01d0-11e7-acaa-c714d3e93f2a.gi
 //Variables for game engine
 var characterModel;
 
-var destination = {x:0, y:0};
-var origin      = {x:0, y:0};
+var screenheight;
+var screenwidth;
 
-var canvasListenerOut = false;
-var animationCounter = 0;
 //End of variables for game engine.
 
 //Assisting functions for game engine! :D
 
 function part(type, img, parent) {//parent should be torso, unless you're using a lower arm or hand! In that case, use upperarm or lowerarm, respectively Also, arm upper is the only one that needs two images, put them in the way we read: left to right :D
 	
+    //IN THE NEAR FUTURE ALL OF THIS CODE WILL BE REPLACED BY SPRITER ANIMATIONS.
+  
 	this.image = img[0];
 	
 	ctx.drawImage(this.image, 0, 0);
@@ -324,37 +324,11 @@ function character(parts){
 	this.animationType = 'none';
 	
 	
-	this.drawAll = function(animation, counter, canvasContext){
+	this.drawAll = function(canvasContext){
 		
-		if(animation === 'none'){//This one runs if no other animation is called!
-			parts.forEach(function(element){
-				element.draw(true, true, canvasContext);
-			});
-		}
-		
-		
-		else if(animation === 'wave'){
-			
-			var rotationAmount;// This will be an integer that we will use to rotate the arm.
-			
-			if(counter < 30){//If the counter is above 30, then we are still moving the arm into place.
-				rotationAmount = (counter*3) + 90;
-				//console.log(rotationAmount);
-			}
-			else rotationAmount = -180;
-			
-			parts.forEach(function(element){
-				if(element.type === 'armUpper' || element.type === 'armLower' || element.type === 'hand'){
-					if(element.type === 'armUpper')element.drawRotated(element.rightX + element.width/2, element.rightY + element.height/2, rotationAmount, 0, 0, false, true, canvasContext);
-					else if(element.type === 'armLower')element.drawRotated(parent.rightX + parent.width/2, parent.rightY + parent.height/2, rotationAmount, 0, 0, false, true, canvasContext)
-				}
-				element.draw(true, false, canvasContext);
-			});
-
-			if(counter === 50)this.animationType = 'none';
-			
-		}
-		
+      parts.forEach(function(element){
+		element.draw(true, true, canvasContext);
+      });
 		
 	}
 	
@@ -455,9 +429,8 @@ function gameMap(tileImage1, tileImage2, size){
 
 //MAIN FUNCTION FOR STARTING UP GAME ENGINE! :D
 function startGame(){
-	$('#canvasCan').html('<canvas id="gameCanvas" width="650" height="650">This human\'s web browser is incapable of using the graphical deity interface I have created...</canvas>');
-	
-	var cnv = document.getElementById('gameCanvas');
+	//$('#gameCanvas').replaceWith('<canvas id="gameCanvas" width="600" height="600">This human\'s web browser is incapable of using the graphical deity interface I have created...</canvas>');
+    var cnv = document.getElementById('gameCanvas');
 	var ctx = cnv.getContext('2d');
 	setpixelated(ctx);
 	//ctx.translate(25, 25);
@@ -586,15 +559,10 @@ function gameUpdate(ctx, cnv){
 	
 	ctx.clearRect(0, 0, cnv.width, cnv.height);
 	
-	if(!(canvasListenerOut)){
-		cnv.addEventListener('click', function(){player.animationType = 'wave';animationCounter = 0;});
-		canvasListenerOut = true;
-	}
 	
 	worldMap.drawTiles(ctx);
-	player.drawAll(player.animationType, animationCounter, ctx);
+	player.drawAll(ctx);
 	
-	if(animationCounter < 51)animationCounter++;
 	
 	setTimeout(function(){gameUpdate(ctx, cnv);}, 50);
 }

@@ -59,7 +59,7 @@ function startScreen() {
     gameCanvas.height = $(window).height()-15;
   });
   
-  window.addEventListener('resize', titleScreenBubbles.makeMap)
+  window.addEventListener('resize', function(){titleScreenBubbles.makeMap()})
 }
 
 function makeBackgroundScreen(){
@@ -108,6 +108,7 @@ function bubbles(){
       ctx.fillStyle = element[3];
       
       for(var bubbleLoop = 0; bubbleLoop < element[2]; bubbleLoop++){
+        if(Math.floor(Math.random()*100000) === 1)element[3] = element[3] === 'peru' ? 'DarkGrey' : 'peru';
         ctx.globalAlpha = element[4];//How clear the bubbles get
         ctx.beginPath();
         ctx.arc(element[0] + Math.floor(Math.random()*(element[2]/1.75)), element[1] + Math.floor(Math.random()*(element[2]/1.75)), 2 + 2 * bubbleLoop, 0, Math.PI * 2, true);
@@ -162,6 +163,7 @@ cnv.addEventListener('click', function doThisOnClick(evt) {
 	
 	if(isInside(mousePos, playButtonRect)){ 
 		cnv.removeEventListener('click', doThisOnClick);
+        window.removeEventListener('resize', function(){titleScreenBubbles.makeMap()})
 		onStartScreen = false;
 	}
 });

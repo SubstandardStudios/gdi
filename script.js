@@ -11,8 +11,9 @@ var onStartScreen = true;
 var boxOn = false;
 var colorForBox = true;
 var counterForBox = 0;
-var playButtonRect = {x:275,y:400,width:150,height:50};
+var playButtonRect = {x:$(window).width()/2-75,y:$(window).height()/2+12,width:150,height:50};
 var playButtonBoolean = true;
+var titleScreenBubbles = new bubbles();
 //End of start screen variables
 
 //End of variable dictionary
@@ -25,23 +26,26 @@ function drawPlayButton() {
 	counterForBox++;
 	if(counterForBox > 10){colorForBox = !colorForBox;counterForBox = 0;}
 	ctx.fillStyle = colorForBox ? 'Peru' : 'DarkGrey';
-	ctx.fillRect(275, 400, 150, 50);
+	ctx.fillRect($(window).width()/2-75, $(window).height()/2+12, 150, 50);
 	ctx.fillStyle = 'black';
 	ctx.lineWidth = 4;
 	ctx.textAlign = 'center';
-	ctx.font = "30px 'Press Start 2P'";
-	ctx.fillText('PLAY!', 356, 443);
+    ctx.textBaseline = 'middle';
+	ctx.font = "30px 'Aclonica'";
+	ctx.fillText('PLAY', $(window).width()/2, $(window).height()/2+39, 150, 50);
 	
 	ctx.beginPath();
 	ctx.setLineDash([20,10]);
 	ctx.lineDashOffset = -playButtonSet;
-	ctx.strokeRect(275, 400, 150, 50);
+	ctx.strokeRect($(window).width()/2-75, $(window).height()/2+12, 150, 50);
 	ctx.closePath();
 }
 
 function startScreen() {
   
   var gameCanvas = document.getElementById("gameCanvas");
+  
+  titleScreenBubbles.makeMap();
   
   gameCanvas.width = $(window).width();
   gameCanvas.height = $(window).height();
@@ -55,9 +59,13 @@ function startScreen() {
     gameCanvas.height = $(window).height()-15;
   });
   
+  window.addEventListener('resize', titleScreenBubbles.makeMap)
+}
+
+function makeBackgroundScreen(){
   //Background tile beginning
-  for(var green = 0;green < 35;green++){
-    for(var red = 0;red < 35;red++){
+  for(var green = 0;green < ($(window).width() - $(window).width() % 20)/20+1;green++){
+    for(var red = 0;red < ($(window).height() - $(window).height() % 20)/20+1;red++){
       var size = 20;
       var tileX = green*size;
       var tileY = red*size;
@@ -69,36 +77,84 @@ function startScreen() {
 			
     }
   }//Background tile code end
-	
-	//Bubble code start
-	var bubbleCount = 25;//Amount of bubbles
-	ctx.globalAlpha = 0.15;//How clear the bubbles get
-	
-	for(var bubbles = 0;bubbles < bubbleCount;bubbles++){
-		var circleX = Math.floor(Math.random() * 700);
-		var circleY = Math.floor(Math.random() * 700);
-		ctx.fillStyle = chooseFrom(['peru', 'DarkGrey']);
-		var bubbleLoops = Math.floor(Math.random() * 25) + 10;
-		//console.log(bubbleLoops)
-		
-		for(var bubbleLoop = 0; bubbleLoop < bubbleLoops; bubbleLoop++){
-			var radius = 2 + 2 * bubbleLoop;
-			ctx.beginPath();
-			ctx.arc(circleX, circleY, radius, 0, Math.PI * 2, true);
-			ctx.fill();
+}
 
-		}
-	}
+function bubbles(){
+  
+  this.makeMap = function(){
+    
+    this.map = []
+    
+    var bubbleCount = $(window).height() * $(window).width() / 15000;//Amount of bubbles
+    
+    for(var bubbles = 0;bubbles < bubbleCount;bubbles++){
+      var circleX = Math.floor(Math.random() * $(window).width());
+      var circleY = Math.floor(Math.random() * $(window).height());
+    
+      var bubbleLoops = Math.floor(Math.random() * 25) + 10; //This decides how many times this bubble should be looped, which dictates how big it is.
+      
+      var color = chooseFrom(['peru', 'DarkGrey']);
+      
+      var alphaLevel = (45-bubbleLoops)*0.005;
+      
+      this.map.push([circleX, circleY, bubbleLoops, color, alphaLevel]);
+    }
+  }
+  
+  this.drawMap = function(){
+    
+    this.map.forEach(function(element){
+      
+      ctx.fillStyle = element[3];
+      
+      for(var bubbleLoop = 0; bubbleLoop < element[2]; bubbleLoop++){
+        ctx.globalAlpha = element[4];//How clear the bubbles get
+        ctx.beginPath();
+        ctx.arc(element[0] + Math.floor(Math.random()*(element[2]/1.75)), element[1] + Math.floor(Math.random()*(element[2]/1.75)), 2 + 2 * bubbleLoop, 0, Math.PI * 2, true);
+        ctx.closePath();
+        ctx.fill();
+      }
+      
+      
+    })
+  }
+  /*
+  //If you can begin, then 'i' just need to push the 'g' over the 'n', and then it's brought into being!
+  //Bubble code start
+  var bubbleCount = $(window).height() * $(window).width() / 15000;//Amount of bubbles
+  ctx.globalAlpha = 0.15;//How clear the bubbles get
+  
+  for(var bubbles = 0;bubbles < bubbleCount;bubbles++){
+    var circleX = Math.floor(Math.random() * $(window).width());
+    var circleY = Math.floor(Math.random() * $(window).height());
+    ctx.fillStyle = chooseFrom(['peru', 'DarkGrey']);
+    var bubbleLoops = Math.floor(Math.random() * 25) + 10;
+    //console.log(bubbleLoops)
+    
+    for(var bubbleLoop = 0; bubbleLoop < bubbleLoops; bubbleLoop++){
+      var radius = 2 + 2 * bubbleLoop;
+      ctx.beginPath();
+      ctx.arc(circleX, circleY, radius, 0, Math.PI * 2, true);
+      ctx.fill();
+
+    }
+  }
+  */
+}
+function drawTitle(){
 	ctx.globalAlpha = 1;
 	ctx.fillStyle = 'black';
 	//End of Bubble Code
 	
 	//Title
-	ctx.font = "bold 75px 'Press Start 2P'";
+	ctx.font = "bold 75px 'Aclonica'";
+    ctx.textBaseline = 'bottom';
 	ctx.textAlign = 'center';
-	ctx.fillText('Cogitatio', 350, 300);
+	ctx.fillText('GDI', $(window).width()/2, $(window).height()/2-12);
 	//End Title
 }
+
+
 //Code for the play button
 //Code that does stuff when the play button is clicked
 cnv.addEventListener('click', function doThisOnClick(evt) {
@@ -116,6 +172,9 @@ function startUpdate() {
 	playButtonSet++;
 	if(playButtonSet > 210)playButtonSet = 0;
 	//Passing around a huge number could cause lag, so we'll shorten every once in a while.
+    makeBackgroundScreen();
+    titleScreenBubbles.drawMap();
+    drawTitle();
 	drawPlayButton();
 	
 	
@@ -315,7 +374,7 @@ function placeContent() {
 
 //END OF CHARACTER SELECTION SCREEN CODE!--------------------------------------------------------------------------------------------
 
-
+startScreen();
 startUpdate();
 //startGame();
 

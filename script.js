@@ -54,6 +54,7 @@ function startScreen() {
   $('html').css('overflow', 'hidden');
   
   window.addEventListener('resize', function(){
+    playButtonRect = {x:$(window).width()/2-75,y:$(window).height()/2+12,width:150,height:50};
     var gameCanvas = document.getElementById("gameCanvas");
     gameCanvas.width = $(window).width();
     gameCanvas.height = $(window).height()-15;
@@ -81,6 +82,8 @@ function makeBackgroundScreen(){
 
 function bubbles(){
   
+  this.map = []
+  
   this.makeMap = function(){
     
     this.map = []
@@ -95,9 +98,16 @@ function bubbles(){
       
       var color = chooseFrom(['peru', 'DarkGrey']);
       
-      var alphaLevel = (45-bubbleLoops)*0.005;
+      var alphaLevel = (45-bubbleLoops)*0.004;
       
-      this.map.push([circleX, circleY, bubbleLoops, color, alphaLevel]);
+      var rect = {
+        width:bubbleLoops*2+2,
+        height:bubbleLoops*2+2,
+        x:circleX-(bubbleLoops*2+2)/2,
+        y:circleY-(bubbleLoops*2+2)/2
+      }
+      
+      this.map.push([circleX, circleY, bubbleLoops, color, alphaLevel, rect]);
     }
   }
   
@@ -107,11 +117,11 @@ function bubbles(){
       
       ctx.fillStyle = element[3];
       
-      for(var bubbleLoop = 0; bubbleLoop < element[2]; bubbleLoop++){
+      for(var bubbleLoop = 0; bubbleLoop <= element[2]; bubbleLoop++){
         if(Math.floor(Math.random()*100000) === 1)element[3] = element[3] === 'peru' ? 'DarkGrey' : 'peru';
         ctx.globalAlpha = element[4];//How clear the bubbles get
         ctx.beginPath();
-        ctx.arc(element[0] + Math.floor(Math.random()*(element[2]/1.75)), element[1] + Math.floor(Math.random()*(element[2]/1.75)), 2 + 2 * bubbleLoop, 0, Math.PI * 2, true);
+        ctx.arc(element[0] + Math.floor(Math.random()*(element[2]/1.25)), element[1] + Math.floor(Math.random()*(element[2]/1.25)), 2 + 2 * bubbleLoop, 0, Math.PI * 2, true);
         ctx.closePath();
         ctx.fill();
       }
@@ -159,13 +169,18 @@ function drawTitle(){
 //Code for the play button
 //Code that does stuff when the play button is clicked
 cnv.addEventListener('click', function doThisOnClick(evt) {
-	var mousePos = getMousePos(cnv, evt);
-	
-	if(isInside(mousePos, playButtonRect)){ 
-		cnv.removeEventListener('click', doThisOnClick);
-        window.removeEventListener('resize', function(){titleScreenBubbles.makeMap()})
-		onStartScreen = false;
-	}
+  
+  var mousePos = getMousePos(cnv, evt);
+  
+  if(isInside(mousePos, playButtonRect)){ 
+    cnv.removeEventListener('click', doThisOnClick);
+    window.removeEventListener('resize', function(){titleScreenBubbles.makeMap()})
+    onStartScreen = false;
+  }
+  
+  titleScreenBubbles.map.forEach(function(element){
+    if(isInside(mousePos, element[5]))element[3] = element[3] === 'peru' ? 'DarkGrey' : 'peru';
+  });
 });
 
 

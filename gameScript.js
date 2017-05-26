@@ -2,6 +2,7 @@
 
 //Start of function dictionary
 
+/*
 (function () {
     var old = console.log;
     var logger = document.getElementById('log');
@@ -15,7 +16,7 @@
       }
     }
 })();
-
+*/
 function printTest(){
 	console.log("This function prints 'Test!' for testing purposes. Test!");
 }

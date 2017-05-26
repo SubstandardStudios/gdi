@@ -14,6 +14,9 @@ var counterForBox = 0;
 var playButtonRect = {x:$(window).width()/2-75,y:$(window).height()/2+12,width:150,height:50};
 var playButtonBoolean = true;
 var titleScreenBubbles = new bubbles();
+
+var colorOne = 'rgb(' + Math.floor(Math.random()*255) + ',' + Math.floor(Math.random()*255) + ',' + Math.floor(Math.random()*255) + ')';
+var colorTwo = 'rgb(' + Math.floor(Math.random()*255) + ',' + Math.floor(Math.random()*255) + ',' + Math.floor(Math.random()*255) + ')';
 //End of start screen variables
 
 //End of variable dictionary
@@ -25,7 +28,7 @@ var titleScreenBubbles = new bubbles();
 function drawPlayButton() {
 	counterForBox++;
 	if(counterForBox > 10){colorForBox = !colorForBox;counterForBox = 0;}
-	ctx.fillStyle = colorForBox ? 'Peru' : 'DarkGrey';
+	ctx.fillStyle = colorForBox ? colorOne : colorTwo;
 	ctx.fillRect($(window).width()/2-75, $(window).height()/2+12, 150, 50);
 	ctx.fillStyle = 'black';
 	ctx.lineWidth = 4;
@@ -84,9 +87,6 @@ function bubbles(){
   
   this.map = []
   
-  this.colorOne = 'rgb(' + Math.floor(Math.random()*255) + ',' + Math.floor(Math.random()*255) + ',' + Math.floor(Math.random()*255) + ')';
-  this.colorTwo = 'rgb(' + Math.floor(Math.random()*255) + ',' + Math.floor(Math.random()*255) + ',' + Math.floor(Math.random()*255) + ')';
-  
   this.makeMap = function(){
     
     this.map = []
@@ -99,7 +99,7 @@ function bubbles(){
     
       var bubbleLoops = Math.floor(Math.random() * 25) + 10; //This decides how many times this bubble should be looped, which dictates how big it is.
       
-      var color = chooseFrom([this.colorOne, this.colorTwo]);
+      var color = chooseFrom([colorOne, colorTwo]);
       
       var alphaLevel = (45-bubbleLoops)*0.008;
       
@@ -110,19 +110,21 @@ function bubbles(){
         y:circleY-(bubbleLoops*2+2)/1.25
       }
       
-      this.map.push([circleX, circleY, bubbleLoops, color, alphaLevel, rect]);
+      var colorOptions = [colorOne, colorTwo];
+      
+      this.map.push([circleX, circleY, bubbleLoops, color, alphaLevel, rect, colorOptions]);
     }
   }
   
   this.drawMap = function(){
     
-    this.map.forEach(function(element){
+    this.map.forEach(function(element, index){
       
+      if(Math.floor(Math.random()*2000) === 1)element[3] = (element[3] === colorOne) ? colorTwo : colorOne;
+      if(Math.floor(Math.random()*100) === 1)titleScreenBubbles.glideTo(index, Math.floor(Math.random()*$(window).width()), Math.floor(Math.random()*$(window).height()));
       ctx.fillStyle = element[3];
       
       for(var bubbleLoop = 0; bubbleLoop <= element[2]; bubbleLoop++){
-        if(Math.floor(Math.random()*100000) === 1)element[3] = element[3] === this.colorOne ? this.colorTwo : this.colorOne;
-        //ctx.fillStyle = 'rgb(' + Math.floor(Math.random()*255) + ',' + Math.floor(Math.random()*255) + ',' + Math.floor(Math.random()*255) + ')';
         ctx.globalAlpha = element[4];//How clear the bubbles get
         ctx.beginPath();
         ctx.arc(element[0] + Math.floor(Math.random()*(element[2]/1.25)), element[1] + Math.floor(Math.random()*(element[2]/1.25)), 2 + 2 * bubbleLoop, 0, Math.PI * 2, true);
@@ -131,7 +133,7 @@ function bubbles(){
       }
       
       
-    })
+    });
   }
   
   this.glideTo = function(indexOfGlidingBubble, glideToX, glideToY){
@@ -191,43 +193,6 @@ function bubbles(){
 	}
     recursiveMovement();
   }
-  
-  /*
-function plotLine(xStart, yStart, xEnd, yEnd, color, ctx){
-	var dx =  Math.abs(xEnd-xStart);
-	var sx = xStart<xEnd ? 1 : -1;
-	var dy = -Math.abs(yEnd-yStart);
-	var sy = yStart<yEnd ? 1 : -1;
-	
-	var err = dx+dy;
-	var e2;
-	
-	ctx.fillStyle = color;
-	
-	function recursiveMovement(){
-																								 
-      setPixel(xStart,yStart, ctx);
-		
-      if (xStart == xEnd && yStart == yEnd) return;
-		
-      else{
-		e2 = 2*err;
-		
-		if (e2 >= dy) {
-		  err += dy;
-		  xStart += sx;
-		}
-        
-		if (e2 <= dx) {
-		  err += dx;
-		  yStart += sy;
-		}
-          
-        setTimeout(100, recursiveMovement);
-      }
-	}
-}
-  */
 }
 function drawTitle(){
 	ctx.globalAlpha = 1;

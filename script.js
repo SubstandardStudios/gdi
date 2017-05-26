@@ -15,8 +15,19 @@ var playButtonRect = {x:$(window).width()/2-75,y:$(window).height()/2+12,width:1
 var playButtonBoolean = true;
 var titleScreenBubbles = new bubbles();
 
-var colorOne = 'rgb(' + Math.floor(Math.random()*255) + ',' + Math.floor(Math.random()*255) + ',' + Math.floor(Math.random()*255) + ')';
-var colorTwo = 'rgb(' + Math.floor(Math.random()*255) + ',' + Math.floor(Math.random()*255) + ',' + Math.floor(Math.random()*255) + ')';
+var colorOneRGB = [Math.floor(Math.random()*255), Math.floor(Math.random()*255), Math.floor(Math.random()*255)]
+var colorTwoRGB = [Math.floor(Math.random()*255), Math.floor(Math.random()*255), Math.floor(Math.random()*255)]
+
+var colorOne = 'rgb(' + colorOneRGB[0] + ',' + colorOneRGB[1] + ',' + colorOneRGB[2] + ')';
+var colorTwo = 'rgb(' + colorTwoRGB[0] + ',' + colorTwoRGB[1] + ',' + colorTwoRGB[2] + ')';
+
+//Variables for the background tiles
+
+var differenceRed = [colorOneRGB[0] - colorTwoRGB[0]];
+var differenceGreen = [colorOneRGB[1] - colorTwoRGB[1]];
+var differenceBlue = [colorOneRGB[2] - colorTwoRGB[2]];
+
+//End of variables for the background tiles
 //End of start screen variables
 
 //End of variable dictionary
@@ -68,6 +79,22 @@ function startScreen() {
 
 function makeBackgroundScreen(){
   //Background tile beginning
+  var numberOfTilesWide = ($(window).width() - $(window).width() % 20)/20+1;
+  var numberOfTilesHigh = ($(window).height() - $(window).height() % 20)/20+1;
+  
+  for(var tileX = 1; tileX <= numberOfTilesWide; tileX++){
+    for(var tileY = 1; tileY <= numberOfTilesHigh; tileY++){
+      
+      var redColor = Math.ceil(differenceRed[0]/numberOfTilesWide)*tileX + colorOneRGB[0] - tileY*Math.ceil(differenceRed[0]/numberOfTilesHigh);
+      var greenColor = Math.ceil(differenceGreen[0]/numberOfTilesWide)*tileX + colorOneRGB[1] - tileY*Math.ceil(differenceGreen[0]/numberOfTilesHigh);
+      var blueColor = Math.ceil(differenceBlue[0]/numberOfTilesWide)*tileX + colorOneRGB[2] - tileY*Math.ceil(differenceBlue[0]/numberOfTilesHigh);
+      
+      ctx.fillStyle = 'rgb(' + redColor + ',' + greenColor + ',' + blueColor + ')';
+      ctx.fillRect(tileX*20-20, tileY*20-20, 20, 20);
+    }
+  }//Background tile code end
+}
+/*
   for(var green = 0;green < ($(window).width() - $(window).width() % 20)/20+1;green++){
     for(var red = 0;red < ($(window).height() - $(window).height() % 20)/20+1;red++){
       var size = 20;
@@ -76,13 +103,7 @@ function makeBackgroundScreen(){
       var greenColor = 4*green + 100 - 6*red;
       var redColor = 4*green + 180 - 6*red;
 			var blueColor = 4*green + 19 - 6*red;
-      ctx.fillStyle = 'rgb(' + redColor + ',' + greenColor + ',' + blueColor + ')';
-      ctx.fillRect(tileX, tileY, size, size);
-			
-    }
-  }//Background tile code end
-}
-
+*/
 function bubbles(){
   
   this.map = []

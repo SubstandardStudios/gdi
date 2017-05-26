@@ -112,7 +112,9 @@ function bubbles(){
       
       var colorOptions = [colorOne, colorTwo];
       
-      this.map.push([circleX, circleY, bubbleLoops, color, alphaLevel, rect, colorOptions]);
+      var moving = false;
+      
+      this.map.push([circleX, circleY, bubbleLoops, color, alphaLevel, rect, colorOptions, moving]);
     }
   }
   
@@ -139,6 +141,8 @@ function bubbles(){
   this.glideTo = function(indexOfGlidingBubble, glideToX, glideToY){
     //setup of constants:
     var glidingBubble = this.map[indexOfGlidingBubble];
+    if(glidingBubble[7] === true) return;
+    glidingBubble[7] = true;
     
     var xStart = glidingBubble[0];
     var yStart = glidingBubble[1];
@@ -156,6 +160,7 @@ function bubbles(){
     var timesGoneCounter = 0;
     
     var speed = Math.floor(Math.random()*50)+10
+    
     //Done with setup of constants
     
     //Function for resetting the position of our glidingBubble
@@ -190,6 +195,7 @@ function bubbles(){
         
         else recursiveMovement();
       }
+      else glidingBubble[7] = false;
 	}
     recursiveMovement();
   }
@@ -221,7 +227,7 @@ cnv.addEventListener('click', function doThisOnClick(evt) {
   }
   
   titleScreenBubbles.map.forEach(function(element, index){
-    if(isInside(mousePos, element[5]))titleScreenBubbles.glideTo(index, Math.floor(Math.random()*$(window).width()), Math.floor(Math.random()*$(window).height()));
+    titleScreenBubbles.glideTo(index, mousePos.x, mousePos.y);
   });
 });
 

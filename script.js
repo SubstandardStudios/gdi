@@ -84,11 +84,14 @@ function bubbles(){
   
   this.map = []
   
+  this.colorOne = 'rgb(' + Math.floor(Math.random()*255) + ',' + Math.floor(Math.random()*255) + ',' + Math.floor(Math.random()*255) + ')';
+  this.colorTwo = 'rgb(' + Math.floor(Math.random()*255) + ',' + Math.floor(Math.random()*255) + ',' + Math.floor(Math.random()*255) + ')';
+  
   this.makeMap = function(){
     
     this.map = []
     
-    var bubbleCount = $(window).height() * $(window).width() / 15000;//Amount of bubbles
+    var bubbleCount = $(window).height() * $(window).width() / 25000;//Amount of bubbles
     
     for(var bubbles = 0;bubbles < bubbleCount;bubbles++){
       var circleX = Math.floor(Math.random() * $(window).width());
@@ -96,15 +99,15 @@ function bubbles(){
     
       var bubbleLoops = Math.floor(Math.random() * 25) + 10; //This decides how many times this bubble should be looped, which dictates how big it is.
       
-      var color = chooseFrom(['peru', 'DarkGrey']);
+      var color = chooseFrom([this.colorOne, this.colorTwo]);
       
-      var alphaLevel = (45-bubbleLoops)*0.004;
+      var alphaLevel = (45-bubbleLoops)*0.008;
       
       var rect = {
-        width:bubbleLoops*2+2,
-        height:bubbleLoops*2+2,
-        x:circleX-(bubbleLoops*2+2)/2,
-        y:circleY-(bubbleLoops*2+2)/2
+        width:bubbleLoops*4+2,
+        height:bubbleLoops*4+2,
+        x:circleX-(bubbleLoops*2+2)/1.25,
+        y:circleY-(bubbleLoops*2+2)/1.25
       }
       
       this.map.push([circleX, circleY, bubbleLoops, color, alphaLevel, rect]);
@@ -118,7 +121,8 @@ function bubbles(){
       ctx.fillStyle = element[3];
       
       for(var bubbleLoop = 0; bubbleLoop <= element[2]; bubbleLoop++){
-        if(Math.floor(Math.random()*100000) === 1)element[3] = element[3] === 'peru' ? 'DarkGrey' : 'peru';
+        if(Math.floor(Math.random()*100000) === 1)element[3] = element[3] === this.colorOne ? this.colorTwo : this.colorOne;
+        //ctx.fillStyle = 'rgb(' + Math.floor(Math.random()*255) + ',' + Math.floor(Math.random()*255) + ',' + Math.floor(Math.random()*255) + ')';
         ctx.globalAlpha = element[4];//How clear the bubbles get
         ctx.beginPath();
         ctx.arc(element[0] + Math.floor(Math.random()*(element[2]/1.25)), element[1] + Math.floor(Math.random()*(element[2]/1.25)), 2 + 2 * bubbleLoop, 0, Math.PI * 2, true);
@@ -129,27 +133,100 @@ function bubbles(){
       
     })
   }
-  /*
-  //If you can begin, then 'i' just need to push the 'g' over the 'n', and then it's brought into being!
-  //Bubble code start
-  var bubbleCount = $(window).height() * $(window).width() / 15000;//Amount of bubbles
-  ctx.globalAlpha = 0.15;//How clear the bubbles get
   
-  for(var bubbles = 0;bubbles < bubbleCount;bubbles++){
-    var circleX = Math.floor(Math.random() * $(window).width());
-    var circleY = Math.floor(Math.random() * $(window).height());
-    ctx.fillStyle = chooseFrom(['peru', 'DarkGrey']);
-    var bubbleLoops = Math.floor(Math.random() * 25) + 10;
-    //console.log(bubbleLoops)
+  this.glideTo = function(indexOfGlidingBubble, glideToX, glideToY){
+    //setup of constants:
+    var glidingBubble = this.map[indexOfGlidingBubble];
     
-    for(var bubbleLoop = 0; bubbleLoop < bubbleLoops; bubbleLoop++){
-      var radius = 2 + 2 * bubbleLoop;
-      ctx.beginPath();
-      ctx.arc(circleX, circleY, radius, 0, Math.PI * 2, true);
-      ctx.fill();
-
+    var xStart = glidingBubble[0];
+    var yStart = glidingBubble[1];
+    var xEnd = glideToX;
+    var yEnd = glideToY;
+    
+    var dx =  Math.abs(xEnd-xStart);
+	var sx = xStart<xEnd ? 1 : -1;
+	var dy = -Math.abs(yEnd-yStart);
+	var sy = yStart<yEnd ? 1 : -1;
+	
+	var err = dx+dy;
+	var e2;
+    
+    var timesGoneCounter = 0;
+    
+    var speed = Math.floor(Math.random()*50)+10
+    //Done with setup of constants
+    
+    //Function for resetting the position of our glidingBubble
+    function positionChange(x, y){
+      glidingBubble[0] = x;
+      glidingBubble[1] = y;
+      glidingBubble[5] = {width:glidingBubble[2]*4+2,height:glidingBubble[2]*4+2,x:glidingBubble[0]-(glidingBubble[2]*2+2)/1.25,y:glidingBubble[1]-(glidingBubble[2]*2+2)/1.25};
     }
+    
+    function recursiveMovement(){
+      
+      timesGoneCounter++;
+		
+      if(!(xStart == xEnd && yStart == yEnd)){
+		e2 = 2*err;
+		
+		if (e2 >= dy){
+		  err += dy;
+		  xStart += sx;
+		}
+        
+		if (e2 <= dx){
+		  err += dx;
+		  yStart += sy;
+		}
+        
+        if(timesGoneCounter > speed){
+          timesGoneCounter = 0;
+          positionChange(xStart,yStart);
+          setTimeout(recursiveMovement, 16);
+        }
+        
+        else recursiveMovement();
+      }
+	}
+    recursiveMovement();
   }
+  
+  /*
+function plotLine(xStart, yStart, xEnd, yEnd, color, ctx){
+	var dx =  Math.abs(xEnd-xStart);
+	var sx = xStart<xEnd ? 1 : -1;
+	var dy = -Math.abs(yEnd-yStart);
+	var sy = yStart<yEnd ? 1 : -1;
+	
+	var err = dx+dy;
+	var e2;
+	
+	ctx.fillStyle = color;
+	
+	function recursiveMovement(){
+																								 
+      setPixel(xStart,yStart, ctx);
+		
+      if (xStart == xEnd && yStart == yEnd) return;
+		
+      else{
+		e2 = 2*err;
+		
+		if (e2 >= dy) {
+		  err += dy;
+		  xStart += sx;
+		}
+        
+		if (e2 <= dx) {
+		  err += dx;
+		  yStart += sy;
+		}
+          
+        setTimeout(100, recursiveMovement);
+      }
+	}
+}
   */
 }
 function drawTitle(){
@@ -178,8 +255,8 @@ cnv.addEventListener('click', function doThisOnClick(evt) {
     onStartScreen = false;
   }
   
-  titleScreenBubbles.map.forEach(function(element){
-    if(isInside(mousePos, element[5]))element[3] = element[3] === 'peru' ? 'DarkGrey' : 'peru';
+  titleScreenBubbles.map.forEach(function(element, index){
+    if(isInside(mousePos, element[5]))titleScreenBubbles.glideTo(index, Math.floor(Math.random()*$(window).width()), Math.floor(Math.random()*$(window).height()));
   });
 });
 

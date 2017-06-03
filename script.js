@@ -407,43 +407,52 @@ function displayAcrossScreen(imagesArray, maxRows, startX, edgeFitOverlap) {
   
       this.maxColumns = Math.ceil($(window).height()/this.plankMiddle.height);
       
+      this.addTo = 0;
+      
       if(edgeFitOverlap){
         
         this.addTotal = this.maxColumns*this.plankMiddle.height - $(window).height()
         
         this.whichToAddTo = [];
           
-        for(i = 0; i < this.addTotal; i++){
+        for(var i = 0; i < this.addTotal; i++){
           this.whichToAddTo.push(Math.floor(Math.random()*this.maxColumns));
         }
       }
       
       for(this.columns = 0; this.columns <= this.maxColumns; this.columns++){
+        
+        if(edgeFitOverlap){
+          for(var i = 0; i < this.whichToAddTo.length; i++){
+            if(this.whichToAddTo[i] == this.columns)this.addTo = this.addTo - 1;
+          }
+        }
+        
         for(this.rows = 0; this.rows <= this.maxRows; this.rows++){
           
           if(this.rows === 0)this.map.push([
             this.plankStart,
             this.startX,
-            this.plankMiddle.height * this.columns
+            this.plankMiddle.height * this.columns + this.addTo
           ]);
           
           else if(this.rows === this.maxRows)this.map.push([
             this.plankEnd,
             $(window).width() - (this.plankEnd.width+16),
-            this.plankEnd.height*this.columns
+            this.plankEnd.height * this.columns + this.addTo
           ]);
           
           
           else if(this.rows === this.maxRows-1)this.map.push([
             this.plankMiddle,
             $(window).width()-(this.plankEnd.width+16+this.plankMiddle.width),
-            this.plankMiddle.height * this.columns
+            this.plankMiddle.height * this.columns + this.addTo
           ]);
           
           else this.map.push([
             chooseFrom([this.plankMiddle, this.plankMiddle, this.plankMiddle, this.plankMiddle, this.plankMiddleTwo]),
             20 + this.plankMiddle.width*(this.rows-1)+this.startX,
-            this.plankMiddle.height * this.columns
+            this.plankMiddle.height * this.columns + this.addTo
           ]);
         }
       }

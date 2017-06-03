@@ -133,26 +133,27 @@ function fillArrayUpTo(anArray, upTo, filler){//The purpose of this function is 
 //Image dictionary
 
 var woodenPlank = new Image();
-woodenPlank.src = 'http://piskel-imgstore-b.appspot.com/img/be5d630f-e430-11e6-a821-b98bdf48deb5.gif';
+woodenPlank.src = 'imgs/FillerPixelArt/WoodenPlank.gif';
 
 var stoneTile = new Image();
-stoneTile.src = 'http://piskel-imgstore-b.appspot.com/img/1c118591-e431-11e6-8a51-b98bdf48deb5.gif';
+stoneTile.src = 'imgs/FillerPixelArt/StoneTile.gif';
 
 
 //Plank Images
 var plankOddsAndEnds = new Image();
-plankOddsAndEnds.src = 'http://piskel-imgstore-b.appspot.com/img/e6497bcc-fe69-11e6-8da6-6d27f02baa93.gif';
+plankOddsAndEnds.src = 'imgs/FillerPixelArt/PlankOddsAndEnds.gif';
 
 var plankStart = new Image();
-plankStart.src = 'http://piskel-imgstore-b.appspot.com/img/3cb97afa-fe6a-11e6-9fa4-6d27f02baa93.gif';
+plankStart.src = 'imgs/FillerPixelArt/PlankStart.gif';
 
 var plankEnd = new Image();
-plankEnd.src = 'http://piskel-imgstore-b.appspot.com/img/7ea38cb3-fe6a-11e6-968e-6d27f02baa93.gif';
+plankEnd.src = 'imgs/FillerPixelArt/PlankEnd.gif';
 
 var plankMiddle = new Image();
-plankMiddle.src = 'http://piskel-imgstore-b.appspot.com/img/a9387fab-fe6a-11e6-8e85-6d27f02baa93.gif';
+plankMiddle.src = 'imgs/FillerPixelArt/PlankMiddle.gif';
 //End of Plank Images
 
+/*
 //Jacob's Bow images
 var bowTop = new Image();
 bowTop.src = 'http://piskel-imgstore-b.appspot.com/img/3d2e8480-fec1-11e6-86b8-6d27f02baa93.gif';
@@ -163,6 +164,7 @@ bowBottom.src = 'http://piskel-imgstore-b.appspot.com/img/e0a7aa21-fec0-11e6-80e
 var bowMiddle = new Image();
 bowMiddle.src = 'http://piskel-imgstore-b.appspot.com/img/77c948ae-fec0-11e6-8c5e-6d27f02baa93.gif';
 //End of Jacob's Bow images
+*/
 
 //End of image dictionary
 

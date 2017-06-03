@@ -7,7 +7,6 @@ var ctx = cnv.getContext('2d');
 
 //Start screen variables
 var playButtonSet = 0;
-var onStartScreen = true;
 var boxOn = false;
 var colorForBox = true;
 var counterForBox = 0;
@@ -15,8 +14,8 @@ var playButtonRect = {x:$(window).width()/2-75,y:$(window).height()/2+12,width:1
 var playButtonBoolean = true;
 var titleScreenBubbles = new bubbles();
 
-var colorOneRGB = [Math.floor(Math.random()*255), Math.floor(Math.random()*255), Math.floor(Math.random()*255)]
-var colorTwoRGB = [Math.floor(Math.random()*255), Math.floor(Math.random()*255), Math.floor(Math.random()*255)]
+var colorOneRGB = [Math.ceil(Math.random()*255), Math.ceil(Math.random()*255), Math.ceil(Math.random()*255)];
+var colorTwoRGB = [Math.ceil(Math.random()*255), Math.ceil(Math.random()*255), Math.ceil(Math.random()*255)];
 
 var colorOne = 'rgb(' + colorOneRGB[0] + ',' + colorOneRGB[1] + ',' + colorOneRGB[2] + ')';
 var colorTwo = 'rgb(' + colorTwoRGB[0] + ',' + colorTwoRGB[1] + ',' + colorTwoRGB[2] + ')';
@@ -31,6 +30,36 @@ var differenceBlue = [colorOneRGB[2] - colorTwoRGB[2]];
 //End of start screen variables
 
 //End of variable dictionary
+
+//BEGINNING OF GENERAL PURPOSE CLASSES!
+//These are used in various places throughout the game.
+
+function toggleFunction(mainFunction, startUpFunction, cleanUpFunction, updateDataArray){//This class is used for creating functions that can be turned on or off, and/or are looped.
+  this.on = false;                                                                      //Not a necessity, of course, but really nice to have and saves time here and there.
+  
+  this.doesUpdate = (updateDataArray) ? (updateDataArray[0]) : false; //boolean, decides whether or not the function is recursive
+  this.updateTime = (updateDataArray) ? (updateDataArray[1]) ? updateDataArray[1] : 0 : 0; //Integer, If the updateDataArray doesn't exist, or updateData[1] doesn't exist, this function, which decides how long the delay inbetween loops should be, is registered as zero.
+  
+  this.mainLoop = function(){//This function checks to see if the loop is active, if so, it calls the mainFunction, and then decides whether or not to loop again(and when).
+    if(!this.on){return;}
+    if(mainFunction)mainFunction();
+    if(this.doesUpdate)setTimeout(this.mainLoop.bind(this), this.updateTime);
+  }
+  
+  this.toggleOn = function(){//Calls our startUpFunction(if there is one), sets our loop status to on, and then begins the loop!
+    if(startUpFunction)startUpFunction();
+    this.on = true;
+    this.mainLoop();
+  }
+  
+  this.toggleOff = function(){//Kills loop, then calls cleanUpFunction.
+    this.on = false;
+    if(cleanUpFunction)cleanUpFunction();
+  }
+  
+}
+
+//ENDING OF GENERAL PURPOSE CLASSES
 
 
 
@@ -67,14 +96,55 @@ function startScreen() {
   $('body').css('overflow', 'hidden');
   $('html').css('overflow', 'hidden');
   
+  
+  //Event listeners section
+  
+  
   window.addEventListener('resize', function(){
     playButtonRect = {x:$(window).width()/2-75,y:$(window).height()/2+12,width:150,height:50};
     var gameCanvas = document.getElementById("gameCanvas");
     gameCanvas.width = $(window).width();
-    gameCanvas.height = $(window).height()-15;
+    gameCanvas.height = $(window).height()-16;
+  });
+
+  window.addEventListener('resize', titleScreenBubbles.makeMap);
+
+  cnv.addEventListener('click', function doThisOnClick(evt){
+    var mousePos = getMousePos(cnv, evt);
+    
+    if(isInside(mousePos, playButtonRect)){ 
+      cnv.removeEventListener('click', doThisOnClick);
+      window.removeEventListener('resize', titleScreenBubbles.makeMap);
+      startScreenUpdate.toggleOff();
+    }
+
+    titleScreenBubbles.map.forEach(function(element, index){
+      titleScreenBubbles.glideTo(index, mousePos.x, mousePos.y);
+    });
   });
   
-  window.addEventListener('resize', function(){titleScreenBubbles.makeMap()})
+  
+  //End of event listeners
+  
+  
+  function cleanUp(){
+    woodenBackground = new displayAcrossScreen([plankStart, plankMiddle, plankOddsAndEnds, plankEnd], undefined, undefined, true);
+    stonePillar = new displayAcrossScreen([stoneTile], 0, 175);
+    woodenBackground.drawPlanks(1, function(){stonePillar.drawPlanks(3, function(){characterSelectUpdate(); placeContent();});});
+  }
+  
+  function updateLoop(){
+    playButtonSet++;
+    if(playButtonSet > 210)playButtonSet = 0;
+    //Passing around a huge number could cause lag, so we'll shorten it every once in a while.
+    makeBackgroundScreen();
+    titleScreenBubbles.drawMap();
+    drawTitle();
+    drawPlayButton();
+  }
+  
+  var startScreenUpdate = new toggleFunction(updateLoop, undefined, cleanUp, [true, 16]);
+  startScreenUpdate.toggleOn();
 }
 
 function makeBackgroundScreen(){
@@ -94,23 +164,14 @@ function makeBackgroundScreen(){
     }
   }//Background tile code end
 }
-/*
-  for(var green = 0;green < ($(window).width() - $(window).width() % 20)/20+1;green++){
-    for(var red = 0;red < ($(window).height() - $(window).height() % 20)/20+1;red++){
-      var size = 20;
-      var tileX = green*size;
-      var tileY = red*size;
-      var greenColor = 4*green + 100 - 6*red;
-      var redColor = 4*green + 180 - 6*red;
-			var blueColor = 4*green + 19 - 6*red;
-*/
+
 function bubbles(){
   
-  this.map = []
+  this.map = [];
   
   this.makeMap = function(){
     
-    this.map = []
+    this.map = [];
     
     var bubbleCount = $(window).height() * $(window).width() / 25000;//Amount of bubbles
     
@@ -129,7 +190,7 @@ function bubbles(){
         height:bubbleLoops*4+2,
         x:circleX-(bubbleLoops*2+2)/1.25,
         y:circleY-(bubbleLoops*2+2)/1.25
-      }
+      };
       
       var colorOptions = [colorOne, colorTwo];
       
@@ -137,7 +198,7 @@ function bubbles(){
       
       this.map.push([circleX, circleY, bubbleLoops, color, alphaLevel, rect, colorOptions, moving]);
     }
-  }
+  };
   
   this.drawMap = function(){
     
@@ -157,7 +218,7 @@ function bubbles(){
       
       
     });
-  }
+  };
   
   this.glideTo = function(indexOfGlidingBubble, glideToX, glideToY){
     //setup of constants:
@@ -180,7 +241,7 @@ function bubbles(){
     
     var timesGoneCounter = 0;
     
-    var speed = Math.floor(Math.random()*50)+10
+    var speed = Math.floor(Math.random()*50)+10;
     
     //Done with setup of constants
     
@@ -219,7 +280,7 @@ function bubbles(){
       else glidingBubble[7] = false;
 	}
     recursiveMovement();
-  }
+  };
 }
 function drawTitle(){
 	ctx.globalAlpha = 1;
@@ -234,49 +295,13 @@ function drawTitle(){
 	//End Title
 }
 
-
-//Code for the play button
-//Code that does stuff when the play button is clicked
-cnv.addEventListener('click', function doThisOnClick(evt) {
-  
-  var mousePos = getMousePos(cnv, evt);
-  
-  if(isInside(mousePos, playButtonRect)){ 
-    cnv.removeEventListener('click', doThisOnClick);
-    window.removeEventListener('resize', function(){titleScreenBubbles.makeMap()})
-    onStartScreen = false;
-  }
-  
-  titleScreenBubbles.map.forEach(function(element, index){
-    titleScreenBubbles.glideTo(index, mousePos.x, mousePos.y);
-  });
-});
-
-
-//Code for the function that animates the play button
-function startUpdate() {
-	playButtonSet++;
-	if(playButtonSet > 210)playButtonSet = 0;
-	//Passing around a huge number could cause lag, so we'll shorten every once in a while.
-    makeBackgroundScreen();
-    titleScreenBubbles.drawMap();
-    drawTitle();
-	drawPlayButton();
-	
-	
-	if(onStartScreen)setTimeout(startUpdate, 20);
-	else{transition1Update();}
-}
-
 //END OF START SCREEN CODE ----------------------------------------------------------------------------------------------------------
 
 
 
 //START OF CHARACTER SELECTION SCREEN CODE!------------------------------------------------------------------------------------------
 
-//Variables associated with just this section of code
-var rows = 0;
-var columns = 0;
+//Variables associated with this section of code
 
 var contentPlaced = false;
 var waveCount = 0;
@@ -285,15 +310,11 @@ var callBackCount = 0;
 
 var boxCounter = 0;
 
-var transition1 = true;
-var transition2 = true;
-
 var animationTitles = [
 	'Dark Waves Transition',
 	'Yzy Bow Firing',
 	'Sparkle',
 ];
-
 
 function DarkWaves(callback){//Dark Wave!
 		
@@ -301,10 +322,10 @@ function DarkWaves(callback){//Dark Wave!
 		ctx.fillStyle = rbgValuez;
 		ctx.beginPath();
 		ctx.moveTo(0, 0);
-		ctx.lineTo(0, whereToGo*50);
-		ctx.lineTo(whereToGo*50, 0);
+		ctx.lineTo(0, whereToGo*($(window).height()/12));
+		ctx.lineTo(whereToGo*($(window).width()/12), 0);
 		ctx.fill();
-		}
+    }
 		
 	if(waveCount === 0){
 		$('#rightSideBarOuter').hide();
@@ -323,63 +344,132 @@ function DarkWaves(callback){//Dark Wave!
 		
 	if(waveCount > 120)waveCount = 0;
 		
-	if(waveCount !== 0)setTimeout(function(){DarkWaves(callback)}, 50);
-	else{callback()}
+	if(waveCount !== 0)setTimeout(function(){DarkWaves(callback);}, 50);
+	else{callback();}
 }
 
 function clearScreen() {//Clear screen!
-	transition1 = true;
-	transition2 = true;
-	rows = 0;
-	columns = 0;
-	transition1Update();
+	//new displayAcrossScreen(1, [plankStart, plankOddsAndEnds, plankMiddle, plankEnd]);
 	$('#rightSideBarOuter').hide();
 	$('#mainAreaOuter').hide();
 }
 
 
 var animationCode = [
-  function() {
-		DarkWaves(clearScreen);
-	},
+  function(){
+    DarkWaves(clearScreen);
+  },
 	
-  function(){//Fire dat Yzy Bow!
-		console.log('Pew! Pew! DEATH AND DESTRUCTION!');
-	},
+  function(){//Fire down upon them!
+    console.log('My tongue is sharp, but my arrow is sharper!');
+  },
 	
-	function(){//Sparkle: a somewhat feminine, useful nonetheless, particle effect!
-		console.log('Twinkle twinkle little star!');
-	}
+  function(){//Sparkle: a somewhat feminine, useful nonetheless, particle effect!
+    console.log('Twinkle twinkle little star!');
+  }
 ];
 
 
-
-function drawPlank() {
-	if(rows === 0){ctx.drawImage(plankStart, 0, 16 * columns);}
-	else if(rows === 18){ctx.drawImage(plankEnd, 680, 16*columns);}
-	else if(rows === 17)ctx.drawImage(plankMiddle, 20 + 40*(rows-1), 16 * columns);
-	else{ctx.drawImage(chooseFrom([plankMiddle, plankMiddle, plankMiddle, plankMiddle, plankOddsAndEnds]), 20 + 40*(rows-1), 16 * columns);}
+function characterSelectUpdate(){
+  
+  characterSelectionScreen = new toggleFunction(
+    undefined,
+    function(){
+      window.addEventListener('resize', function makeNewMaps(){woodenBackground.mapPlanks(true); stonePillar.mapPlanks(true);});
+    },
+    function(){
+      window.removeEventListener('resize', makeNewMaps);
+    }
+  );
+  characterSelectionScreen.toggleOn();
 }
 
-function transition1Update() {
-	drawPlank();
-	
-	rows++
-	
-	if(rows > 18){columns++; rows = 0;}
-	if(columns > 43){transition1 = false; rows = 0;}
-	
-	if(transition1)setTimeout(transition1Update, 1);
-	else{transition2Update();}
-}
 
-function transition2Update() {
-	ctx.drawImage(stoneTile, 175, stoneTile.height * rows);
-	rows++;
-	
-	if(rows > 14){rows = 0; transition2 = false;}
-	if(transition2)setTimeout(transition2Update, 30);
-	else{placeContent();}
+function displayAcrossScreen(imagesArray, maxRows, startX, edgeFitOverlap) {
+  
+    this.plankStart = imagesArray[0];
+    this.plankMiddle = (imagesArray[1]) ? imagesArray[1] : this.plankStart;
+    this.plankMiddleTwo = (imagesArray[2]) ? imagesArray[2] : this.plankMiddle;
+    this.plankEnd = (imagesArray[3]) ? imagesArray[3] : this.plankMiddleTwo;
+    
+    this.startX = (startX)?0+startX:0;
+    
+    this.map = [];
+  
+    this.index = 0;
+  
+    //this.edgeFitOverlap = edgeFitOverlap;
+  
+    this.mapPlanks = function(drawAfter, timeBreak, callBack){
+      this.map = [];
+      
+      this.maxRows = (maxRows || maxRows === 0) ? maxRows : Math.ceil($(window).width()/this.plankMiddle.width);
+  
+      this.maxColumns = Math.ceil($(window).height()/this.plankMiddle.height);
+      
+      if(edgeFitOverlap){
+        
+        this.addTotal = this.maxColumns*this.plankMiddle.height - $(window).height()
+        
+        this.whichToAddTo = [];
+          
+        for(i = 0; i < this.addTotal; i++){
+          this.whichToAddTo.push(Math.floor(Math.random()*this.maxColumns));
+        }
+      }
+      
+      for(this.columns = 0; this.columns <= this.maxColumns; this.columns++){
+        for(this.rows = 0; this.rows <= this.maxRows; this.rows++){
+          
+          if(this.rows === 0)this.map.push([
+            this.plankStart,
+            this.startX,
+            this.plankMiddle.height * this.columns
+          ]);
+          
+          else if(this.rows === this.maxRows)this.map.push([
+            this.plankEnd,
+            $(window).width() - (this.plankEnd.width+16),
+            this.plankEnd.height*this.columns
+          ]);
+          
+          
+          else if(this.rows === this.maxRows-1)this.map.push([
+            this.plankMiddle,
+            $(window).width()-(this.plankEnd.width+16+this.plankMiddle.width),
+            this.plankMiddle.height * this.columns
+          ]);
+          
+          else this.map.push([
+            chooseFrom([this.plankMiddle, this.plankMiddle, this.plankMiddle, this.plankMiddle, this.plankMiddleTwo]),
+            20 + this.plankMiddle.width*(this.rows-1)+this.startX,
+            this.plankMiddle.height * this.columns
+          ]);
+        }
+      }
+      
+      if(drawAfter)this.drawPlanks(timeBreak, callBack);
+    };
+    
+    this.mapPlanks();
+    
+    this.drawPlanks = function(timeBreak, callback){
+      
+      var element = this.map[this.index];
+      //console.log(this.map);
+      if(element)ctx.drawImage(element[0], element[1], element[2]);
+      
+      if(this.index < this.map.length-1){
+        this.index++;
+        if(timeBreak)setTimeout(this.drawPlanks.bind(this, timeBreak, callback), timeBreak);
+        else this.drawPlanks(timeBreak, callback);
+      }
+      
+      else{
+        this.index = 0;
+        if(callback)callback();
+      }
+    };
 }
 
 function placeContent() {
@@ -390,7 +480,7 @@ function placeContent() {
 	}
 	else if(!contentPlaced)contentPlaced = true;
 	
-	$('#canvasCan').prepend('<div id = rightSideBarOuter style = position:absolute;top:0px;left:0px;height:700px;width:175px; zindex = 2 > </div>')
+	$('#canvasCan').prepend('<div id = rightSideBarOuter style = position:absolute;top:0px;left:0px;height:700px;width:175px; zindex = 2 > </div>');
 		$('#rightSideBarOuter').prepend('<div id = rightSideBarInner style = position:relative;height:700px;width:175px;></div>');
 			$('#rightSideBarInner').prepend('<div style = padding-right:4px;margin-top:4px; zindex = 2 id = characterBox class = quickPlay></div>');
 				$('.quickPlay').prepend('<p id = characterSubTitle>Quick Play</p>');
@@ -441,9 +531,9 @@ function placeContent() {
 			else{
 				animationNumber = (boxCounter%3 === 0) ? boxCounter + 2 : boxCounter - 1;
 				$('.animationNumber' + boxCounter).append('<p margin-top:5px>Animation #' + animationNumber + '</p>');
-				$('.animationNumber' + boxCounter).click(function(){ console.log('No function yet! :D') });
+				$('.animationNumber' + boxCounter).click(function(){ console.log('No function yet! :D');});
 			}
-		}J
+		}
 	});
 
 	$('.inventoryTest').click(function(){
@@ -461,7 +551,6 @@ function placeContent() {
 //END OF CHARACTER SELECTION SCREEN CODE!--------------------------------------------------------------------------------------------
 
 startScreen();
-startUpdate();
 //startGame();
 
 

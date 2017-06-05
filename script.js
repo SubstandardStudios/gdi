@@ -10,7 +10,14 @@ var playButtonSet = 0;
 var boxOn = false;
 var colorForBox = true;
 var counterForBox = 0;
-var playButtonRect = {x:$(window).width()/2-75,y:$(window).height()/2+12,width:150,height:50};
+
+var playButtonRect = {
+  x:$(window).width()/2-(($(window).width()/5 > 150) ? $(window).width()/5 : 150)/2,
+  y:$(window).height()/2-(($(window).height()/13 > 50) ? $(window).height()/13 : 50)/2,
+  width:(ctx.measureText('START').width > roundToMaxOrMin($(window).width()/5, 250, 50)) ? ctx.measureText('START').width+8 : roundToMaxOrMin($(window).width()/5, 250, 50),
+  height:($(window).height()/13 > 50) ? $(window).height()/13 : 50
+};
+
 var playButtonBoolean = true;
 var titleScreenBubbles = new bubbles();
 
@@ -25,6 +32,8 @@ var colorTwo = 'rgb(' + colorTwoRGB[0] + ',' + colorTwoRGB[1] + ',' + colorTwoRG
 var differenceRed = [colorOneRGB[0] - colorTwoRGB[0]];
 var differenceGreen = [colorOneRGB[1] - colorTwoRGB[1]];
 var differenceBlue = [colorOneRGB[2] - colorTwoRGB[2]];
+
+var characterSelectionScreen;
 
 //End of variables for the background tiles
 //End of start screen variables
@@ -49,7 +58,7 @@ function toggleFunction(mainFunction, startUpFunction, cleanUpFunction, updateDa
   this.toggleOn = function(){//Calls our startUpFunction(if there is one), sets our loop status to on, and then begins the loop!
     if(startUpFunction)startUpFunction();
     this.on = true;
-    this.mainLoop();
+    if(this.mainLoop)this.mainLoop();
   }
   
   this.toggleOff = function(){//Kills loop, then calls cleanUpFunction.
@@ -66,22 +75,28 @@ function toggleFunction(mainFunction, startUpFunction, cleanUpFunction, updateDa
 
 //Start Screen Code! --------------------------------------------------------------------------------------------
 function drawPlayButton() {
-	counterForBox++;
-	if(counterForBox > 10){colorForBox = !colorForBox;counterForBox = 0;}
-	ctx.fillStyle = colorForBox ? colorOne : colorTwo;
-	ctx.fillRect($(window).width()/2-75, $(window).height()/2+12, 150, 50);
-	ctx.fillStyle = 'black';
-	ctx.lineWidth = 4;
-	ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-	ctx.font = "30px 'Aclonica'";
-	ctx.fillText('PLAY', $(window).width()/2, $(window).height()/2+39, 150, 50);
-	
-	ctx.beginPath();
-	ctx.setLineDash([20,10]);
-	ctx.lineDashOffset = -playButtonSet;
-	ctx.strokeRect($(window).width()/2-75, $(window).height()/2+12, 150, 50);
-	ctx.closePath();
+  var height = ($(window).height()/13 > 50) ? $(window).height()/13 : 50;
+  ctx.font = (height-8)+"px 'Aclonica'";
+  
+  var width = (ctx.measureText('START').width > roundToMaxOrMin($(window).width()/5, 250, 50)) ? ctx.measureText('START').width+8 : roundToMaxOrMin($(window).width()/5, 250, 50);
+  //(ctx.measureText('START').width > (($(window).width()/5 > 150) ? ($(window).width()/5 < 300 ? )150)) ? ctx.measureText('START').width+8 : ($(window).width()/5 > 150) ? $(window).width()/5 : 150;
+  
+  counterForBox++;
+  if(counterForBox > 10){colorForBox = !colorForBox;counterForBox = 0;}
+  ctx.fillStyle = colorForBox ? colorOne : colorTwo;
+  ctx.fillRect($(window).width()/2-width/2, $(window).height()/2-height/2+height/3, width, height);
+  ctx.fillStyle = 'black';
+  ctx.lineWidth = 4;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  
+  ctx.fillText('START', $(window).width()/2, $(window).height()/2+height/2.5);
+
+  ctx.beginPath();
+  ctx.setLineDash([20,10]);
+  ctx.lineDashOffset = -playButtonSet;
+  ctx.strokeRect($(window).width()/2-width/2, $(window).height()/2-height/2+height/3, width, height);
+  ctx.closePath();
 }
 
 function startScreen() {
@@ -123,14 +138,27 @@ function startScreen() {
     });
   });
   
+  function makeNewMaps(){woodenBackground.mapPlanks(true); stonePillar.mapPlanks(true);}
   
   //End of event listeners
-  
+  characterSelectionScreen = new toggleFunction(
+    undefined,
+    function(){
+      woodenBackground.drawPlanks(1, function(){stonePillar.drawPlanks(3, function(){
+        window.addEventListener('resize', makeNewMaps);
+        placeContent();
+      });});
+    },
+    function(){
+      window.removeEventListener('resize', makeNewMaps);
+      hideContent();
+    }
+  );
   
   function cleanUp(){
     woodenBackground = new displayAcrossScreen([plankStart, plankMiddle, plankOddsAndEnds, plankEnd], undefined, undefined, true);
     stonePillar = new displayAcrossScreen([stoneTile], 0, 175);
-    woodenBackground.drawPlanks(1, function(){stonePillar.drawPlanks(3, function(){characterSelectUpdate(); placeContent();});});
+    characterSelectionScreen.toggleOn();
   }
   
   function updateLoop(){
@@ -141,6 +169,12 @@ function startScreen() {
     titleScreenBubbles.drawMap();
     drawTitle();
     drawPlayButton();
+    /* //The following code is for making sure that everything is centered correctly. Essentially, it's living proof of my OCD.
+    ctx.beginPath();
+    ctx.moveTo($(window).width()/2,0);
+    ctx.lineTo($(window).width()/2, $(window).height());
+    ctx.stroke();
+    */
   }
   
   var startScreenUpdate = new toggleFunction(updateLoop, undefined, cleanUp, [true, 16]);
@@ -288,10 +322,11 @@ function drawTitle(){
 	//End of Bubble Code
 	
 	//Title
-	ctx.font = "bold 75px 'Aclonica'";
+    var height = ($(window).height()/8 > 100) ? $(window).height()/8 : 100;
+	ctx.font = "bold " + height + "px 'Aclonica'";
     ctx.textBaseline = 'bottom';
 	ctx.textAlign = 'center';
-	ctx.fillText('GDI', $(window).width()/2, $(window).height()/2-12);
+	ctx.fillText('GDI', $(window).width()/2, $(window).height()/2-height/10);
 	//End Title
 }
 
@@ -310,79 +345,6 @@ var callBackCount = 0;
 
 var boxCounter = 0;
 
-var animationTitles = [
-	'Dark Waves Transition',
-	'Yzy Bow Firing',
-	'Sparkle',
-];
-
-function DarkWaves(callback){//Dark Wave!
-		
-	function advancingTriangle(whereToGo, rbgValuez){
-		ctx.fillStyle = rbgValuez;
-		ctx.beginPath();
-		ctx.moveTo(0, 0);
-		ctx.lineTo(0, whereToGo*($(window).height()/12));
-		ctx.lineTo(whereToGo*($(window).width()/12), 0);
-		ctx.fill();
-    }
-		
-	if(waveCount === 0){
-		$('#rightSideBarOuter').hide();
-		$('#mainAreaOuter').hide();
-	}
-		
-	if(waveCount < 30)advancingTriangle(waveCount, 'rgb(0, 0, 0)');
-	if(waveCount > 15 && waveCount < 45)advancingTriangle(waveCount - 15, 'rgb(40, 40, 40)');
-	if(waveCount > 30 && waveCount < 60)advancingTriangle(waveCount - 30, 'rgb(80, 80, 80)');
-	if(waveCount > 45 && waveCount < 75)advancingTriangle(waveCount - 45, 'rgb(120, 120, 120)');
-	if(waveCount > 60 && waveCount < 90)advancingTriangle(waveCount - 60, 'rgb(160, 160, 160)');
-	if(waveCount > 75 && waveCount < 105)advancingTriangle(waveCount - 75, 'rgb(200, 200, 200)');
-	if(waveCount > 90 && waveCount < 120)advancingTriangle(waveCount - 90, 'rgb(240, 240, 240)');
-	
-	waveCount++;
-		
-	if(waveCount > 120)waveCount = 0;
-		
-	if(waveCount !== 0)setTimeout(function(){DarkWaves(callback);}, 50);
-	else{callback();}
-}
-
-function clearScreen() {//Clear screen!
-	//new displayAcrossScreen(1, [plankStart, plankOddsAndEnds, plankMiddle, plankEnd]);
-	$('#rightSideBarOuter').hide();
-	$('#mainAreaOuter').hide();
-}
-
-
-var animationCode = [
-  function(){
-    DarkWaves(clearScreen);
-  },
-	
-  function(){//Fire down upon them!
-    console.log('My tongue is sharp, but my arrow is sharper!');
-  },
-	
-  function(){//Sparkle: a somewhat feminine, useful nonetheless, particle effect!
-    console.log('Twinkle twinkle little star!');
-  }
-];
-
-
-function characterSelectUpdate(){
-  
-  characterSelectionScreen = new toggleFunction(
-    undefined,
-    function(){
-      window.addEventListener('resize', function makeNewMaps(){woodenBackground.mapPlanks(true); stonePillar.mapPlanks(true);});
-    },
-    function(){
-      window.removeEventListener('resize', makeNewMaps);
-    }
-  );
-  characterSelectionScreen.toggleOn();
-}
 
 
 function displayAcrossScreen(imagesArray, maxRows, startX, edgeFitOverlap) {
@@ -481,80 +443,133 @@ function displayAcrossScreen(imagesArray, maxRows, startX, edgeFitOverlap) {
     };
 }
 
-function placeContent() {
-	if(contentPlaced){
-		$('#rightSideBarOuter').show();
-		$('#mainAreaOuter').show();
-		return;
-	}
-	else if(!contentPlaced)contentPlaced = true;
-	
-	$('#canvasCan').prepend('<div id = rightSideBarOuter style = position:absolute;top:0px;left:0px;height:700px;width:175px; zindex = 2 > </div>');
-		$('#rightSideBarOuter').prepend('<div id = rightSideBarInner style = position:relative;height:700px;width:175px;></div>');
-			$('#rightSideBarInner').prepend('<div style = padding-right:4px;margin-top:4px; zindex = 2 id = characterBox class = quickPlay></div>');
-				$('.quickPlay').prepend('<p id = characterSubTitle>Quick Play</p>');
-				$('.quickPlay').append('<hr id = thinHr>');
-				$('.quickPlay').append('<p style = text-align:center;margin-top:0px; id = characterSubText>Play without having to generate a character first.</p>');
-				$('.quickPlay').append('<hr style = margin-top:20px; id = thinHr>');
-			$('#rightSideBarInner').append('<div style = padding-right:4px;margin-top:18px; zindex = 2 id = characterBox class = animationPlayGround></div>');
-				$('.animationPlayGround').prepend('<p id = characterSubTitle>Animations</p>');
-				$('.animationPlayGround').append('<hr id = thinHr>');
-				$('.animationPlayGround').append('<p style = text-align:center;margin-top:0px; id = characterSubText>Test out some of our fresh animations!</p>');
-				$('.animationPlayGround').append('<hr style = margin-top:20px; id = thinHr>');
-			$('#rightSideBarInner').append('<div style = padding-right:4px;margin-top:18px; zindex = 2 id = characterBox class = inventoryTest></div>');
-				$('.inventoryTest').prepend('<p id = characterSubTitle>Inventory</p>');
-				$('.inventoryTest').append('<hr id = thinHr>');
-				$('.inventoryTest').append('<p style = text-align:center;margin-top:0px; id = characterSubText>Test out the inventory system!</p>');
-				//$('.inventoryTest').append('<hr style = margin-top:20px; id = thinHr>');
-	
-	$('#canvasCan').append('<div id = mainAreaOuter style = position:absolute;top:0px;left:222px;height:700px;width:478px; zindex = 2 ></div>');
-		$('#mainAreaOuter').prepend('<div id = mainAreaInner style = position:relative;height:700px;width:478px; zindex = 2></div>');
-	
-	
-	$('.animationPlayGround').click(function(){
-		$('#mainAreaInner').empty();
-		rows = 0;
-		columns = 0;
-		boxCounter = 0;
-		$('#mainAreaInner').append('<div id = animationMainArea style = margin:auto;width:95%;height:95%;padding:5px;></div>');
-		$('#animationMainArea').append('<div style = width:100%;height:50px; id = animationTitleBar><h3 style = text-align:center;>Animations</h3></div>');
-		$('#animationMainArea').append('<hr style = margin-top:10px; id = thinHr>');
-		
-		for(columns = 0; columns < 6; columns++){
-			$('#animationMainArea').append('<div style = width:100%;height:100px id = thisColumn' + columns + '></div>');
-			for(rows = 0; rows < 4; rows++){
-				if(rows === 0)$('#thisColumn' + columns).append('<div id = animationBox style = float:right; class = animationNumber' + boxCounter + '></div>');
-				else if(rows === 1)$('#thisColumn' + columns).append('<div id = animationBox style = float:left; class = animationNumber' + boxCounter + '></div>');
-				else if(rows === 2)$('#thisColumn' + columns).append('<div id = animationBox style = margin:auto; class = animationNumber' + boxCounter + '></div>');
-				else if(rows === 3)$('#thisColumn' + columns).append('<hr style = margin-top:10px; id = thinHr>');
-				if(rows < 3)boxCounter++;
-			}
-		}
-		
-		for(boxCounter;boxCounter !== -1; boxCounter--){
-			if(boxCounter < 3) {
-				$('.animationNumber' + boxCounter).append('<p margin-top:5px>' + animationTitles[boxCounter] + '</p>');
-				$('.animationNumber' + boxCounter).click(animationCode[boxCounter]);
-			}
-		
-			else{
-				animationNumber = (boxCounter%3 === 0) ? boxCounter + 2 : boxCounter - 1;
-				$('.animationNumber' + boxCounter).append('<p margin-top:5px>Animation #' + animationNumber + '</p>');
-				$('.animationNumber' + boxCounter).click(function(){ console.log('No function yet! :D');});
-			}
-		}
-	});
+var animationTitles = [
+	'Dark Waves Transition',
+	'Yzy Bow Firing',
+	'Sparkle',
+];
 
-	$('.inventoryTest').click(function(){
-		$('#mainAreaInner').empty();
-		$('#mainAreaInner').append('<div id = inventoryMainArea style = margin:auto;width:95%;height:95%;padding:5px;></div>');
-		$('#inventoryMainArea').append('<div style = width:100%;height:50px; id = inventoryTitleBar><h3 style = text-align:center;margin-top:35px;>Inventory</h3></div>');
-		$('#inventoryMainArea').append('<hr style = margin-top:10px; id = thinHr>');
-	});
+function DarkWaves(callback){//Dark Wave!
+
+  function advancingTriangle(whereToGo, rbgValuez){
+    ctx.fillStyle = rbgValuez;
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.lineTo(0, whereToGo*($(window).height()/12));
+    ctx.lineTo(whereToGo*($(window).width()/12), 0);
+    ctx.fill();
+  }
+
+  if(waveCount === 0){
+    $('#rightSideBarOuter').hide();
+    $('#mainAreaOuter').hide();
+  }
+
+  if(waveCount < 30)advancingTriangle(waveCount, 'rgb(0, 0, 0)');
+  if(waveCount > 15 && waveCount < 45)advancingTriangle(waveCount - 15, 'rgb(40, 40, 40)');
+  if(waveCount > 30 && waveCount < 60)advancingTriangle(waveCount - 30, 'rgb(80, 80, 80)');
+  if(waveCount > 45 && waveCount < 75)advancingTriangle(waveCount - 45, 'rgb(120, 120, 120)');
+  if(waveCount > 60 && waveCount < 90)advancingTriangle(waveCount - 60, 'rgb(160, 160, 160)');
+  if(waveCount > 75 && waveCount < 105)advancingTriangle(waveCount - 75, 'rgb(200, 200, 200)');
+  if(waveCount > 90 && waveCount < 120)advancingTriangle(waveCount - 90, 'rgb(240, 240, 240)');
+
+  waveCount++;
+
+  if(waveCount > 120)waveCount = 0;
+
+  if(waveCount !== 0)setTimeout(function(){DarkWaves(callback);}, 50);
+  else{callback();}
+}
+
+
+var animationCode = [
+  function(){
+    characterSelectionScreen.toggleOff();
+    DarkWaves(characterSelectionScreen.toggleOn);
+  },
 	
-	$('.quickPlay').click(function(){
-		DarkWaves(startGame);
-	});
+  function(){//Fire down upon them!
+    console.log('My tongue is sharp, but my arrow is sharper!');
+  },
+	
+  function(){//Sparkle: a somewhat feminine, useful nonetheless, particle effect!
+    console.log('Twinkle twinkle little star!');
+  }
+];
+
+function hideContent(){//Clear screen!
+	//new displayAcrossScreen(1, [plankStart, plankOddsAndEnds, plankMiddle, plankEnd]);
+	$('#rightSideBarOuter').hide();
+	$('#mainAreaOuter').hide();
+}
+
+function placeContent(){
+  $('#canvasCan').prepend('<div id = rightSideBarOuter style = position:absolute;top:0px;left:0px;height:700px;width:175px; zindex = 2 > </div>');
+    $('#rightSideBarOuter').prepend('<div id = rightSideBarInner style = position:relative;height:700px;width:175px;></div>');
+      $('#rightSideBarInner').prepend('<div style = padding-right:4px;margin-top:4px; zindex = 2 id = characterBox class = quickPlay></div>');
+        $('.quickPlay').prepend('<p id = characterSubTitle>Quick Play</p>');
+        $('.quickPlay').append('<hr id = thinHr>');
+        $('.quickPlay').append('<p style = text-align:center;margin-top:0px; id = characterSubText>Play without having to generate a character first.</p>');
+        $('.quickPlay').append('<hr style = margin-top:20px; id = thinHr>');
+      $('#rightSideBarInner').append('<div style = padding-right:4px;margin-top:18px; zindex = 2 id = characterBox class = animationPlayGround></div>');
+        $('.animationPlayGround').prepend('<p id = characterSubTitle>Animations</p>');
+        $('.animationPlayGround').append('<hr id = thinHr>');
+        $('.animationPlayGround').append('<p style = text-align:center;margin-top:0px; id = characterSubText>Test out some of our fresh animations!</p>');
+        $('.animationPlayGround').append('<hr style = margin-top:20px; id = thinHr>');
+      $('#rightSideBarInner').append('<div style = padding-right:4px;margin-top:18px; zindex = 2 id = characterBox class = inventoryTest></div>');
+        $('.inventoryTest').prepend('<p id = characterSubTitle>Inventory</p>');
+        $('.inventoryTest').append('<hr id = thinHr>');
+        $('.inventoryTest').append('<p style = text-align:center;margin-top:0px; id = characterSubText>Test out the inventory system!</p>');
+        //$('.inventoryTest').append('<hr style = margin-top:20px; id = thinHr>');
+
+  $('#canvasCan').append('<div id = mainAreaOuter style = position:absolute;top:0px;left:222px;height:700px;width:478px; zindex = 2 ></div>');
+    $('#mainAreaOuter').prepend('<div id = mainAreaInner style = position:relative;height:700px;width:478px; zindex = 2></div>');
+
+
+  $('.animationPlayGround').click(function(){
+    $('#mainAreaInner').empty();
+    rows = 0;
+    columns = 0;
+    boxCounter = 0;
+    $('#mainAreaInner').append('<div id = animationMainArea style = margin:auto;width:95%;height:95%;padding:5px;></div>');
+    $('#animationMainArea').append('<div style = width:100%;height:50px; id = animationTitleBar><h3 style = text-align:center;>Animations</h3></div>');
+    $('#animationMainArea').append('<hr style = margin-top:10px; id = thinHr>');
+
+    for(columns = 0; columns < 6; columns++){
+      $('#animationMainArea').append('<div style = width:100%;height:100px id = thisColumn' + columns + '></div>');
+      for(rows = 0; rows < 4; rows++){
+        if(rows === 0)$('#thisColumn' + columns).append('<div id = animationBox style = float:right; class = animationNumber' + boxCounter + '></div>');
+        else if(rows === 1)$('#thisColumn' + columns).append('<div id = animationBox style = float:left; class = animationNumber' + boxCounter + '></div>');
+        else if(rows === 2)$('#thisColumn' + columns).append('<div id = animationBox style = margin:auto; class = animationNumber' + boxCounter + '></div>');
+        else if(rows === 3)$('#thisColumn' + columns).append('<hr style = margin-top:10px; id = thinHr>');
+        if(rows < 3)boxCounter++;
+      }
+    }
+
+    for(boxCounter;boxCounter !== -1; boxCounter--){
+      if(boxCounter < 3) {
+        $('.animationNumber' + boxCounter).append('<p margin-top:5px>' + animationTitles[boxCounter] + '</p>');
+        $('.animationNumber' + boxCounter).click(animationCode[boxCounter]);
+      }
+
+      else{
+        animationNumber = (boxCounter%3 === 0) ? boxCounter + 2 : boxCounter - 1;
+        $('.animationNumber' + boxCounter).append('<p margin-top:5px>Animation #' + animationNumber + '</p>');
+        $('.animationNumber' + boxCounter).click(function(){ console.log('No function yet! :D');});
+      }
+    }
+  });
+
+  $('.inventoryTest').click(function(){
+    $('#mainAreaInner').empty();
+    $('#mainAreaInner').append('<div id = inventoryMainArea style = margin:auto;width:95%;height:95%;padding:5px;></div>');
+    $('#inventoryMainArea').append('<div style = width:100%;height:50px; id = inventoryTitleBar><h3 style = text-align:center;margin-top:35px;>Inventory</h3></div>');
+    $('#inventoryMainArea').append('<hr style = margin-top:10px; id = thinHr>');
+  });
+
+  $('.quickPlay').click(function(){
+    DarkWaves(startGame);
+  });
 }
 
 //END OF CHARACTER SELECTION SCREEN CODE!--------------------------------------------------------------------------------------------

@@ -24,6 +24,12 @@ function setPixel(x, y, ctx) {
 	ctx.fillRect(x - 0.5, y - 0.5, 1, 1 );	
 }
 
+function roundToMaxOrMin(value, max, min){
+  if(value > max)return max;
+  else if(value < min)return min;
+  else return value;  
+}
+
 function distanceFrom(firstX, firstY, secondX, secondY){
 	var leftOrRight = (firstX<secondX)? 'left' : 'right';
 	var upOrDown = (firstY<secondY)? 'up' : 'down';

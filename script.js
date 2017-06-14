@@ -11,12 +11,7 @@ var boxOn = false;
 var colorForBox = true;
 var counterForBox = 0;
 
-var playButtonRect = {
-  x:$(window).width()/2-(($(window).width()/5 > 150) ? $(window).width()/5 : 150)/2,
-  y:$(window).height()/2-(($(window).height()/13 > 50) ? $(window).height()/13 : 50)/2,
-  width:(ctx.measureText('START').width > roundToMaxOrMin($(window).width()/5, 250, 50)) ? ctx.measureText('START').width+8 : roundToMaxOrMin($(window).width()/5, 250, 50),
-  height:($(window).height()/13 > 50) ? $(window).height()/13 : 50
-};
+var playButtonRect;
 
 var playButtonBoolean = true;
 var titleScreenBubbles = new bubbles();
@@ -81,6 +76,13 @@ function drawPlayButton() {
   var width = (ctx.measureText('START').width > roundToMaxOrMin($(window).width()/5, 250, 50)) ? ctx.measureText('START').width+8 : roundToMaxOrMin($(window).width()/5, 250, 50);
   //(ctx.measureText('START').width > (($(window).width()/5 > 150) ? ($(window).width()/5 < 300 ? )150)) ? ctx.measureText('START').width+8 : ($(window).width()/5 > 150) ? $(window).width()/5 : 150;
   
+  playButtonRect = {
+    x:$(window).width()/2-width/2,
+    y:$(window).height()/2-height/2+height/3,
+    width:width,
+    height:height
+  };
+  
   counterForBox++;
   if(counterForBox > 10){colorForBox = !colorForBox;counterForBox = 0;}
   ctx.fillStyle = colorForBox ? colorOne : colorTwo;
@@ -138,16 +140,19 @@ function startScreen() {
     });
   });
   
-  function makeNewMaps(){woodenBackground.mapPlanks(true); stonePillar.mapPlanks(true);}
+  function makeNewMaps(){
+    woodenBackground.mapPlanks(true);
+    stonePillar.mapPlanks(true);
+  }
   
   //End of event listeners
   characterSelectionScreen = new toggleFunction(
     undefined,
     function(){
-      woodenBackground.drawPlanks(1, function(){stonePillar.drawPlanks(3, function(){
-        window.addEventListener('resize', makeNewMaps);
-        placeContent();
-      });});
+      window.addEventListener('resize', makeNewMaps);
+      
+      woodenBackground.mapPlanks();
+      stonePillar.mapPlanks();
     },
     function(){
       window.removeEventListener('resize', makeNewMaps);
@@ -158,17 +163,24 @@ function startScreen() {
   function cleanUp(){
     woodenBackground = new displayAcrossScreen([plankStart, plankMiddle, plankOddsAndEnds, plankEnd], undefined, undefined, true);
     stonePillar = new displayAcrossScreen([stoneTile], 0, 175);
+    
     characterSelectionScreen.toggleOn();
+    
+    woodenBackground.drawPlanks(1, function(){
+        stonePillar.drawPlanks(3, placeContent);
+    });
   }
   
   function updateLoop(){
     playButtonSet++;
     if(playButtonSet > 210)playButtonSet = 0;
     //Passing around a huge number could cause lag, so we'll shorten it every once in a while.
+    
     makeBackgroundScreen();
     titleScreenBubbles.drawMap();
     drawTitle();
     drawPlayButton();
+    
     /* //The following code is for making sure that everything is centered correctly. Essentially, it's living proof of my OCD.
     ctx.beginPath();
     ctx.moveTo($(window).width()/2,0);
@@ -358,8 +370,6 @@ function displayAcrossScreen(imagesArray, maxRows, startX, edgeFitOverlap) {
     
     this.map = [];
   
-    this.index = 0;
-  
     //this.edgeFitOverlap = edgeFitOverlap;
   
     this.mapPlanks = function(drawAfter, timeBreak, callBack){
@@ -369,7 +379,11 @@ function displayAcrossScreen(imagesArray, maxRows, startX, edgeFitOverlap) {
   
       this.maxColumns = Math.ceil($(window).height()/this.plankMiddle.height);
       
+      this.originalScreenDimensions = [$(window).width(), $(window).height()];
+      
       this.addTo = 0;
+      
+      this.index = 0;
       
       if(edgeFitOverlap){
         
@@ -425,9 +439,13 @@ function displayAcrossScreen(imagesArray, maxRows, startX, edgeFitOverlap) {
     this.mapPlanks();
     
     this.drawPlanks = function(timeBreak, callback){
+      if(this.originalScreenDimensions[0] !== $(window).width() && this.originalScreenDimensions[1] !== $(window).height()){
+        ctx.clearRect(0, 0, $(window).width(), $(window).height());
+        if(callback)callback();
+        return;
+      }
       
       var element = this.map[this.index];
-      //console.log(this.map);
       if(element)ctx.drawImage(element[0], element[1], element[2]);
       
       if(this.index < this.map.length-1){
@@ -451,19 +469,22 @@ var animationTitles = [
 
 function DarkWaves(callback){//Dark Wave!
 
-  function advancingTriangle(whereToGo, rbgValuez){
+  function advancingTriangle(whereToGo, rbgValuez, clear){
     ctx.fillStyle = rbgValuez;
     ctx.beginPath();
     ctx.moveTo(0, 0);
     ctx.lineTo(0, whereToGo*($(window).height()/12));
     ctx.lineTo(whereToGo*($(window).width()/12), 0);
-    ctx.fill();
+    if(!clear)ctx.fill();
+    else {
+      ctx.save();
+      ctx.clip();
+      ctx.clearRect(0, 0, cnv.width, cnv.height);
+      ctx.restore();
+    }
   }
 
-  if(waveCount === 0){
-    $('#rightSideBarOuter').hide();
-    $('#mainAreaOuter').hide();
-  }
+  if(waveCount === 0)hideContent();
 
   if(waveCount < 30)advancingTriangle(waveCount, 'rgb(0, 0, 0)');
   if(waveCount > 15 && waveCount < 45)advancingTriangle(waveCount - 15, 'rgb(40, 40, 40)');
@@ -471,14 +492,14 @@ function DarkWaves(callback){//Dark Wave!
   if(waveCount > 45 && waveCount < 75)advancingTriangle(waveCount - 45, 'rgb(120, 120, 120)');
   if(waveCount > 60 && waveCount < 90)advancingTriangle(waveCount - 60, 'rgb(160, 160, 160)');
   if(waveCount > 75 && waveCount < 105)advancingTriangle(waveCount - 75, 'rgb(200, 200, 200)');
-  if(waveCount > 90 && waveCount < 120)advancingTriangle(waveCount - 90, 'rgb(240, 240, 240)');
+  if(waveCount > 90 && waveCount < 120)advancingTriangle(waveCount - 90, 'rgb(240, 240, 240)', true);
 
   waveCount++;
 
   if(waveCount > 120)waveCount = 0;
 
   if(waveCount !== 0)setTimeout(function(){DarkWaves(callback);}, 50);
-  else{callback();}
+  else if(callback)callback();
 }
 
 
@@ -498,14 +519,87 @@ var animationCode = [
 ];
 
 function hideContent(){//Clear screen!
-	//new displayAcrossScreen(1, [plankStart, plankOddsAndEnds, plankMiddle, plankEnd]);
-	$('#rightSideBarOuter').hide();
-	$('#mainAreaOuter').hide();
+	$('#leftSideBar').remove();
+	$('#mainArea').remove();
 }
 
 function placeContent(){
-  $('#canvasCan').prepend('<div id = rightSideBarOuter style = position:absolute;top:0px;left:0px;height:700px;width:175px; zindex = 2 > </div>');
-    $('#rightSideBarOuter').prepend('<div id = rightSideBarInner style = position:relative;height:700px;width:175px;></div>');
+  
+  //Starting the setting up of things
+  
+  //First, we'll remove already existing content, if any.
+  hideContent();
+  
+  //These make some divs that essentially section off the screen.
+  
+  $('#canvasCan').append('<div id = leftSideBar style = position:absolute;top:0px;left:0px;height:100%;width:175px; zindex = 2 > </div>');
+    $('#leftSideBar').append('<hr style = margin-top:8px;width:90%; id = thinHr>');
+  $('#canvasCan').append('<div id = mainArea style = position:absolute;top:0px;left:222px;height:100%;width:' + (100 - 100*(222/$(window).width())) + '%; zindex = 2 ></div>');
+  
+  //Finished the setting up of screen sectioning.
+  
+  //Upcoming are functions that we use to stick things in these sectioned off divs.
+  
+  function addLeftBox(title, id, content, onClick){
+    $('#leftSideBar').append('<div style = padding-right:4px;margin-top:4px; zindex = 2 id = ' + id + ' class = characterBox></div>');
+      $('#'+id).append('<p id = characterSubTitle>' + title + '</p>');
+      $('#'+id).append('<hr id = thinHr>');
+      $('#'+id).append('<p style = text-align:center;margin-top:0px; id = characterSubText>' + content + '</p>');
+      if(onClick)$('#'+id).click(onClick);
+    
+    $('#leftSideBar').append('<hr style = margin-top:8px;width:90%; id = thinHr>');
+  }
+  
+  function addMainArea(areaID, title){
+    $('#mainArea').empty();
+    $('#mainArea').append('<div id = ' + areaID + 'MainArea style = margin:auto;width:95%;height:95%;padding:5px;></div>');
+    $('#' + areaID + 'MainArea').append('<div style = width:100%;height:50px; id = ' + areaID + 'TitleBar><h3 style = text-align:center;font-size:50px;>' + title + '</h3></div>');
+    $('#' + areaID + 'MainArea').append('<hr style = margin-top:10px; id = thinHr>');
+  }
+  
+  //Finished the functions for sticking things in sectioned off divs.
+  
+  //Finished setting things up.
+  
+  addLeftBox('Quick Test', 'testBox', 'Test the Graphical Deity Interface', function(){
+    DarkWaves(startGame);
+  });
+  
+  addLeftBox('Inventory', 'inventoryBox', "Test out GDI's nonexistent inventory system", function(){
+    addMainArea('inventory', 'Inventory');
+  });
+  
+  addLeftBox('Animations', 'animationTest', 'View animations used in GDI', function(){
+    var rows = 0;
+    var columns = 0;
+    var boxCounter = 0;
+    addMainArea('animation', 'Animation');
+
+    for(columns = 0; columns < 6; columns++){
+      $('#animationMainArea').append('<div style = width:100%;height:100px id = thisColumn' + columns + '></div>');
+      for(rows = 0; rows < 4; rows++){
+        if(rows === 0)$('#thisColumn' + columns).append('<div id = animationBox style = float:right; class = animationNumber' + boxCounter + '></div>');
+        else if(rows === 1)$('#thisColumn' + columns).append('<div id = animationBox style = float:left; class = animationNumber' + boxCounter + '></div>');
+        else if(rows === 2)$('#thisColumn' + columns).append('<div id = animationBox style = margin:auto; class = animationNumber' + boxCounter + '></div>');
+        else if(rows === 3)$('#thisColumn' + columns).append('<hr style = margin-top:10px; id = thinHr>');
+        if(rows < 3)boxCounter++;
+      }
+    }
+
+    for(boxCounter;boxCounter !== -1; boxCounter--){
+      if(boxCounter < 3) {
+        $('.animationNumber' + boxCounter).append('<p margin-top:5px>' + animationTitles[boxCounter] + '</p>');
+        $('.animationNumber' + boxCounter).click(animationCode[boxCounter]);
+      }
+
+      else{
+        animationNumber = (boxCounter%3 === 0) ? boxCounter + 2 : boxCounter - 1;
+        $('.animationNumber' + boxCounter).append('<p margin-top:5px>Animation #' + animationNumber + '</p>');
+        $('.animationNumber' + boxCounter).click(function(){ console.log('No function yet! :D');});
+      }
+    }
+  });
+  /*
       $('#rightSideBarInner').prepend('<div style = padding-right:4px;margin-top:4px; zindex = 2 id = characterBox class = quickPlay></div>');
         $('.quickPlay').prepend('<p id = characterSubTitle>Quick Play</p>');
         $('.quickPlay').append('<hr id = thinHr>');
@@ -521,7 +615,7 @@ function placeContent(){
         $('.inventoryTest').append('<hr id = thinHr>');
         $('.inventoryTest').append('<p style = text-align:center;margin-top:0px; id = characterSubText>Test out the inventory system!</p>');
         //$('.inventoryTest').append('<hr style = margin-top:20px; id = thinHr>');
-
+  
   $('#canvasCan').append('<div id = mainAreaOuter style = position:absolute;top:0px;left:222px;height:700px;width:478px; zindex = 2 ></div>');
     $('#mainAreaOuter').prepend('<div id = mainAreaInner style = position:relative;height:700px;width:478px; zindex = 2></div>');
 
@@ -568,8 +662,8 @@ function placeContent(){
   });
 
   $('.quickPlay').click(function(){
-    DarkWaves(startGame);
   });
+  */
 }
 
 //END OF CHARACTER SELECTION SCREEN CODE!--------------------------------------------------------------------------------------------

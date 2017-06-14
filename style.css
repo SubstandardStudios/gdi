@@ -81,10 +81,6 @@ h1 {
     font-weight:bold;
 }
 
-#animationTitleBar {
-	font-size:30px;
-}
-
 .generatorBox {
  
   border: 2px solid black;
@@ -209,31 +205,17 @@ h1 {
 #thinHr {
 	border:1px solid black;
 	margin-top:0px;
-	margin-bottom:10px;
-}
-
-#characterBox {
-	margin: 0 auto;
-  margin-bottom: 15px;
-	
-	border: 3px solid black;
-  border-radius: 25px;
-	
-	height: 85px;
-  width: 150px;
-	
-	padding:5px;	
+	margin-bottom:5px;
 }
 
 #animationBox {
-	
-	border: 3px solid black;
+  border: 3px solid black;
   border-radius: 25px;
-	
-	height: 70px;
+
+  height: 70px;
   width: 125px;
-	
-	text-align:center;
+
+  text-align:center;
 }
 
 #mainhr {
@@ -254,7 +236,7 @@ h1 {
 	
 	margin:0px;
 	
-  background-color:DarkGrey;
+  background-color:'rgba(0,0,0,0)';
 	-ms-interpolation-mode: nearest-neighbor;
 	image-rendering: -webkit-optimize-contrast;
 	image-rendering: -webkit-crisp-edges;
@@ -263,6 +245,18 @@ h1 {
 	image-rendering: pixelated;
 }
 
+.characterBox {
+  margin: 0 auto;
+  margin-bottom: 0px;
+
+  border: 3px solid black;
+  border-radius: 25px;
+
+  height: 85px;
+  width: 150px;
+
+  padding:5px;	
+}
 
 .verticalLine {
     border-left: thick solid #ff0000;

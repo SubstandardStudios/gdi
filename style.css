@@ -99,19 +99,18 @@ h1 {
 }
 
 .titleBox{
-  border: 2px solid black;
-  border-radius: 25px;
+  border: 3px solid black;
+  border-radius: 20px;
   
-  background:url(http://piskel-imgstore-b.appspot.com/img/be5d630f-e430-11e6-a821-b98bdf48deb5.gif);
+  padding:5px;
   
-  height:25px;
-  width:375px;
+  width: 95%;
   
   display:table;
   margin: 0 auto;
-  margin-bottom: 15px;
-  margin-top:15px;
   
+  margin-bottom: 10px;
+  margin-top:10px;
 }
 
 .inner {
@@ -208,7 +207,10 @@ h1 {
 	margin-bottom:5px;
 }
 
-#animationBox {
+.animationBox {
+  
+  position: relative;
+  
   border: 3px solid black;
   border-radius: 25px;
 
@@ -246,16 +248,23 @@ h1 {
 }
 
 .characterBox {
+  font-size:20px;
+  
+  width:150px;
+  height:25px;
+  
   margin: 0 auto;
   margin-bottom: 0px;
 
   border: 3px solid black;
   border-radius: 25px;
 
+  padding:5px;	
+}
+
+.characterBox:hover{
   height: 85px;
   width: 150px;
-
-  padding:5px;	
 }
 
 .verticalLine {

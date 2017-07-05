@@ -141,6 +141,8 @@ function startScreen() {
   });
   
   function makeNewMaps(){
+    woodenBackground.alive = false;
+    stonePillar.alive = false;
     woodenBackground.mapPlanks(true);
     stonePillar.mapPlanks(true);
   }
@@ -161,13 +163,16 @@ function startScreen() {
   );
   
   function cleanUp(){
+    
     woodenBackground = new displayAcrossScreen([plankStart, plankMiddle, plankOddsAndEnds, plankEnd], undefined, undefined, true);
     stonePillar = new displayAcrossScreen([stoneTile], 0, 175);
     
     characterSelectionScreen.toggleOn();
     
-    woodenBackground.drawPlanks(1, function(){
-        stonePillar.drawPlanks(3, placeContent);
+    woodenBackground.drawPlanks(true, function(){
+      stonePillar.drawPlanks(true, function(){
+        placeContent();
+      });
     });
   }
   
@@ -361,6 +366,8 @@ var boxCounter = 0;
 
 function displayAcrossScreen(imagesArray, maxRows, startX, edgeFitOverlap) {
   
+    this.alive = true;
+  
     this.plankStart = imagesArray[0];
     this.plankMiddle = (imagesArray[1]) ? imagesArray[1] : this.plankStart;
     this.plankMiddleTwo = (imagesArray[2]) ? imagesArray[2] : this.plankMiddle;
@@ -373,10 +380,10 @@ function displayAcrossScreen(imagesArray, maxRows, startX, edgeFitOverlap) {
     //this.edgeFitOverlap = edgeFitOverlap;
   
     this.mapPlanks = function(drawAfter, timeBreak, callBack){
+      
       this.map = [];
       
       this.maxRows = (maxRows || maxRows === 0) ? maxRows : Math.ceil($(window).width()/this.plankMiddle.width);
-  
       this.maxColumns = Math.ceil($(window).height()/this.plankMiddle.height);
       
       this.originalScreenDimensions = [$(window).width(), $(window).height()];
@@ -384,6 +391,8 @@ function displayAcrossScreen(imagesArray, maxRows, startX, edgeFitOverlap) {
       this.addTo = 0;
       
       this.index = 0;
+      
+      this.waitBuffer = 0;
       
       if(edgeFitOverlap){
         
@@ -432,15 +441,14 @@ function displayAcrossScreen(imagesArray, maxRows, startX, edgeFitOverlap) {
           ]);
         }
       }
-      
+      this.alive = true;
       if(drawAfter)this.drawPlanks(timeBreak, callBack);
     };
     
     this.mapPlanks();
     
     this.drawPlanks = function(timeBreak, callback){
-      if(this.originalScreenDimensions[0] !== $(window).width() && this.originalScreenDimensions[1] !== $(window).height()){
-        ctx.clearRect(0, 0, $(window).width(), $(window).height());
+      if(!this.alive){
         if(callback)callback();
         return;
       }
@@ -450,11 +458,22 @@ function displayAcrossScreen(imagesArray, maxRows, startX, edgeFitOverlap) {
       
       if(this.index < this.map.length-1){
         this.index++;
-        if(timeBreak)setTimeout(this.drawPlanks.bind(this, timeBreak, callback), timeBreak);
+        
+        if(timeBreak){
+          this.waitBuffer = this.waitBuffer + 1;
+          
+          if(this.waitBuffer >= this.maxRows*this.maxColumns/100){
+            this.waitBuffer = 0;
+            setTimeout(this.drawPlanks.bind(this, timeBreak, callback), 1);
+          }
+          else this.drawPlanks(timeBreak, callback);
+        }
         else this.drawPlanks(timeBreak, callback);
       }
       
       else{
+        console.log(this.maxRows*this.maxColumns/100);
+        this.alive=false;
         this.index = 0;
         if(callback)callback();
       }
@@ -543,8 +562,16 @@ function placeContent(){
   function addLeftBox(title, id, content, onClick){
     $('#leftSideBar').append('<div style = padding-right:4px;margin-top:4px; zindex = 2 id = ' + id + ' class = characterBox></div>');
       $('#'+id).append('<p id = characterSubTitle>' + title + '</p>');
-      $('#'+id).append('<hr id = thinHr>');
-      $('#'+id).append('<p style = text-align:center;margin-top:0px; id = characterSubText>' + content + '</p>');
+      $('#'+id).hover(
+        function(){
+          $('#'+id).append('<hr id = thinHr>');
+          $('#'+id).append('<p style = text-align:center;margin-top:0px; id = characterSubText>' + content + '</p>');
+        },
+        function(){
+          $('#'+id).empty();
+          $('#'+id).append('<p id = characterSubTitle>' + title + '</p>');
+        }
+      );
       if(onClick)$('#'+id).click(onClick);
     
     $('#leftSideBar').append('<hr style = margin-top:8px;width:90%; id = thinHr>');
@@ -553,8 +580,7 @@ function placeContent(){
   function addMainArea(areaID, title){
     $('#mainArea').empty();
     $('#mainArea').append('<div id = ' + areaID + 'MainArea style = margin:auto;width:95%;height:95%;padding:5px;></div>');
-    $('#' + areaID + 'MainArea').append('<div style = width:100%;height:50px; id = ' + areaID + 'TitleBar><h3 style = text-align:center;font-size:50px;>' + title + '</h3></div>');
-    $('#' + areaID + 'MainArea').append('<hr style = margin-top:10px; id = thinHr>');
+    $('#' + areaID + 'MainArea').append('<div id = ' + areaID + 'TitleBar class = titleBox><h3 style = text-align:center;font-size:45px;margin-top:5px;margin-bottom:5px;>' + title + '</h3></div>');
   }
   
   //Finished the functions for sticking things in sectioned off divs.
@@ -570,19 +596,27 @@ function placeContent(){
   });
   
   addLeftBox('Animations', 'animationTest', 'View animations used in GDI', function(){
-    var rows = 0;
-    var columns = 0;
-    var boxCounter = 0;
+    //SPR
     addMainArea('animation', 'Animation');
-
-    for(columns = 0; columns < 6; columns++){
-      $('#animationMainArea').append('<div style = width:100%;height:100px id = thisColumn' + columns + '></div>');
-      for(rows = 0; rows < 4; rows++){
-        if(rows === 0)$('#thisColumn' + columns).append('<div id = animationBox style = float:right; class = animationNumber' + boxCounter + '></div>');
-        else if(rows === 1)$('#thisColumn' + columns).append('<div id = animationBox style = float:left; class = animationNumber' + boxCounter + '></div>');
-        else if(rows === 2)$('#thisColumn' + columns).append('<div id = animationBox style = margin:auto; class = animationNumber' + boxCounter + '></div>');
-        else if(rows === 3)$('#thisColumn' + columns).append('<hr style = margin-top:10px; id = thinHr>');
-        if(rows < 3)boxCounter++;
+    
+    var columns = 0;
+    var maxColumns = Math.floor($('#animationMainArea').width()/131)-1;
+    
+    var rows = 0;
+    var maxRows = 0;
+    
+    var boxCounter = 0;
+    
+    $('#animationMainArea').append('<hr style = margin-top:10px; id = thinHr>');
+    $('#animationMainArea').css('overflowy', 'scroll');
+    
+    for(rows = 0; rows < 6; rows++){
+      $('#animationMainArea').append('<div style = width:100%;height:100px id = rowNumber' + rows + '></div>');
+      
+      for(columns = 0; columns < maxColumns; columns++){
+        $('#rowNumber' + rows).append('<div class = animationBox style = top:20px; id = animationNumber' + boxCounter + '></div>');
+        if(columns === maxColumns-1)$('#thisColumn' + rows).append('<hr style = margin-top:10px; id = thinHr>');
+        boxCounter++;
       }
     }
 

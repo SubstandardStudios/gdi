@@ -141,6 +141,8 @@ function startScreen() {
   });
   
   function makeNewMaps(){
+    hideContent();
+    placeContent();
     woodenBackground.alive = false;
     stonePillar.alive = false;
     woodenBackground.mapPlanks(true);
@@ -150,11 +152,8 @@ function startScreen() {
   //End of event listeners
   characterSelectionScreen = new toggleFunction(
     undefined,
-    function(){
+    function(){      
       window.addEventListener('resize', makeNewMaps);
-      
-      woodenBackground.mapPlanks();
-      stonePillar.mapPlanks();
     },
     function(){
       window.removeEventListener('resize', makeNewMaps);
@@ -255,8 +254,8 @@ function bubbles(){
     
     this.map.forEach(function(element, index){
       
-      if(Math.floor(Math.random()*2000) === 1)element[3] = (element[3] === colorOne) ? colorTwo : colorOne;
       if(Math.floor(Math.random()*100) === 1)titleScreenBubbles.glideTo(index, Math.floor(Math.random()*$(window).width()), Math.floor(Math.random()*$(window).height()));
+      if(Math.floor(Math.random()*2000) === 1)element[3] = (element[3] === colorOne) ? colorTwo : colorOne;
       ctx.fillStyle = element[3];
       
       for(var bubbleLoop = 0; bubbleLoop <= element[2]; bubbleLoop++){
@@ -266,8 +265,6 @@ function bubbles(){
         ctx.closePath();
         ctx.fill();
       }
-      
-      
     });
   };
   
@@ -472,7 +469,6 @@ function displayAcrossScreen(imagesArray, maxRows, startX, edgeFitOverlap) {
       }
       
       else{
-        console.log(this.maxRows*this.maxColumns/100);
         this.alive=false;
         this.index = 0;
         if(callback)callback();
@@ -483,7 +479,7 @@ function displayAcrossScreen(imagesArray, maxRows, startX, edgeFitOverlap) {
 var animationTitles = [
 	'Dark Waves Transition',
 	'Yzy Bow Firing',
-	'Sparkle',
+	'Sparkle'
 ];
 
 function DarkWaves(callback){//Dark Wave!
@@ -525,7 +521,21 @@ function DarkWaves(callback){//Dark Wave!
 var animationCode = [
   function(){
     characterSelectionScreen.toggleOff();
-    DarkWaves(characterSelectionScreen.toggleOn);
+    DarkWaves(
+      function(){
+        characterSelectionScreen.toggleOn();
+        
+        woodenBackground.mapPlanks();
+        stonePillar.mapPlanks();
+        
+        woodenBackground.drawPlanks(true, function(){
+          stonePillar.drawPlanks(true, function(){
+            placeContent();
+            $('#animationTest').click();
+          });
+        });
+      }
+    );
   },
 	
   function(){//Fire down upon them!
@@ -534,6 +544,10 @@ var animationCode = [
 	
   function(){//Sparkle: a somewhat feminine, useful nonetheless, particle effect!
     console.log('Twinkle twinkle little star!');
+  },
+  
+  function(){
+    
   }
 ];
 
@@ -591,113 +605,39 @@ function placeContent(){
     DarkWaves(startGame);
   });
   
-  addLeftBox('Inventory', 'inventoryBox', "Test out GDI's nonexistent inventory system", function(){
+  addLeftBox('Inventory', 'inventoryBox', "Yet to be seen!", function(){
     addMainArea('inventory', 'Inventory');
   });
   
   addLeftBox('Animations', 'animationTest', 'View animations used in GDI', function(){
-    //SPR
     addMainArea('animation', 'Animation');
     
+    //$('#animationMainArea').append('<div id = animationBoxesArea style = height:100%;width:95%;margin:auto;></div>');
+    
+    var numberOfBoxes = animationTitles.length;
+    
     var columns = 0;
-    var maxColumns = Math.floor($('#animationMainArea').width()/131)-1;
+    var maxColumns = Math.floor($('#animationMainArea').width()/150);
     
-    var rows = 0;
-    var maxRows = 0;
+    var leftOverAmount = $('#mainArea').width() - (maxColumns)*150;
     
-    var boxCounter = 0;
+    var numberOfFullRows = Math.floor(animationTitles.length/maxColumns);
     
-    $('#animationMainArea').append('<hr style = margin-top:10px; id = thinHr>');
-    $('#animationMainArea').css('overflowy', 'scroll');
+    var addThisMuch = Math.round((maxColumns-animationTitles.length%maxColumns)/2);
+    console.log();
     
-    for(rows = 0; rows < 6; rows++){
-      $('#animationMainArea').append('<div style = width:100%;height:100px id = rowNumber' + rows + '></div>');
-      
-      for(columns = 0; columns < maxColumns; columns++){
-        $('#rowNumber' + rows).append('<div class = animationBox style = top:20px; id = animationNumber' + boxCounter + '></div>');
-        if(columns === maxColumns-1)$('#thisColumn' + rows).append('<hr style = margin-top:10px; id = thinHr>');
-        boxCounter++;
-      }
+    for(columns = 0; columns < maxColumns; columns++){
+      $('#animationMainArea').append('<div style = position:absolute;overflow:hidden;width:131px;height:100%;top:115px;left:'+(leftOverAmount/2+150*columns)+'px; id = animationColumn' + columns + '></div>');
     }
-
-    for(boxCounter;boxCounter !== -1; boxCounter--){
-      if(boxCounter < 3) {
-        $('.animationNumber' + boxCounter).append('<p margin-top:5px>' + animationTitles[boxCounter] + '</p>');
-        $('.animationNumber' + boxCounter).click(animationCode[boxCounter]);
+    
+    animationTitles.forEach(
+      function(element, index){
+        var goToColumn = ((index+1)/maxColumns > numberOfFullRows) ? index%maxColumns+addThisMuch : index%maxColumns;
+        $('#animationColumn'+goToColumn).append('<div class=animationBox id = animationNumber' + index + '>'+ animationTitles[index] + '</div>');
+        if(animationCode[index])$('#animationNumber'+index).click(animationCode[index]);
       }
-
-      else{
-        animationNumber = (boxCounter%3 === 0) ? boxCounter + 2 : boxCounter - 1;
-        $('.animationNumber' + boxCounter).append('<p margin-top:5px>Animation #' + animationNumber + '</p>');
-        $('.animationNumber' + boxCounter).click(function(){ console.log('No function yet! :D');});
-      }
-    }
+    );
   });
-  /*
-      $('#rightSideBarInner').prepend('<div style = padding-right:4px;margin-top:4px; zindex = 2 id = characterBox class = quickPlay></div>');
-        $('.quickPlay').prepend('<p id = characterSubTitle>Quick Play</p>');
-        $('.quickPlay').append('<hr id = thinHr>');
-        $('.quickPlay').append('<p style = text-align:center;margin-top:0px; id = characterSubText>Play without having to generate a character first.</p>');
-        $('.quickPlay').append('<hr style = margin-top:20px; id = thinHr>');
-      $('#rightSideBarInner').append('<div style = padding-right:4px;margin-top:18px; zindex = 2 id = characterBox class = animationPlayGround></div>');
-        $('.animationPlayGround').prepend('<p id = characterSubTitle>Animations</p>');
-        $('.animationPlayGround').append('<hr id = thinHr>');
-        $('.animationPlayGround').append('<p style = text-align:center;margin-top:0px; id = characterSubText>Test out some of our fresh animations!</p>');
-        $('.animationPlayGround').append('<hr style = margin-top:20px; id = thinHr>');
-      $('#rightSideBarInner').append('<div style = padding-right:4px;margin-top:18px; zindex = 2 id = characterBox class = inventoryTest></div>');
-        $('.inventoryTest').prepend('<p id = characterSubTitle>Inventory</p>');
-        $('.inventoryTest').append('<hr id = thinHr>');
-        $('.inventoryTest').append('<p style = text-align:center;margin-top:0px; id = characterSubText>Test out the inventory system!</p>');
-        //$('.inventoryTest').append('<hr style = margin-top:20px; id = thinHr>');
-  
-  $('#canvasCan').append('<div id = mainAreaOuter style = position:absolute;top:0px;left:222px;height:700px;width:478px; zindex = 2 ></div>');
-    $('#mainAreaOuter').prepend('<div id = mainAreaInner style = position:relative;height:700px;width:478px; zindex = 2></div>');
-
-
-  $('.animationPlayGround').click(function(){
-    $('#mainAreaInner').empty();
-    rows = 0;
-    columns = 0;
-    boxCounter = 0;
-    $('#mainAreaInner').append('<div id = animationMainArea style = margin:auto;width:95%;height:95%;padding:5px;></div>');
-    $('#animationMainArea').append('<div style = width:100%;height:50px; id = animationTitleBar><h3 style = text-align:center;>Animations</h3></div>');
-    $('#animationMainArea').append('<hr style = margin-top:10px; id = thinHr>');
-
-    for(columns = 0; columns < 6; columns++){
-      $('#animationMainArea').append('<div style = width:100%;height:100px id = thisColumn' + columns + '></div>');
-      for(rows = 0; rows < 4; rows++){
-        if(rows === 0)$('#thisColumn' + columns).append('<div id = animationBox style = float:right; class = animationNumber' + boxCounter + '></div>');
-        else if(rows === 1)$('#thisColumn' + columns).append('<div id = animationBox style = float:left; class = animationNumber' + boxCounter + '></div>');
-        else if(rows === 2)$('#thisColumn' + columns).append('<div id = animationBox style = margin:auto; class = animationNumber' + boxCounter + '></div>');
-        else if(rows === 3)$('#thisColumn' + columns).append('<hr style = margin-top:10px; id = thinHr>');
-        if(rows < 3)boxCounter++;
-      }
-    }
-
-    for(boxCounter;boxCounter !== -1; boxCounter--){
-      if(boxCounter < 3) {
-        $('.animationNumber' + boxCounter).append('<p margin-top:5px>' + animationTitles[boxCounter] + '</p>');
-        $('.animationNumber' + boxCounter).click(animationCode[boxCounter]);
-      }
-
-      else{
-        animationNumber = (boxCounter%3 === 0) ? boxCounter + 2 : boxCounter - 1;
-        $('.animationNumber' + boxCounter).append('<p margin-top:5px>Animation #' + animationNumber + '</p>');
-        $('.animationNumber' + boxCounter).click(function(){ console.log('No function yet! :D');});
-      }
-    }
-  });
-
-  $('.inventoryTest').click(function(){
-    $('#mainAreaInner').empty();
-    $('#mainAreaInner').append('<div id = inventoryMainArea style = margin:auto;width:95%;height:95%;padding:5px;></div>');
-    $('#inventoryMainArea').append('<div style = width:100%;height:50px; id = inventoryTitleBar><h3 style = text-align:center;margin-top:35px;>Inventory</h3></div>');
-    $('#inventoryMainArea').append('<hr style = margin-top:10px; id = thinHr>');
-  });
-
-  $('.quickPlay').click(function(){
-  });
-  */
 }
 
 //END OF CHARACTER SELECTION SCREEN CODE!--------------------------------------------------------------------------------------------

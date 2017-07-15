@@ -79,6 +79,44 @@ function plotLine(xStart, yStart, xEnd, yEnd, color, ctx){ //The start variables
 //I understand that that the code works, because it does, I'm just not entirely sure how/why it does.
 //If I don't understand something mathmatically(or in any other area), I can just research it until I do, but I'm not sure what I'm missing here.
 
+//startCoords and endCoords are an array of x then y.
+function getCoordsOnWayTo(startCoords, endCoords){
+  //setup of constants:
+
+  var xStart = startCoords[0];
+  var yStart = startCoords[1];
+  var xEnd = endCoords[0];
+  var yEnd = endCoords[1];
+
+  var dx =  Math.abs(xEnd-xStart);
+  var sx = xStart<xEnd ? 1 : -1;
+  var dy = -Math.abs(yEnd-yStart);
+  var sy = yStart<yEnd ? 1 : -1;
+
+  var err = dx+dy;
+  var e2;
+
+  //Done with setup of constants
+
+  if(!(Math.floor(xStart) == xEnd && Math.floor(yStart) == yEnd)){
+    e2 = 2*err;
+
+    if (e2 >= dy){
+      err += dy;
+      xStart += sx;
+    }
+
+    if (e2 <= dx){
+      err += dx;
+      yStart += sy;
+    }
+
+    return [Math.floor(xStart), Math.floor(yStart)];
+  }
+  
+  else return 'Coords Same';
+}
+
 function plotArmPart(firstX, firstY, secondX, secondY, innerColor, outerColor, ctx){
 	for(var i = -1; i < 2; i++)plotLine(firstX+i*2, firstY+i, secondX+i*2, secondY+i, (i === 0)?outerColor:innerColor, ctx);
 }
@@ -109,28 +147,32 @@ function setpixelated(context){
 }
 
 function drawRotatedFromCenter(degrees, image, context, axisX, axisY, positionX, positionY){
-    context.clearRect(0,0,600,600);
-	
-    // save the unrotated context of the canvas so we can restore it later
-    // the alternative is to untranslate & unrotate after drawing
-    context.save();
-	
-    // move to the center of the canvas
-    context.translate(axisX, axisY);
-	
-    // rotate the canvas to the specified degrees
-    context.rotate(degrees*Math.PI/180);
-	
-    // draw the image
-    // since the context is rotated, the image will be rotated also
-    context.drawImage(image,-image.width/2 + positionX,-image.height/2 + positionY);
-	
-    // we’re done with the rotating so restore the unrotated context
-    context.restore();
+  context.clearRect(0,0,600,600);
+
+  // save the unrotated context of the canvas so we can restore it later
+  // the alternative is to untranslate & unrotate after drawing
+  context.save();
+
+  // move to the center of the canvas
+  context.translate(axisX, axisY);
+
+  // rotate the canvas to the specified degrees
+  context.rotate(degrees*Math.PI/180);
+
+  // draw the image
+  // since the context is rotated, the image will be rotated also
+  context.drawImage(image,-image.width/2 + positionX,-image.height/2 + positionY);
+
+  // we’re done with the rotating so restore the unrotated context
+  context.restore();
 }
 
 function fillArrayUpTo(anArray, upTo, filler){//The purpose of this function is to create an array full of empty arrays up to the specified number. This function is used in the map system.
-	while(anArray.length !== upTo)anArray.push(filler);
+  while(anArray.length !== upTo)anArray.push(filler);
+}
+
+function stringToRGBArray(stringOfRGB){
+  return stringOfRGB.replace(/[^\d,]/g, '').split(',');
 }
 
 //End of function dictionary
@@ -210,6 +252,158 @@ var screenwidth;
 //End of variables for game engine.
 
 //Assisting functions for game engine! :D
+
+function effect(type){
+  
+  switch(type){
+    case 'magic orb':
+      //fall through
+    case 'magic ball':
+      //fall through
+    case 'magical ball':
+      //fall through
+    case 'magical orb':
+      this.durationCounter = 0;//Incremented each time the orb is drawn, if duration isn't false.
+      this.duration = false;//integer representing times to be looped before the orb stops being drawn. False for infinite duration.
+      this.shouldAutoUpdate = false;//Dictates whether or not the drawing function should call itself.
+      this.updateRate = 30;//Integer, milliseconds. If the orb is self drawn, this dictates how often it should update itself.
+      
+      this.loopSpacing = false;//How much space inbetween each loop. 0 works, if false the value will be generated algorithmically.
+      this.loops = 10;//Dictates how many loops the orb should have. More loops causes more lag, but makes the orb look more whispy around the edges.
+      this.alphaTransparency = 0.4;//Integer, dictates translucency
+      
+      this.frequencyOfColorChange = 0.01;//Decimal representing percentage chance orb has of changing color each time it's drawn.
+      this.shouldColorChange = true;//Boolean, if true, activeColor is reassigned to a randomly selected color from the colors array.
+      this.shouldColorFade = true;//Fades into the next color instead of directly changing.
+      this.isColorFading = false;//Used internally if shouldColorFade is true. If it is true, the color will start fading.
+      this.activeColorValues = false;//Used internally if shouldColorFade is true. Stores the values of the active color.
+      this.fadeToColorValues = false;//Used internally if shouldColorFade is true. Stores the values of the color selected for fading to.
+      this.fadeMax = 300;//Used internally to count level of fade.
+      this.colors = ['rgb(255, 0, 0)', 'rgb(0, 255, 0)', 'rgb(0, 0, 255)','rgb(0, 0, 0)', 'rgb(255, 255, 255)'];//Any color values should work(excluding RGBA).
+      this.activeColor = 'rgb(255, 255, 255)';//Color the orb is currently being drawn as.
+      
+      this.alive = true;//Dictates whether or not the orb is drawn. Can be changed externally. Is set to false at the end of duration.
+      this.x = $(window).width()/2;//Drawn to this coordinate, will change if shouldGlide is true.
+      this.y = $(window).height()/2;//Drawn to this coordinate, will change if shouldGlide is true.
+      
+      this.speed = 5;//Dictates how many times the movement loop is iterated before a time delay is enacted.
+      this.isGliding = false;//Boolean, if true x and y will gradually change to glideX and glide Y.
+      this.glideX = false;//Integer(0 inclusive), or false for gliding to any(randomly selected) location. A-Okay to change externally.
+      this.glideY = false;//Integer(0 inclusive), or false for gliding to any(randomly selected) location. A-Okay to change externally.
+      
+      this.size = 20;//Integer, size in pixels. Changes if shouldSizeChange is true.
+      this.shouldSizeChange = true;//Boolean, if true then size changes gradually inbetween sizeMax and sizeMin
+      this.maxSize = 20;//Maximum size in px, disreguarded if this.shouldSizeChange === false
+      this.minSize = 15;//Minimum size in px, disreguarded if this.shouldSizeChange === false
+      this.growthRate = 1;//Number to be added to size after growthBuffer fills to growthBufferMax.
+      this.growthBufferMax = 10;//Number of times function has to be iterated before growthRate is added to size.
+      this.growthBuffer = 0;//Used internally to slow growth.
+      this.growing = true;//Boolean, Used internally (if shouldSizeChange is true), if false then the orb is shrinking.
+      
+      this.degreeOfWobble = 5;//Integer, amount of pixels to drift away from set x value by.
+      this.shouldWobble = true;//If this is true, a random number in between degreeOfWobble and -degreeOfWobble offsets where each layer is drawn.
+      
+      ///Use me externally to make the orb draw itself! :D
+      this.startUp = function(){
+        if(this.shouldAutoUpdate){
+          updateLoop = setInterval(this.draw.bind(this), this.updateRate);
+        }
+      }
+      
+      //Use me externally for gliding to a random location! :D
+      this.glideRandom = function(){
+        this.isGliding = true;
+        this.glideX = Math.floor(Math.random()*$(window).width());
+        this.glideY = Math.floor(Math.random()*$(window).height());
+      }
+      
+      
+      this.draw = function(){
+        if(this.alive && this.shouldAutoUpdate)ctx.clearRect(0, 0, $(window).width(), $(window).height());
+        
+        if(this.shouldColorChange){
+          if(Math.floor(Math.random()*100) < this.frequencyOfColorChange*100){
+            
+            if(this.shouldColorFade && !this.isColorFading){
+              this.isColorFading = true;
+              this.fadeToColorValues = stringToRGBArray(chooseFrom(this.colors));
+              this.activeColorValues = stringToRGBArray(this.activeColor);
+            }
+            
+            else if(!this.shouldColorFade)this.activeColor = chooseFrom(this.colors);
+          }
+        }
+        
+        if(this.isColorFading){
+          for(var i = 0; i < 3; i++){
+            if(this.activeColorValues[i] !== this.fadeToColorValues[i]){
+              if(this.fadeToColorValues[i] > this.activeColorValues[i])this.activeColorValues[i] = this.activeColorValues[i]*1 + 1;
+              else if(this.fadeToColorValues[i] < this.activeColorValues[i])this.activeColorValues[i] = this.activeColorValues[i]*1 - 1;
+            }
+          }
+          
+          this.activeColor = 'rgb(' + this.activeColorValues[0] + ',' + this.activeColorValues[1] + ',' + this.activeColorValues[2] + ')';
+          this.fadeToColor = 'rgb(' + this.fadeToColorValues[0] + ',' + this.fadeToColorValues[1] + ',' + this.fadeToColorValues[2] + ')';
+          
+          if(this.activeColor === this.fadeToColor){
+            this.isColorFading = false;
+          }
+          
+        }
+        
+        if(this.shouldSizeChange){
+          this.growthBuffer = this.growthBuffer + 1;
+          if(this.growthBuffer >= this.growthBufferMax){
+            this.growthBuffer = 0;
+            //Logic controlling growth:
+            if(this.growing){
+              this.size = this.size + this.growthRate;
+              if(this.size > this.maxSize)this.growing = false;
+            }
+            else {
+              this.size = this.size - this.growthRate;
+              if(this.size < this.minSize)this.growing = true;
+            }
+          }
+        }
+        
+        if(this.isGliding){
+          for(var i = 0; i <= this.speed; i++){
+            var newCoords = getCoordsOnWayTo([this.x, this.y], [this.glideX, this.glideY]);
+            
+            if(newCoords == 'Coords Same'){
+              this.isGliding = false;
+              break;
+            }
+
+            else {
+              this.x = newCoords[0];
+              this.y = newCoords[1];
+            }
+          }
+        }
+        
+        ctx.fillStyle = this.activeColor;
+        
+        for(var i = 0;i < this.loops;i++){
+          ctx.globalAlpha = this.alphaTransparency;
+          ctx.beginPath();
+          ctx.arc(this.x + ((this.shouldWobble) ? Math.floor(Math.random()*(this.degreeOfWobble*2)-this.degreeOfWobble) : 0),this.y + ((this.shouldWobble) ? Math.floor(Math.random()*this.degreeOfWobble) : 0), this.size*2/(i/2+1),0,Math.PI * 2,true);
+          ctx.closePath();
+          ctx.fill();
+        }
+      }
+      
+      this.draw.bind(this)
+      
+      break;
+      
+    default:
+      console.log('Oh deity, ye must be oh so very confused: such an effect is not within our realm of existence.');
+      break;
+  }
+}
+
 
 function part(type, img, parent) {//parent should be torso, unless you're using a lower arm or hand! In that case, use upperarm or lowerarm, respectively Also, arm upper is the only one that needs two images, put them in the way we read: left to right :D
 	

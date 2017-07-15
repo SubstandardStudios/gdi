@@ -162,6 +162,7 @@ function startScreen() {
   );
   
   function cleanUp(){
+    ctx.globalAlpha = 1;
     
     woodenBackground = new displayAcrossScreen([plankStart, plankMiddle, plankOddsAndEnds, plankEnd], undefined, undefined, true);
     stonePillar = new displayAcrossScreen([stoneTile], 0, 175);
@@ -184,7 +185,7 @@ function startScreen() {
     titleScreenBubbles.drawMap();
     drawTitle();
     drawPlayButton();
-    
+    ctx.globalAlpha = .5;
     /* //The following code is for making sure that everything is centered correctly. Essentially, it's living proof of my OCD.
     ctx.beginPath();
     ctx.moveTo($(window).width()/2,0);
@@ -193,7 +194,7 @@ function startScreen() {
     */
   }
   
-  var startScreenUpdate = new toggleFunction(updateLoop, undefined, cleanUp, [true, 16]);
+  var startScreenUpdate = new toggleFunction(updateLoop, undefined, cleanUp, [true, 30]);
   startScreenUpdate.toggleOn();
 }
 
@@ -476,12 +477,6 @@ function displayAcrossScreen(imagesArray, maxRows, startX, edgeFitOverlap) {
     };
 }
 
-var animationTitles = [
-	'Dark Waves Transition',
-	'Yzy Bow Firing',
-	'Sparkle'
-];
-
 function DarkWaves(callback){//Dark Wave!
 
   function advancingTriangle(whereToGo, rbgValuez, clear){
@@ -517,9 +512,17 @@ function DarkWaves(callback){//Dark Wave!
   else if(callback)callback();
 }
 
+var animationTitles = [
+  'Dark Waves Transition',
+  'Yzy Bow Firing',
+  'Sparkle',
+  'Magic Orb',
+  "Don't Press!"
+];
 
 var animationCode = [
   function(){
+    if(!(typeof magicalOrb == "undefined"))magicalOrb.alive = false;
     characterSelectionScreen.toggleOff();
     DarkWaves(
       function(){
@@ -547,7 +550,66 @@ var animationCode = [
   },
   
   function(){
+    if(typeof magicalOrb == "undefined"){
+      magicalOrb = new effect('magical orb');
+      magicalOrb.frequencyOfColorChange = 1;
+      magicalOrb.speed = 10;
+      magicalOrb.maxSize = 25;
+      magicalOrb.minSize = 15;
+      magicalOrb.size = 1;
+      orbUpdateLoop();
+      
+      $('#canvasCan').mouseover(
+        function(event){
+          var rect = cnv.getBoundingClientRect();
+          magicalOrb.glideX = event.clientX - rect.left;
+          magicalOrb.glideY = event.clientY - rect.top;
+          magicalOrb.isGliding = true;
+        }
+      );
+    }
+    else {
+      magicalOrb.alive = !magicalOrb.alive;
+      
+      if(magicalOrb.alive){
+        orbUpdateLoop();
+        $('#canvasCan').mouseover(
+          function(event){
+            var rect = cnv.getBoundingClientRect();
+            magicalOrb.glideX = event.clientX - rect.left;
+            magicalOrb.glideY = event.clientY - rect.top;
+            magicalOrb.isGliding = true;
+          }
+        );
+      }
+    }
     
+    function orbUpdateLoop(){
+      if(!magicalOrb.alive){
+        ctx.globalAlpha = 1;
+        stonePillar.alive = true;
+        woodenBackground.alive = true;
+        woodenBackground.drawPlanks();
+        stonePillar.drawPlanks();
+        
+        $('#canvasCan').off("mouseover");
+        return;
+      }
+      
+      ctx.globalAlpha = .5;
+      stonePillar.alive = true;
+      woodenBackground.alive = true;
+      woodenBackground.drawPlanks();
+      ctx.globalAlpha = 1;
+      stonePillar.drawPlanks();
+      
+      magicalOrb.degreeOfWobble = magicalOrb.size*1.25;
+      magicalOrb.speed = magicalOrb.size*1.75;
+      magicalOrb.alphaTransparency = (0.01 * magicalOrb.size*1.5)+0.15;
+      magicalOrb.draw();
+      
+      setTimeout(orbUpdateLoop, magicalOrb.updateRate);
+    }
   }
 ];
 
@@ -624,7 +686,6 @@ function placeContent(){
     var numberOfFullRows = Math.floor(animationTitles.length/maxColumns);
     
     var addThisMuch = Math.round((maxColumns-animationTitles.length%maxColumns)/2);
-    console.log();
     
     for(columns = 0; columns < maxColumns; columns++){
       $('#animationMainArea').append('<div style = position:absolute;overflow:hidden;width:131px;height:100%;top:115px;left:'+(leftOverAmount/2+150*columns)+'px; id = animationColumn' + columns + '></div>');

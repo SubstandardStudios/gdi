@@ -689,8 +689,6 @@ function placeContent(){
     $('#mortalMakerMainArea').append('<div id = fullResCharacterBox></div>');
     
     $('#fullResCharacterBox').append('<h2 style = margin-top:0px;margin-bottom:0px;> Visual </h2>');
-    $('#fullResCharacterBox').append('<div id = genericButton style = position:absolute;left:10px;top:5px;> <- </div>');
-    $('#fullResCharacterBox').append('<div id = genericButton style = position:absolute;right:10px;top:5px;> -> </div>');
     $('#fullResCharacterBox').append('<hr id = thinHr>');
     
     $('#fullResCharacterBox').append('<hr id = thinHr style = position:absolute;bottom:30px;left:3%;width:93%;>');
@@ -703,20 +701,49 @@ function placeContent(){
     var counter = 0;
     
     for(var i = 0; i < 8; i++){
+      imagesInAnArray.push([]);
       for(var i2 = 0; i2 < 14; i2++){
-        imagesInAnArray.push(new Image());
+        imagesInAnArray[i].push(new Image());
         
-        imagesInAnArray[14 * i + i2].onload = function(){
+        imagesInAnArray[i][i2].onload = function(){
           counter = counter + 1;
           
-          console.log('I think one of them loaded!' + counter);
-          
-          if(counter === imagesInAnArray.length){
-            console.log('All done!');
+          if(counter === imagesInAnArray.length*14){
+            
+            function changeSide(rightOrLeft){
+              
+              stonePillar.alive = true;
+              woodenBackground.alive = true;
+              woodenBackground.drawPlanks();
+              stonePillar.drawPlanks();
+              
+              directionOfCharacter = directionOfCharacter + rightOrLeft;
+              if(directionOfCharacter > 7)directionOfCharacter = 0;
+              if(directionOfCharacter < 0)directionOfCharacter = 7;
+              
+              imagesInAnArray[directionOfCharacter].forEach(function(element){
+                var position = $('#fullResCharacterBox').offset();
+                ctx.drawImage(element, position.left + 23.5, position.top + 17);
+              });
+            }
+            
+            var directionOfCharacter = 0;
+            changeSide(0);
+            
+            $('#fullResCharacterBox').append('<div id = genericButton class = leftyButtonBox style = position:absolute;left:10px;top:5px;> <- </div>');
+            $('#fullResCharacterBox').append('<div id = genericButton class = rightButtonBox style = position:absolute;right:10px;top:5px;> -> </div>');
+            
+            $('.leftyButtonBox').click(function(){
+              changeSide(-1);
+            });
+            
+            $('.rightButtonBox').click(function(){
+              changeSide(1);
+            });
           }
         };
         
-        imagesInAnArray[14 * i + i2].src = folder + i + '/' + i2 + '.png';
+        imagesInAnArray[i][i2].src = folder + i + '/' + i2 + '.png';
       }
     }
     // End of image loading.

@@ -30,6 +30,11 @@ function roundToMaxOrMin(value, max, min){
   else return value;  
 }
 
+//Thanks disfated! :D
+String.prototype.capitalize = function(lower) {
+    return (lower ? this.toLowerCase() : this).replace(/(?:^|\s)\S/g, function(a) { return a.toUpperCase(); });
+};
+
 function distanceFrom(firstX, firstY, secondX, secondY){
 	var leftOrRight = (firstX<secondX)? 'left' : 'right';
 	var upOrDown = (firstY<secondY)? 'up' : 'down';
@@ -252,6 +257,151 @@ var screenwidth;
 //End of variables for game engine.
 
 //Assisting functions for game engine! :D
+
+function raceFromGroup(group){
+  var val = Math.floor(Math.random() * 100) + 1;//This code generates a random number, 1-100 inclusive.
+  var subRace = "";//This assigns the subRace variable to an empty string, so we can use it later.
+  var raisedBy;
+  
+  group = group.capitalize(true);
+  
+  switch(group){
+    case 'Inclus':
+      return 'Inclus';
+
+    case 'Kewer'://Agrakin is open to immigrants, and so the Humans and Impkin came.
+      if (val < 90) {subRace = 'Kewer'}
+      else if (val < 95) {subRace = 'Human'}
+      else {subRace = 'Impkin'}
+      
+      if(subRace = 'Impkin')return [subRace, raisedBy];
+      else return subRace;
+
+    case 'Empyrean Guild'://All Empyreans are
+      return 'Human';//human, as only humans are dumb enough to want to live on islands that float in the sky.
+
+    case 'Hell Dweller'://However, there are many different races for Hell Dwellers, so their code is quite a bit more complicated.
+      //However, when broken into parts, it's actually quite simple.
+
+      //Remember those subrace and var variables we set up later? If not, check back and remember what they are, they are used a lot in the following code
+
+      //THIS CODE PICKS THE RACE
+      if(val <= 30) { subRace = "Uhk"; if (val > 29) { subRace = "Hell Hound";} }//This says if val is less than 30, then call the code inbetween the brackets. The code inbetween the brackets says if val is above 29, so then if it was 30, then your Ugh is a Hell Hound
+      else if(val <= 50) { subRace = "Fiend"; if (val > 49) { subRace = "Blue Fiend";}}//This code is very similiar to the Uhk code; Only instead of having 30% of the population be Uhks, only 20% of the population is Fiend, so since all of the numbers below 30 have already been filtered out, we'll say all of the numbers below 50(and above 30) are Fiends. One percent of the total population(the number 50) would be Blue Fiendish.
+      else if (val <= 65) { subRace = "Hell Gnome";}//15 percent of the population are Hell Gnomes, so 50 + 15 = 65.
+      else if(val <= 80) { subRace = "Impkin";}//15 percent Impkin, 65 + 15 = 80
+      else if(val <= 95) { subRace = 'Succubi';}//15% are Cubi, so 80 + 15 = 95
+      else if (val <= 100) { subRace = "Human";}//5% are human, so 95+ 5 = 100. There we go, we now have code that generates a random hell dweller race.
+      //END OF RACE PICKING CODE
+
+      //var answer = subRace;
+      if(subRace = 'Impkin')return [subRace, raisedBy];
+      else return subRace;
+
+    default:
+      return "Error!";
+  }
+}
+
+function nameFromRace(race, raisedBy){
+  var firstPart = [];
+  var lastPart  = [];
+  var blacklist = [];
+  var completeName = '';
+  
+  race = race.capitalize(true);
+
+  var whichName = Math.floor(Math.random() * 20 + 1);
+
+  switch(race){
+    case 'Kewer'://Favors ending words in consonants g and z, uses a and o as most common vowel.
+      firstPart = ['Swogg', 'Tragg', 'Raz', 'Ag'];
+      lastPart  = ['lah', 'ack', 'ak', 'rakin'];
+
+      return chooseFrom(firstPart) + chooseFrom(lastPart);
+
+    case 'Human'://These should sound like english names, within reason. etaoin shrdlu are most common letters in english.
+      firstPart = ["Jak", "Jac", "Jam", "Ger", 'Anth', "Robb", "Gid", "Der", "Sal"];
+      lastPart  = ['e', "ard", "ean", 'ony', "ick", "es", "us", "ob"];
+      var firstName = chooseFrom(firstPart) + chooseFrom(lastPart);
+      var lastName  = chooseFrom(firstPart) + chooseFrom(lastPart);
+      completeName = firstName + ' ' + lastName;
+      blacklist = ['Sales', 'Sale', 'Robbob'];//These names will be blocked.
+      
+      //The following line works because indexOf returns 0 if the item isn't in the list.
+      if (blacklist.indexOf(firstName) === -1 && blacklist.indexOf(lastName) === -1) {
+        return completeName;
+      }
+      else {
+        //console.log('Name blacklisted!');
+        return nameFromRace('Human');
+      }
+      break;
+
+
+    case 'Inclus'://Soft consonants only
+      firstPart =   chooseFrom(["Yil", "Lis", "Yeow", "Shis", "Swill"]);
+      middlePart  = chooseFrom(["ill", "ol", "ee", 'o', '', "'"]);//Empty ones so that there could be no middle part
+      lastPart =    chooseFrom(["o", 'ye', 'oah', 'oso', '']);//Empty so that there could be no last part
+
+      if (middlePart === "'")lastPart = lastPart.charAt(0).toUpperCase();
+      if (middlePart === "'" && lastPart === '')middlePart = '';
+      return firstPart + middlePart + lastPart;
+
+    case 'Succubi':
+      firstPart = ['Succ', 'Beaut', 'Lust', 'Nub', 'Volup', 'Curv', 'Bux', 'Scand'];
+      middlePart = 'ul'
+      lastPart  = ['ent', 'ence', 'issa', 'ica', 'tuous'];
+
+      return chooseFrom(firstPart) + middlePart + chooseFrom(lastPart);
+
+
+    case "Hell Gnome":
+      firstPart = ['Oct', 'Jul', 'Sept', 'Null', 'Mor', "Unit", "Bin", 'Tern', "Quad", 'Noven', 'Den', 'Cent', 'Millen'];
+      lastPart  = ['avius', 'ulius', 'ius', 'ullus', 'pheus', 'ero', 'ace', 'etus', 'onius'];
+
+      return chooseFrom(firstPart) + chooseFrom(lastPart);
+
+    case 'Fiend': //Guttural noises
+      firstPart = ["Teshk", "Ficksh", "Thekt", "Ught", "Deght", "Kicksh", 'Flektsh', 'Flesht', 'Vegth'];
+      lastPart  = ["ekt", "igth", "egst", "erkt", "'Jiktheh", 'akth', 'othked', ''];
+
+      return chooseFrom(firstPart) + chooseFrom(lastPart);
+
+
+    case 'Blue Fiend': //More unconventional Fiend names
+      firstPart = ["Zhaan", "Racksh", "Delv", "Ugh", "Neagh"];
+      lastPart  = ["ian", "sikt", "blasht", "frahk", "atik", "'Jaktan"];
+
+      return chooseFrom(firstPart) + chooseFrom(lastPart);
+
+    case 'Uhk':
+
+      if (whichName === 1)//Easter egg pet names
+      {
+        return chooseFrom(["Mr. Mittens", "Pokey", "Crack-Head", "Sparky", "Guido", "Buckwheat", "Rug", "Fluffy", "Spanky", "Napoleon", "Bonaparte", "Rygel"]);
+      }
+
+      else
+      { //Traditional Uhk names will depend upon eh and similiar vowels, along with soft consonants
+        firstPart = ["Meh", 'Yeh', 'Seh', 'Reh', 'Weh', 'Bleh', 'Phle'];
+        lastPart  = ["m", 's', 'r', 'weh', 'gm'];//Option to have no last part
+
+        return chooseFrom(firstPart) + chooseFrom(lastPart);
+      }
+      break;
+
+    case 'Hell Hound':
+      return chooseFrom(["Mr. Mittens", "Pokey", "Crack-Head", "Sparky", "Guido", "Buckwheat", "Rugrat", "Fluffy", "Spanky", "Napoleon", "Bonaparte", "Arty"]);
+
+    case 'Impkin':
+      return nameFromRace(raisedBy);
+      
+    default:
+      return "Unkown Race";
+  }
+
+}
 
 function effect(type){
   

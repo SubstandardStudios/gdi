@@ -663,13 +663,71 @@ function placeContent(){
   
   //Finished setting things up.
   
+  
+  
+  
   addLeftBox('Quick Test', 'testBox', 'Test the Graphical Deity Interface', function(){
     DarkWaves(startGame);
   });
   
-  addLeftBox('Inventory', 'inventoryBox', "Yet to be seen!", function(){
-    addMainArea('inventory', 'Inventory');
+  
+  addLeftBox('New Mortal', 'mortalMaker', "These will be quite useful...", function(){
+    var group = 'empyrean guild';//We'll add in other races/groups once we have models for 'em.
+    var race = raceFromGroup(group);
+    
+    if(typeof race == 'object'){
+      var mortalName = nameFromRace(race[1]);
+      race = race[0];
+    }
+    
+    else var mortalName = nameFromRace(race);
+    
+    
+    addMainArea('mortalMaker', mortalName);
+    $('#mortalMakerMainArea').append('<hr id = thickishHr>');
+    
+    $('#mortalMakerMainArea').append('<div id = fullResCharacterBox></div>');
+    
+    $('#fullResCharacterBox').append('<h2 style = margin-top:0px;margin-bottom:0px;> Visual </h2>');
+    $('#fullResCharacterBox').append('<div id = genericButton style = position:absolute;left:10px;top:5px;> <- </div>');
+    $('#fullResCharacterBox').append('<div id = genericButton style = position:absolute;right:10px;top:5px;> -> </div>');
+    $('#fullResCharacterBox').append('<hr id = thinHr>');
+    
+    $('#fullResCharacterBox').append('<hr id = thinHr style = position:absolute;bottom:30px;left:3%;width:93%;>');
+    $('#fullResCharacterBox').append('<h3 style = position:absolute;bottom:5px;left:7%;> Representation </h3>');
+    
+    //Image loading script:
+    
+    var imagesInAnArray = [];
+    var folder = 'imgs/spritesAndArmor/fullResSprites/humanStandard/';
+    var counter = 0;
+    
+    for(var i = 0; i < 8; i++){
+      for(var i2 = 0; i2 < 14; i2++){
+        imagesInAnArray.push(new Image());
+        imagesInAnArray[i*i2].src = folder + i + '/' + i2 + '.png';
+        imagesInAnArray[i*i2].onload = function(){
+          counter = counter + 1;
+          
+          console.log('I think one of them loaded!' + counter);
+          
+          if(counter === imagesInAnArray.length){
+            console.log('All done!');
+          }
+        };
+      }
+    }
+
+    function incrementCounter() {
+      counter++;
+      
+      if (counter === len) {
+        console.log("So, like, uh, I'm pretty like maybe sure that all of the images could have loaded by now, maybe?");
+      }
+    }
+    // End of image loading.
   });
+  
   
   addLeftBox('Animations', 'animationTest', 'View animations used in GDI', function(){
     addMainArea('animation', 'Animation');

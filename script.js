@@ -705,8 +705,8 @@ function placeContent(){
     for(var i = 0; i < 8; i++){
       for(var i2 = 0; i2 < 14; i2++){
         imagesInAnArray.push(new Image());
-        imagesInAnArray[i*i2].src = folder + i + '/' + i2 + '.png';
-        imagesInAnArray[i*i2].onload = function(){
+        
+        imagesInAnArray[14 * i + i2].onload = function(){
           counter = counter + 1;
           
           console.log('I think one of them loaded!' + counter);
@@ -715,14 +715,8 @@ function placeContent(){
             console.log('All done!');
           }
         };
-      }
-    }
-
-    function incrementCounter() {
-      counter++;
-      
-      if (counter === len) {
-        console.log("So, like, uh, I'm pretty like maybe sure that all of the images could have loaded by now, maybe?");
+        
+        imagesInAnArray[14 * i + i2].src = folder + i + '/' + i2 + '.png';
       }
     }
     // End of image loading.

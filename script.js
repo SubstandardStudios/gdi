@@ -691,6 +691,11 @@ function placeContent(){
     $('#fullResCharacterBox').append('<h2 style = margin-top:0px;margin-bottom:0px;> Visual </h2>');
     $('#fullResCharacterBox').append('<hr id = thinHr>');
     
+    //When ye be programmin' in mystikal landz...
+    $('#fullResCharacterBox').append('<div id = divOfLoading></div>');//... ye may find yerself in needova div o' loading
+      $('#divOfLoading').append('<h3 style = position:absolute;top:115px;left:30%>Loading</div>');
+      $('#divOfLoading').append('<h4 style = position:absolute;top:125px;left:38% id = counterOfLoading>0/112</div>');
+    
     $('#fullResCharacterBox').append('<hr id = thinHr style = position:absolute;bottom:30px;left:3%;width:93%;>');
     $('#fullResCharacterBox').append('<h3 style = position:absolute;bottom:5px;left:7%;> Representation </h3>');
     
@@ -708,7 +713,11 @@ function placeContent(){
         imagesInAnArray[i][i2].onload = function(){
           counter = counter + 1;
           
+          $('#counterOfLoading').text(counter+'/112');
+          
           if(counter === imagesInAnArray.length*14){
+            
+            $('#divOfLoading').empty();
             
             function changeSide(rightOrLeft){
               

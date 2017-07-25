@@ -673,7 +673,9 @@ function placeContent(){
   
   addLeftBox('New Mortal', 'mortalMaker', "These will be quite useful...", function(){
     var group = 'empyrean guild';//We'll add in other races/groups once we have models for 'em.
+    var gender = 'male';//Prolly gonna need a playermodel...
     var race = raceFromGroup(group);
+    var profession = chooseFrom(['mage', 'rogue', 'warrior']);//Add craftsman, bard, baker, and...
     
     if(typeof race == 'object'){
       var mortalName = nameFromRace(race[1]);
@@ -682,23 +684,112 @@ function placeContent(){
     
     else var mortalName = nameFromRace(race);
     
+    var body = {
+      limbs:modifiersForPart('limbs', race, group, profession, mortalName.split(/[ ]+/), 'male'),
+      face:modifiersForPart('face', race, group, profession, mortalName.split(/[ ]+/), 'male'),
+      torso:modifiersForPart('torso', race, group, profession, mortalName.split(/[ ]+/), 'male')
+    }
+    
     
     addMainArea('mortalMaker', mortalName);
     $('#mortalMakerMainArea').append('<hr id = thickishHr>');
     
-    $('#mortalMakerMainArea').append('<div id = fullResCharacterBox></div>');
+    $('#mortalMakerMainArea').append('<div id = firstRowBox style = overflow-y:hidden;overflow-x:scroll;height:365px;width:100%;></div>');
     
-    $('#fullResCharacterBox').append('<h2 style = margin-top:0px;margin-bottom:0px;> Visual </h2>');
+    
+    
+    $('#firstRowBox').append('<div id = fullResCharacterBox></div>');
+    
+    $('#fullResCharacterBox').append('<h2 style = margin:0px;text-align:center;float:none;> Visual </h2>');
     $('#fullResCharacterBox').append('<hr id = thinHr>');
     
-    //When ye be programmin' in mystikal landz...
-    $('#fullResCharacterBox').append('<div id = divOfLoading></div>');//... ye may find yerself in needova div o' loading
+    $('#fullResCharacterBox').append('<div id = divOfLoading></div>');
       $('#divOfLoading').append('<h3 style = position:absolute;top:115px;left:30%>Loading</div>');
       $('#divOfLoading').append('<h4 style = position:absolute;top:125px;left:38% id = counterOfLoading>0/112</div>');
     
-    $('#fullResCharacterBox').append('<hr id = thinHr style = position:absolute;bottom:30px;left:3%;width:93%;>');
+    $('#fullResCharacterBox').append('<hr id = thinHr style = position:absolute;bottom:25px;left:3%;width:93%;>');
     $('#fullResCharacterBox').append('<h3 style = position:absolute;bottom:5px;left:7%;> Representation </h3>');
     
+    var statsAndStoryBoxWidth = $('#firstRowBox').width() - 225;
+    
+    var statsBoxIndex = 0;
+    var statsBoxTitles = ['Description', 'Skills', 'Stats'];
+    var statsBoxCode = [
+      function(){
+        for (var element in body){
+          $('#statsAndStoryLeftDiv').append('<div id = ' + element + 'Box class = borderedBoxThin style = padding-top:2px;margin-bottom:10px;>' + element.capitalize() + '</div>');
+          $('#statsAndStoryLeftDiv').append('<hr id = thinHr style = margin-bottom:10px;>');
+          $('#statsAndStoryRightDiv').append('<p>' + body[element][2] + '</p>');
+          
+          $('#' + element + 'Box').click(function(){
+            var element = this.id.slice(0, this.id.length-3);
+            //$('#statsAndStoryRightDiv').empty();
+            //$('#statsAndStoryRightDiv').append('<h4 style = margin-top:5px;margin-bottom:0px;>' + body[element][0].capitalize() + ' ' + element.capitalize() + '</h4>');
+            //$('#statsAndStoryRightDiv').append('<h5 style = position:absolute;top:-15px;left:0px;>' + 'Main Skill:' + ' ' + profession.capitalize() + '</h5>');
+            //$('#statsAndStoryRightDiv').append('<hr id = thinHr style = margin-top:0px;>');
+            
+          });
+        }
+        $('#statsAndStoryLeftDiv').prepend('<hr id = thinHr style = margin-bottom:10px;>');
+        $('#statsAndStoryLeftDiv').prepend('<div id = ' + 'story' + 'Box class = borderedBoxThin style = padding-top:2px;margin-bottom:10px;>' + 'Story' + '</div>');
+        $('#storyBox').click(function(){
+          $('#statsAndStoryRightDiv').empty();
+          for (var element in body){
+            $('#statsAndStoryRightDiv').append('<p>' + body[element][2] + '</p>');
+          }
+        });
+        
+        $('#statsAndStoryLeftDiv').children().last().remove();
+        $('#statsAndStoryLeftDiv').children().first().css('margin-top', '5px');
+        $('#statsAndStoryLeftDiv').children().first().click();
+      },
+      
+      function(){
+        console.log('Skills');
+      },
+      
+      function(){
+        console.log('Stats');
+      }
+    ]
+    
+    function changeStatsBoxContent(direction){
+      $('#statsAndStoryLeftDiv').empty();
+      $('#statsAndStoryRightDiv').empty();
+      
+      statsBoxIndex = statsBoxIndex + direction;
+      if(statsBoxIndex < 0)statsBoxIndex = statsBoxTitles.length - 1;
+      if(statsBoxIndex > statsBoxTitles.length - 1)statsBoxIndex = 0;
+      $('#statsAndStoryTitleDiv').empty();
+      $('#statsAndStoryTitleDiv').append(statsBoxTitles[statsBoxIndex]);
+      statsBoxCode[statsBoxIndex].call();
+      
+      $('#leftyStoryButton').empty();
+      $('#leftyStoryButton').append('<- ' + statsBoxTitles[circularArray(statsBoxTitles, -1, statsBoxIndex)]);
+      $('#leftyStoryButton').css('width', '125px');
+      $('#rightStoryButton').empty();
+      $('#rightStoryButton').append(statsBoxTitles[circularArray(statsBoxTitles, 1, statsBoxIndex)] + ' ->');
+      $('#rightStoryButton').css('width', '125px');
+    }
+    
+    $('#firstRowBox').append('<div class = borderedBox id = statsAndStoryBox style = position:relative;text-align:center;margin-top:25px;float:right;width:' + statsAndStoryBoxWidth + 'px;height:305px;></div>');
+    $('#statsAndStoryBox').append('<div id = statsAndStoryTitleDiv style = font-weight:bold;margin-top:4px;display:inline-block;font-size:25px;></div>');
+    $('#statsAndStoryBox').append('<hr id = thinHr style = width:97.5%;position:absolute;top:35px;left:1%;>');
+    $('#statsAndStoryBox').append('<div class = genericButton id = leftyStoryButton style = position:absolute;left:10px;top:5px;> <- </div>');
+    $('#statsAndStoryBox').append('<div class = genericButton id = rightStoryButton style = position:absolute;right:10px;top:5px;> -> </div>');
+    $('#statsAndStoryBox').append('<div id = statsAndStoryLeftDiv></div>');
+    var rightSideWidth = $('#statsAndStoryBox').width()-115;
+    var rightSideHeight = $('#statsAndStoryBox').height()-40;
+    $('#statsAndStoryBox').append('<div id = statsAndStoryRightDiv style = width:' + rightSideWidth + 'px;height:' + rightSideHeight + 'px;></div>');
+    changeStatsBoxContent(0);
+    
+    $('#leftyStoryButton').click(function(){
+      changeStatsBoxContent(-1);
+    });
+
+    $('#rightStoryButton').click(function(){
+      changeStatsBoxContent(1);
+    });
     //Image loading script:
     
     var imagesInAnArray = [];
@@ -739,14 +830,14 @@ function placeContent(){
             var directionOfCharacter = 0;
             changeSide(0);
             
-            $('#fullResCharacterBox').append('<div id = genericButton class = leftyButtonBox style = position:absolute;left:10px;top:5px;> <- </div>');
-            $('#fullResCharacterBox').append('<div id = genericButton class = rightButtonBox style = position:absolute;right:10px;top:5px;> -> </div>');
+            $('#fullResCharacterBox').append('<div class = genericButton id = leftyButtonBox style = position:absolute;left:10px;top:5px;> <- </div>');
+            $('#fullResCharacterBox').append('<div class = genericButton id = rightButtonBox style = position:absolute;right:10px;top:5px;> -> </div>');
             
-            $('.leftyButtonBox').click(function(){
+            $('#leftyButtonBox').click(function(){
               changeSide(-1);
             });
             
-            $('.rightButtonBox').click(function(){
+            $('#rightButtonBox').click(function(){
               changeSide(1);
             });
           }

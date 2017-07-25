@@ -180,6 +180,15 @@ function stringToRGBArray(stringOfRGB){
   return stringOfRGB.replace(/[^\d,]/g, '').split(',');
 }
 
+//Pretend an array is a circle: If you call for the element of the array that is one beyond the end of the array, you get the the first element, and vice versa.
+function circularArray(array, direction, currentIndex){
+  currentIndex = currentIndex + direction;
+  if(currentIndex < 0)currentIndex = array.length - 1;
+  else if(currentIndex > array.length-1)currentIndex = 0;
+  
+  return currentIndex;
+}
+
 //End of function dictionary
 
 
@@ -401,6 +410,213 @@ function nameFromRace(race, raisedBy){
       return "Unkown Race";
   }
 
+}
+
+function modifiersForPart(part, race, group, profession, mortalName, gender){
+  var secondaryClass;
+  
+  var pronouns;
+  if(gender === 'male')pronouns = ['he', 'his', 'him'];
+  else if (gender === 'female')pronouns = ['she', 'her', 'her'];
+  else pronouns = ['they', 'their']
+  
+  switch(part){
+    case 'face':
+      switch(profession){
+        case 'mage':
+          var nameArray = ['wise', 'friendly'];
+          var name = chooseFrom(nameArray);
+          
+          switch(name){
+            case 'wise':
+              var story = "Something in the shape of " + mortalName[0] + "'s brow suggests that " + pronouns[0] + " is knowledgable in many subjects.";
+              var bonusToStats = {charismaAcademic:5, wisdom:3}
+              break;
+              
+            case 'friendly':
+              var story = "Something in " + mortalName[0] + "'s eyes suggests that " + pronouns[0] + " is someone you can trust.";
+              var bonusToStats = {charismaGeneral:3}
+              break;
+          }
+          
+          return [name, bonusToStats, story, secondaryClass];
+          
+          
+        case 'rogue':
+          var nameArray = ['mischievous', 'charming'];
+          var name = chooseFrom(nameArray);
+          
+          switch(name){
+            case 'mischievous':
+              var story = "Something in the way that the edges of " + mortalName[0] + "'s mouth crease suggest that " + pronouns[0] + "'s up to no good.";
+              var bonusToStats = {charismaCriminal:4, sneaking:2, stealing:2}
+              break;
+              
+            case 'charming':
+              var story = "Something in the shape of " + mortalName[0] + "'s cheekbones draws the eye, and suggests that " + pronouns[1] + " words conceal another meaning.";
+              var bonusToStats = {charismaGeneral:2, charismaCriminal:3}
+              break;
+          }
+          
+          return [name, bonusToStats, story, secondaryClass];
+          
+        
+        case 'warrior':
+          var nameArray = ['simple', 'charismatic'];
+          var name = chooseFrom(nameArray);
+          
+          switch(name){
+            case 'simple':
+              var story = "Something in the way that " + mortalName[0] + "'s wide forhead is shaped suggests that " + pronouns[0] + " possesses unparalleled stupidity.";
+              var bonusToStats = {wisdom:-3, strength:5}
+              break;
+              
+            case 'charismatic':
+              var story = "Something in the way that " + mortalName[0] + "'s features are put together makes him quite pleasant to be around.";
+              var bonusToStats = {charismaGeneral:1, charismaMilitary:3}
+              break;
+          }
+          
+          return [name, bonusToStats, story, secondaryClass];
+      }
+      break;
+      
+    case 'limbs':
+      switch(profession){
+          
+        case 'mage':
+          var nameArray = ['weak', 'weak', 'weak', 'weak', 'disfigured'];
+          for(var i = 0; i < 12; i++)nameArray.push('long');
+          var name = chooseFrom(nameArray);
+          
+          switch(name){
+              
+            case 'long':
+              var story = mortalName[0] + '\'s long limbs allow ' + pronouns[2] + ' to pry books off of distant shelves, and they often do so.';
+              var bonusToStats = {wisdom:3};
+              break;
+              
+            case 'weak':
+              var story = mortalName[0] + "'s weak limbs weren't much good at physical labor or playing outside, so " + mortalName[0] + " read books and practiced channeling magic.";
+              var bonusToStats = {wisdom:5, magic:5, strength:-4};
+              break;
+              
+            case 'nimble':
+              var story = mortalName[0] + " once used " + pronouns[1] + " nimble appendages to steal a few magical tomes from the forbidden section of the library. Soon afterwards, " + pronouns[0] + " cast " + pronouns[1] + " first spell.";
+              var bonusToStats = {magic:5, sneaking:3, stealing:2};
+              var secondaryClass = 'rogue'
+              break;
+          }
+          return [name, bonusToStats, story, secondaryClass];
+          
+        case 'rogue':
+          var nameArray = ['nimble', 'disfigured', 'disfigured', 'disfigured', 'disfigured'];
+          for(var i = 0; i < 12; i++)nameArray.push('long');
+          var name = chooseFrom(nameArray);
+          
+          switch(name){
+            case 'long':
+              var story = mortalName[0] + " discovered early on in " + pronouns[1] + " life that " + pronouns[1] + " long limbs are quite useful for reaching into the pockets of the unwary.";
+              var bonusToStats = {stealing:3};
+              break;
+              
+            case 'nimble':
+              var story = mortalName[0] + " once used " + pronouns[1] + " nimble appendages to steal a few magical tomes from the forbidden section of the library. Soon afterwards, " + pronouns[0] + " cast " + pronouns[1] + " first spell.";
+              var bonusToStats = {magic:5, sneaking:3, stealing:2};
+              var secondaryClass = 'mage'
+              break;
+              
+            case 'disfigured':
+              var story = mortalName[0] + "'s disfigured limbs were often the subject of ridicule by other children."
+                +" That is, until " + mortalName[0] + " stole a knife from an unwary shopkeeper, and proceeded to break into the home of the tortorous childrens' leader. Once there, " + pronouns[0] + " waited until their tormenter fell asleep, and proceeded to sever one of his toes."
+                +" The next day, when the bully began to tease " + mortalName[0] + " yet again, " + pronouns[0] + " returned the toe to it's open-mouthed owner, who never again spoke to " + mortalName[0] + ".";
+              var bonusToStats = {sneaking:5, stealing:2};
+              break;
+          }
+          return [name, bonusToStats, story, secondaryClass];
+          
+        case 'warrior':
+          var nameArray = ['strong', 'long', 'quick'];
+          var name = chooseFrom(nameArray);
+          
+          switch(name){
+            case 'long':
+              var story = mortalName[0] + " often uses the extra reach provided to " + pronouns[2] + " by " + pronouns[1] + " long limbs in battle, and doing so allows " + pronouns[2] + " to better attack unprotected areas.";
+              var bonusToStats = {criticalChance:3, fighting:5};
+              break;
+
+            case 'strong':
+              var story = "Years spent toiling away at physically intensive tasks have strengthened " + mortalName[0] + "'s limbs. " + pronouns[0].capitalize() + " often uses these strong limbs to bash in the heads of those " + pronouns[0] + " isn't quite fond of.";
+              var bonusToStats = {strength:4};
+              break;
+              
+            case 'quick':
+              var story = mortalName[0] + " spent most of " + pronouns[1] + " childhood running errands for local merchants. These merchants often payed " + mortalName[0] + " extra if " + pronouns[0] + " could do a job quickly. This practice has made " + mortalName[0] + "'s limbs quick and nimble.";
+              var bonusToStats = {dexterity:4, speed:4};
+              break;
+          }
+          return [name, bonusToStats, story, secondaryClass];
+      }
+      break;
+    
+    case 'torso':
+      switch(profession){
+        case 'mage':
+          var nameArray = ['maimed'];
+          for(var i = 0; i < 12; i++)nameArray.push('pale');
+          var name = chooseFrom(nameArray);
+          
+          switch(name){
+            case 'maimed':
+              var story = "One murky night, " + mortalName[0] + " was traveling alone in the wilderness. " + pronouns[0].capitalize() + " bore a torch in one hand, and held a channeling tome of travel in the other. " + pronouns[0].capitalize() + " heard something stir in a nearby patch of foilage, and, in a fright, " + pronouns[0] + " channeled " + pronouns[1] + " magic into the tome. Fortunately, the tome brought " + pronouns[2] + " home, but channeling all of " + pronouns[1] + " at once had scarred " + pronouns[1] + " torso with deep red welts.";
+              var bonusToStats = {generalCharisma:-2, wisdom:3};
+              break;
+            
+            case 'pale':
+              var story = "A life spent inside reading books has left " + mortalName[0] + " with remarkably pale skin.";
+              var bonusToStats = {wisdom:5};
+              break;
+          }
+          return [name, bonusToStats, story, secondaryClass];
+          
+        case 'rogue':
+          var nameArray = ['scarred', 'tattoed'];
+          var name = chooseFrom(nameArray);
+          
+          switch(name){
+            case 'scarred':
+              var story = mortalName[0] + " was once in the process of robbing the local baker's cellar, when the baker stumbled across " + pronouns[2] + ". " + mortalName[0] + " was flogged almost to the point of death, and to this day " + pronouns[0] + " bears long red scars across his back and torso. The next time someone stumbled across " + mortalName[0] + " as " + pronouns[0] + " was stealing something, " + mortalName[0] + " killed them.";
+              var bonusToStats = {charismaCriminal:2, stealing:3, sneaking:3};
+              break;
+            
+            case 'tattoed':
+              var story = "Dark, swirling tattoos cover " + mortalName[0] + "'s chest, marking him as a rogue.";
+              var bonusToStats = {charismaGeneral:-3, charismaCriminal:6}
+              break;
+          }
+          return [name, bonusToStats, story, secondaryClass];
+          
+        case 'warrior':
+          var nameArray = ['scarred', 'muscled'];
+          var name = chooseFrom(nameArray);
+          
+          switch(name){
+            case 'scarred':
+              var story = "Plenty of fighting practice has left jagged scars that cover " + mortalName[0] + "'s torso.";
+              var bonusToStats = {fighting:7, charismaMilitary:2};
+              break;
+            
+            case 'muscled':
+              var story = "Intensive physical labor has left " + mortalName[0] + " with firm muscles all across " + pronouns[1] + " torso.";
+              var bonusToStats = {strength:5};
+              break;
+          }
+          return [name, bonusToStats, story, secondaryClass];
+      }
+      
+  }
+  
+  
 }
 
 function effect(type){

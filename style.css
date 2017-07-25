@@ -14,6 +14,14 @@ h1 {
     display: table;
 }
 
+h2 {
+  display:inline-block;
+  font-size:25px;
+  margin-top:0px;
+  margin-left:10px;
+  margin-right:10px;
+}
+
 h3 {
   margin: 0 auto;
   margin-bottom: 0px;
@@ -171,6 +179,18 @@ h3 {
     */
 }
 
+.borderedBox{
+  border:3px solid black;
+  border-radius:25px;
+}
+
+.borderedBoxThin{
+  border:2px solid black;
+  border-radius:25px;
+  
+  font-weight:bold;
+}
+
 #fullResCharacterBox {
   
   border: 3px solid black;
@@ -188,28 +208,11 @@ h3 {
 
   text-align:center;
   
+  margin-right:0px;
+  
+  float:left;
+  
   position:relative;
-}
-
-#storyBox {
-	position:relative;
-	
-    margin: 0 auto;
-    margin-bottom: 15px;
-	
-    border: 2px solid black;
-    border-radius: 25px;
-	
-    display: table;
-    overflow:scroll;
-	
-    height: 200px;
-    width: 675px;
-	
-    padding: 10px;
-	
-    /*background-color:Burlywood;*/
-    background:url(http://piskel-imgstore-b.appspot.com/img/be5d630f-e430-11e6-a821-b98bdf48deb5.gif);
 }
 
 #thinHr {
@@ -257,17 +260,45 @@ h3 {
   background:url(http://piskel-imgstore-b.appspot.com/img/be5d630f-e430-11e6-a821-b98bdf48deb5.gif);
 }
 
-#genericButton{
+.genericButton{
   width:20px;
   height:17px;
   
   border:2px solid black;
+  border-radius:5px;
   
   padding-top:3px;
   
   font-weight:bold;
+}
+
+#statsAndStoryRightDiv{
+  position:absolute;
   
-  border-radius:5px;
+  top:40px;
+  left:93px;
+  
+  padding-left:10px;
+  padding-right:10px;
+  
+  overflow-y:scroll;
+  
+  float:right;
+}
+
+#statsAndStoryLeftDiv{
+  width:68px;
+  height:86.5%;
+  
+  padding-left:10px;
+  padding-right:10px;
+  padding-top:1%;
+  
+  border-radius:0px 0px 0px 25px;
+  
+  border-right:2px solid black;
+  
+  margin-top:5px;
 }
 
 #gameCanvas {

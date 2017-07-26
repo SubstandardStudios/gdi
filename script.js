@@ -673,25 +673,26 @@ function placeContent(){
   
   addLeftBox('New Mortal', 'mortalMaker', "These will be quite useful...", function(){
     var group = 'empyrean guild';//We'll add in other races/groups once we have models for 'em.
-    var gender = 'male';//Prolly gonna need a playermodel...
+    var gender = 'male';//Prolly gonna need a different playermodel for female...
     var race = raceFromGroup(group);
     var profession = chooseFrom(['mage', 'rogue', 'warrior']);//Add craftsman, bard, baker, and...
     
     if(typeof race == 'object'){
-      var mortalName = nameFromRace(race[1]);
+      var mortalName = nameFromRace(race[1]).split(/[ ]+/);
       race = race[0];
     }
     
-    else var mortalName = nameFromRace(race);
+    else var mortalName = nameFromRace(race).split(/[ ]+/);
     
     var body = {
-      limbs:modifiersForPart('limbs', race, group, profession, mortalName.split(/[ ]+/), 'male'),
-      face:modifiersForPart('face', race, group, profession, mortalName.split(/[ ]+/), 'male'),
-      torso:modifiersForPart('torso', race, group, profession, mortalName.split(/[ ]+/), 'male')
+      limbs:modifiersForPart('limbs', race, group, profession, mortalName, 'male'),
+      face:modifiersForPart('face', race, group, profession, mortalName, 'male'),
+      torso:modifiersForPart('torso', race, group, profession, mortalName, 'male')
     }
     
     
-    addMainArea('mortalMaker', mortalName);
+    addMainArea('mortalMaker', mortalName[0] + ' ' + mortalName[1]);
+    $('#mortalMakerTitleBar').append('<h3 style = position:absolute;top:20px;right:50px;>' + profession.capitalize() + '</h3>');
     $('#mortalMakerMainArea').append('<hr id = thickishHr>');
     
     $('#mortalMakerMainArea').append('<div id = firstRowBox style = overflow-y:hidden;overflow-x:scroll;height:365px;width:100%;></div>');
@@ -723,11 +724,13 @@ function placeContent(){
           
           $('#' + element + 'Box').click(function(){
             var element = this.id.slice(0, this.id.length-3);
-            //$('#statsAndStoryRightDiv').empty();
-            //$('#statsAndStoryRightDiv').append('<h4 style = margin-top:5px;margin-bottom:0px;>' + body[element][0].capitalize() + ' ' + element.capitalize() + '</h4>');
-            //$('#statsAndStoryRightDiv').append('<h5 style = position:absolute;top:-15px;left:0px;>' + 'Main Skill:' + ' ' + profession.capitalize() + '</h5>');
-            //$('#statsAndStoryRightDiv').append('<hr id = thinHr style = margin-top:0px;>');
-            
+            $('#statsAndStoryRightDiv').empty();
+            $('#statsAndStoryRightDiv').append('<p>' + body[element][2] + '</p>');
+            $('#statsAndStoryRightDiv').append('<hr id = thinHr>');
+            $('#statsAndStoryRightDiv').append('<p>' + mortalName[0] + " draws the following from his " + body[element][0] + ' ' + (element == 'face' ? 'features' : element) + ':</p>');
+            for (var attribute in body[element][1]){
+              $('#statsAndStoryRightDiv').append('<p>' + (body[element][1][attribute] < 0 ? body[element][1][attribute]*-1 : body[element][1][attribute]) + ' levels ' + (body[element][1][attribute] < 0 ? 'lower' : 'higher') + ' ' + attribute.replace(/([A-Z])/g, ' $1').trim().capitalize() + '</p>');
+            }
           });
         }
         $('#statsAndStoryLeftDiv').prepend('<hr id = thinHr style = margin-bottom:10px;>');
@@ -779,7 +782,7 @@ function placeContent(){
     $('#statsAndStoryBox').append('<div class = genericButton id = rightStoryButton style = position:absolute;right:10px;top:5px;> -> </div>');
     $('#statsAndStoryBox').append('<div id = statsAndStoryLeftDiv></div>');
     var rightSideWidth = $('#statsAndStoryBox').width()-115;
-    var rightSideHeight = $('#statsAndStoryBox').height()-40;
+    var rightSideHeight = $('#statsAndStoryBox').height()-50;
     $('#statsAndStoryBox').append('<div id = statsAndStoryRightDiv style = width:' + rightSideWidth + 'px;height:' + rightSideHeight + 'px;></div>');
     changeStatsBoxContent(0);
     

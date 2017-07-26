@@ -430,12 +430,12 @@ function modifiersForPart(part, race, group, profession, mortalName, gender){
           switch(name){
             case 'wise':
               var story = "Something in the shape of " + mortalName[0] + "'s brow suggests that " + pronouns[0] + " is knowledgable in many subjects.";
-              var bonusToStats = {charismaAcademic:5, wisdom:3}
+              var bonusToStats = {academicCharisma:5, wisdom:3}
               break;
               
             case 'friendly':
               var story = "Something in " + mortalName[0] + "'s eyes suggests that " + pronouns[0] + " is someone you can trust.";
-              var bonusToStats = {charismaGeneral:3}
+              var bonusToStats = {generalCharisma:3}
               break;
           }
           
@@ -449,12 +449,12 @@ function modifiersForPart(part, race, group, profession, mortalName, gender){
           switch(name){
             case 'mischievous':
               var story = "Something in the way that the edges of " + mortalName[0] + "'s mouth crease suggest that " + pronouns[0] + "'s up to no good.";
-              var bonusToStats = {charismaCriminal:4, sneaking:2, stealing:2}
+              var bonusToStats = {criminalCharisma:4, sneaking:2, stealing:2}
               break;
               
             case 'charming':
               var story = "Something in the shape of " + mortalName[0] + "'s cheekbones draws the eye, and suggests that " + pronouns[1] + " words conceal another meaning.";
-              var bonusToStats = {charismaGeneral:2, charismaCriminal:3}
+              var bonusToStats = {generalCharisma:2, criminalCharisma:3}
               break;
           }
           
@@ -473,7 +473,7 @@ function modifiersForPart(part, race, group, profession, mortalName, gender){
               
             case 'charismatic':
               var story = "Something in the way that " + mortalName[0] + "'s features are put together makes him quite pleasant to be around.";
-              var bonusToStats = {charismaGeneral:1, charismaMilitary:3}
+              var bonusToStats = {generalCharisma:1, militaryCharisma:3}
               break;
           }
           
@@ -485,7 +485,7 @@ function modifiersForPart(part, race, group, profession, mortalName, gender){
       switch(profession){
           
         case 'mage':
-          var nameArray = ['weak', 'weak', 'weak', 'weak', 'disfigured'];
+          var nameArray = ['weak', 'weak', 'weak', 'weak', 'nimble'];
           for(var i = 0; i < 12; i++)nameArray.push('long');
           var name = chooseFrom(nameArray);
           
@@ -502,9 +502,9 @@ function modifiersForPart(part, race, group, profession, mortalName, gender){
               break;
               
             case 'nimble':
-              var story = mortalName[0] + " once used " + pronouns[1] + " nimble appendages to steal a few magical tomes from the forbidden section of the library. Soon afterwards, " + pronouns[0] + " cast " + pronouns[1] + " first spell.";
+              var story = mortalName[0] + " once used " + pronouns[1] + " nimble appendages to steal a few magical tomes from the forbidden section of the library. What " + pronouns[0] + " read in that tome changed him forever.";
               var bonusToStats = {magic:5, sneaking:3, stealing:2};
-              var secondaryClass = 'rogue'
+              var secondaryClass = 'rogue';
               break;
           }
           return [name, bonusToStats, story, secondaryClass];
@@ -528,7 +528,7 @@ function modifiersForPart(part, race, group, profession, mortalName, gender){
               
             case 'disfigured':
               var story = mortalName[0] + "'s disfigured limbs were often the subject of ridicule by other children."
-                +" That is, until " + mortalName[0] + " stole a knife from an unwary shopkeeper, and proceeded to break into the home of the tortorous childrens' leader. Once there, " + pronouns[0] + " waited until their tormenter fell asleep, and proceeded to sever one of his toes."
+                +" That is, until " + mortalName[0] + " stole a knife from an unwary shopkeeper, and proceeded to break into the home of the tortorous childrens' leader. Once there, " + pronouns[0] + " waited until " + pronouns[1] + " tormenter fell asleep, and proceeded to sever one of his toes."
                 +" The next day, when the bully began to tease " + mortalName[0] + " yet again, " + pronouns[0] + " returned the toe to it's open-mouthed owner, who never again spoke to " + mortalName[0] + ".";
               var bonusToStats = {sneaking:5, stealing:2};
               break;
@@ -585,13 +585,13 @@ function modifiersForPart(part, race, group, profession, mortalName, gender){
           
           switch(name){
             case 'scarred':
-              var story = mortalName[0] + " was once in the process of robbing the local baker's cellar, when the baker stumbled across " + pronouns[2] + ". " + mortalName[0] + " was flogged almost to the point of death, and to this day " + pronouns[0] + " bears long red scars across his back and torso. The next time someone stumbled across " + mortalName[0] + " as " + pronouns[0] + " was stealing something, " + mortalName[0] + " killed them.";
-              var bonusToStats = {charismaCriminal:2, stealing:3, sneaking:3};
+              var story = mortalName[0] + " was once in the process of robbing the local baker's cellar, when the baker caught " + pronouns[2] + " in the act. As punishment for this crime, " + mortalName[0] + " was flogged almost to the point of death, and to this day " + pronouns[0] + " bears long red scars across his back and torso. The next time someone stumbled across " + mortalName[0] + " as " + pronouns[0] + " was stealing something, " + mortalName[0] + " killed them.";
+              var bonusToStats = {criminalCharisma:2, stealing:3, sneaking:3};
               break;
             
             case 'tattoed':
               var story = "Dark, swirling tattoos cover " + mortalName[0] + "'s chest, marking him as a rogue.";
-              var bonusToStats = {charismaGeneral:-3, charismaCriminal:6}
+              var bonusToStats = {generalCharisma:-3, criminalCharisma:6}
               break;
           }
           return [name, bonusToStats, story, secondaryClass];
@@ -603,7 +603,7 @@ function modifiersForPart(part, race, group, profession, mortalName, gender){
           switch(name){
             case 'scarred':
               var story = "Plenty of fighting practice has left jagged scars that cover " + mortalName[0] + "'s torso.";
-              var bonusToStats = {fighting:7, charismaMilitary:2};
+              var bonusToStats = {fighting:7, militaryCharisma:2};
               break;
             
             case 'muscled':

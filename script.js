@@ -504,7 +504,7 @@ function DarkWaves(callback){//Dark Wave!
   if(waveCount > 75 && waveCount < 105)advancingTriangle(waveCount - 75, 'rgb(200, 200, 200)');
   if(waveCount > 90 && waveCount < 120)advancingTriangle(waveCount - 90, 'rgb(240, 240, 240)', true);
 
-  waveCount++;
+  waveCount = waveCount+5;
 
   if(waveCount > 120)waveCount = 0;
 
@@ -727,7 +727,7 @@ function placeContent(){
             $('#statsAndStoryRightDiv').empty();
             $('#statsAndStoryRightDiv').append('<p>' + body[element][2] + '</p>');
             $('#statsAndStoryRightDiv').append('<hr id = thinHr>');
-            $('#statsAndStoryRightDiv').append('<p>' + mortalName[0] + " draws the following from his " + body[element][0] + ' ' + (element == 'face' ? 'features' : element) + ' and the experiences leading up to it\'s acquisition.</p>');
+            $('#statsAndStoryRightDiv').append('<p>' + mortalName[0] + " draws the following from his " + body[element][0] + ' ' + (element == 'face' ? 'features' : element) + ' and related experiences:</p>');
             for (var attribute in body[element][1]){
               $('#statsAndStoryRightDiv').append('<p>' + (body[element][1][attribute] < 0 ? body[element][1][attribute]*-1 : body[element][1][attribute]) + ' levels ' + (body[element][1][attribute] < 0 ? 'lower' : 'higher') + ' ' + attribute.replace(/([A-Z])/g, ' $1').trim().capitalize() + '</p>');
             }

@@ -468,7 +468,7 @@ function modifiersForPart(part, race, group, profession, mortalName, gender){
           switch(name){
             case 'simple':
               var story = "Something in the way that " + mortalName[0] + "'s wide forhead is shaped suggests that " + pronouns[0] + " possesses unparalleled stupidity.";
-              var bonusToStats = {wisdom:-3, strength:5}
+              var bonusToStats = {wisdom:-5, strength:3}
               break;
               
             case 'charismatic':
@@ -602,7 +602,7 @@ function modifiersForPart(part, race, group, profession, mortalName, gender){
           
           switch(name){
             case 'scarred':
-              var story = "Plenty of fighting practice has left jagged scars that cover " + mortalName[0] + "'s torso.";
+              var story = "Plenty of fighting practice has left behind jagged scars that cover " + mortalName[0] + "'s torso.";
               var bonusToStats = {fighting:7, militaryCharisma:2};
               break;
             
@@ -770,147 +770,14 @@ function effect(type){
   }
 }
 
-
-function part(type, img, parent) {//parent should be torso, unless you're using a lower arm or hand! In that case, use upperarm or lowerarm, respectively Also, arm upper is the only one that needs two images, put them in the way we read: left to right :D
-	
-    //IN THE NEAR FUTURE ALL OF THIS CODE WILL BE REPLACED BY SPRITER ANIMATIONS.
-  
-	this.image = img[0];
-	
-	ctx.drawImage(this.image, 0, 0);
-	
-	this.width = this.image.width;
-	this.height = this.image.height;
-	
-	this.type = type;
-	
-	if(this.type !== 'torsoFront')this.parent = parent;
-	
-	if(this.type === 'armUpper' || this.type === 'armLower' || this.type === 'hand')this.imageRi = img[1];
-	
-	this.getPosition = function() {
-		if(this.type === 'torsoFront'){
-			this.x = 300 - (((this.image.width/2)%2 === 0) ? this.image.width/2 : Math.round(this.image.width/2));
-			this.y = 300 - this.height/2;
-		}
-
-		else if(this.type === 'legsFront'){
-			this.x = parent.x + (parent.width - this.width)/2;
-			this.y = parent.y + parent.height - 3;
-		}
-
-		else if(this.type === 'headFront'){
-			this.x = parent.x + (parent.width - this.width)/2;
-			this.y = parent.y - this.height;
-		}
-
-		else if(this.type === 'armUpper'){
-			this.leftX = parent.x - this.width;
-			this.positionValueLeftX = 0;
-
-			this.leftY = parent.y;
-
-			this.rightX = parent.x + parent.width;
-			this.positionValueRightX = 0;
-
-			this.rightY = parent.y;
-		}
-		
-		else if(this.type === 'armLower'){
-			this.leftX = parent.leftX;
-			this.positionValueLeftX = 0;
-
-			this.leftY = parent.leftY + parent.height;
-			this.positionValueLeftY = 0;
-
-			this.rightX = parent.rightX + parent.width - this.width;
-			this.positionValueRightX = 0;
-
-			this.rightY = parent.rightY + parent.height;
-			this.positionValueRightY = 0;
-		}
-
-		else if(this.type === 'hand'){
-			this.leftX = parent.leftX;
-			this.positionValueLeftX = 0;
-
-			this.leftY = parent.leftY + parent.height;
-			this.positionValueLeftY = 0;
-
-			this.rightX = parent.rightX + parent.width - this.width;
-			this.positionValueRightX = 0;
-
-			this.rightY = parent.rightY + parent.height;
-			this.positionValueRightY = 0;
-		}
-	}
-	
-	
-	this.getPosition();
-	
-	
-	this.draw = function(drawLeft, drawRight, canvasContext){//Also, remember, drawLeft and drawRight decide whether or not to draw those arms!  :D
-		
-		if(this.type !== 'armUpper' && this.type !== 'armLower' && this.type !== 'hand')canvasContext.drawImage(this.image, this.x, this.y);
-		
-		else if(this.type === 'armUpper'){
-			if(drawRight)canvasContext.drawImage(this.imageRi, this.rightX + this.positionValueRightX, this.rightY);
-			if(drawLeft)canvasContext.drawImage(this.image, this.leftX + this.positionValueLeftX, this.leftY);
-		}
-		else{
-			if(drawLeft)canvasContext.drawImage(this.image, this.leftX + this.positionValueLeftX, this.leftY + this.positionValueLeftY);
-			if(drawRight)canvasContext.drawImage(this.imageRi, this.rightX + this.positionValueRightX, this.rightY + this.positionValueRightY);
-		}
-	}
-	
-	this.drawRotated = function(fromX, fromY, rotateby, xWhere, yWhere, drawLeft, drawRight, canvasContext){
-		if(this.type === 'armUpper' || this.type === 'hand' || this.type === 'armLower'){
-			if(drawLeft)drawRotatedFromCenter(rotateby, this.imageRi, canvasContext, fromX, fromY, xWhere, yWhere);
-			if(drawRight)drawRotatedFromCenter(rotateby, this.image, canvasContext, fromX, fromY, xWhere, yWhere);
-		}
-		/*
-		 if(element.type === 'armLower'){
-			drawRotatedFromCenter(counter, element.image, canvasContext, parent.leftX, parent.leftY, parent.leftX - element.leftX, parent.leftY - element.leftY);
-			drawRotatedFromCenter(counter, element.image, canvasContext, parent.rightX, parent.rightY, parent.rightX - element.rightX, parent.rightY - element.rightY);
-		}
-
-		else if(element.type === 'hand'){
-			drawRotatedFromCenter(counter, element.image, canvasContext, parent.parent.leftX, parent.parent.leftY, parent.parent.leftX - element.leftX, parent.parent.leftY - element.leftY);
-			drawRotatedFromCenter(counter, element.image, canvasContext, parent.parent.rightX, parent.parent.rightY, parent.parent.leftX - element.leftX, parent.parent.leftY - element.leftY);
-		}
-		*/
-		
-		else drawRotatedFromCenter(rotateby, this.image, canvasContext, fromX, fromY, parent.X, parent.Y);
-	}
-}
-
-
-
-
-
-
-function character(parts){
-	this.animationType = 'none';
-	
-	
-	this.drawAll = function(canvasContext){
-		
-      parts.forEach(function(element){
-		element.draw(true, true, canvasContext);
-      });
-		
-	}
-	
-}
-
 function tile(image, x, y){
 	
 	ctx.drawImage(image, 0, 0);
 	
 	this.image = image;
 	
-	this.image.height = 25;
-	this.image.width = 25;
+	this.image.height = 32;
+	this.image.width = 64;
 	
 	this.draw = function(canvasContext, x, y){
 		canvasContext.drawImage(this.image, x, y);
@@ -975,7 +842,7 @@ function gameMap(tileImage1, tileImage2, size){
 		for(var rows = 0; rows < size; rows++){
 			this.arrayForMap.push([]);
 			for(var columns = 0; columns < size; columns++){
-				var newTile = new tile(this.tileImage1, rows*20, columns*23);//var newTile = new tile((Math.round(Math.random()*100) !== 1) ? this.tileImage1 : this.tileImage2, rows*25, columns*25);
+				var newTile = new tile(this.tileImage1, rows*32, columns*32);//var newTile = new tile((Math.round(Math.random()*100) !== 1) ? this.tileImage1 : this.tileImage2, rows*25, columns*25);
 				this.arrayForMap[rows].push(newTile);
 			}
 		}
@@ -987,7 +854,7 @@ function gameMap(tileImage1, tileImage2, size){
 		this.arrayForMap.forEach(function(element, index){
 			var xIndex = index;
 			element.forEach(function(element, index){
-				element.draw(canvasContext, (xIndex-index)*32, ((index+xIndex)/2)*32);
+				element.draw(canvasContext, (xIndex-index)*32-32, ((index+xIndex)/2)*32);
 			});
 		});
 	}
@@ -1008,120 +875,108 @@ function startGame(){
 }
 
 function gameLoad(ctx, cnv){
-	
-	var imageLoadCounter = 0;
-	var allLoaded = false;
-	
-	//Cedric's basic playermodel images
-	var syntheticArmLowerLeft = new Image();
-	syntheticArmLowerLeft.src = 'imgs/Sprites/Synthetic/ArmLowerLeftSynthetic.gif';//'http://piskel-imgstore-b.appspot.com/img/c46121f0-0449-11e7-80d2-9d214acfe1e9.gif'
-	
-	var syntheticArmLowerRight = new Image();
-	syntheticArmLowerRight.src = 'imgs/Sprites/Synthetic/ArmLowerRightSynthetic.gif';//'http://piskel-imgstore-b.appspot.com/img/c46121f0-0449-11e7-80d2-9d214acfe1e9.gif'
-	
-	var syntheticArmUpperRi = new Image();
-	syntheticArmUpperRi.src = 'imgs/Sprites/Synthetic/ArmUpperRightSynthetic.gif';
-	
-	var syntheticArmUpperLe = new Image();
-	syntheticArmUpperLe.src = 'imgs/Sprites/Synthetic/ArmUpperLeftSynthetic.gif';//'http://piskel-imgstore-b.appspot.com/img/502b9d1e-0533-11e7-978a-59d2b040d17b.gif';
-	
-	var syntheticHandLeft = new Image();
-	syntheticHandLeft.src = 'imgs/Sprites/Synthetic/handSynthetic.gif';//'http://piskel-imgstore-b.appspot.com/img/1b55b091-05a1-11e7-925b-1756e446e1a5.gif';
-	
-	var syntheticHandRight = new Image();
-	syntheticHandRight.src = 'imgs/Sprites/Synthetic/handSynthetic.gif';
-	
-	var syntheticTorsoFront = new Image();
-	syntheticTorsoFront.src = 'imgs/Sprites/Synthetic/TorsoFrontSynthetic.gif';//'http://piskel-imgstore-b.appspot.com/img/e8a45987-0516-11e7-9191-4f4fc7e31569.gif';
-	
-	var syntheticTorsoFront2 = new Image();
-	syntheticTorsoFront2.src = 'imgs/Sprites/Synthetic/TorsoFrontSynthetic2.gif'
-	
-	var syntheticHeadFront = new Image();
-	syntheticHeadFront.src = 'imgs/Sprites/Synthetic/HeadFrontSynthetic.gif';//'http://piskel-imgstore-b.appspot.com/img/0d64b930-0449-11e7-96b2-9d214acfe1e9.gif';
-	
-	var syntheticLegFront = new Image();
-	syntheticLegFront.src = 'imgs/Sprites/Synthetic/LegsFrontSynthetic.gif';//'http://piskel-imgstore-b.appspot.com/img/220fea1c-0449-11e7-b65f-9d214acfe1e9.gif';
-	//End of Cedric's playermodels
-	
-	//Beginning of Riley's Fiend Playermodel Images
-	var redFiendArmLowerRi = new Image();
-	redFiendArmLowerRi.src = 'imgs/Sprites/Fiend/Red_Fiend_Arm_Lower_Right.gif';
-	
-	var redFiendArmLowerLe = new Image();
-	redFiendArmLowerLe.src = 'imgs/Sprites/Fiend/Red_Fiend_Arm_Lower_Left.gif';
-	
-	var redFiendArmUpperRi = new Image();
-	redFiendArmUpperRi.src = 'imgs/Sprites/Fiend/Fiend_Shoulder_Right.gif';
-	
-	var redFiendArmUpperLe = new Image();
-	redFiendArmUpperLe.src = 'imgs/Sprites/Fiend/Fiend_Shoulder_Left.gif';
-	
-	var redFiendHandRi =     new Image();
-	redFiendHandRi.src =     'imgs/Sprites/Fiend/Red_Fiend_Hand_Right.gif';
-	
-	var redFiendHandLe =     new Image();
-	redFiendHandLe.src =     'imgs/Sprites/Fiend/Red_Fiend_Hand_Left.gif';
-	
-	var redFiendTorsoFront = new Image();
-	redFiendTorsoFront.src = 'imgs/Sprites/Fiend/Red_Fiend_Torso_Front.gif';
-	
-	var redFiendHeadFront =  new Image();
-	redFiendHeadFront.src =  'imgs/Sprites/Fiend/Red_Fiend_Head.gif';
-	
-	var redFiendLegFront =   new Image();
-	redFiendLegFront.src =   'imgs/Sprites/Fiend/Hell_Dweller_Jeans_Legs_Front.gif';
-	//End of Riley's Fiend Playermodel Images
-	
-	//Start of Riley's amazing tile images
-	var hellTerrain0 = new Image();
-	hellTerrain0.src = 'imgs/Tiles/WaterNeedsDetail.png';
-	//
-	var magmaTerrain0 = new Image();
-	magmaTerrain0.src = 'imgs/Tiles/TileGrass.png';
-	//End of Riley's amazing tile images
-	
-	var imagesInAnArray = [hellTerrain0, magmaTerrain0, syntheticArmLowerLeft, syntheticArmLowerRight, syntheticArmUpperRi, syntheticHandLeft, syntheticHandRight, syntheticTorsoFront, syntheticTorsoFront2, syntheticHeadFront, syntheticLegFront, redFiendArmLowerRi, redFiendArmLowerLe, redFiendArmUpperRi, redFiendHandRi, redFiendHandLe, redFiendTorsoFront, redFiendHeadFront, redFiendLegFront];
-	
-	var imgs = imagesInAnArray, len = imgs.length, counter = 0;
+  var playerModelArray = [];//All of the playerModel images will be here.
+  var playerModelCounter = 0;//This counts how many of the playerModel images have been loaded
+  var tileArray = [];//All of the tile images will go here
+  var tileCounter = 0;//This counts how many of the tiles have been loaded
 
-		[].forEach.call( imgs, function( img ) {
-			img.addEventListener( 'load', incrementCounter, false );
-		});
+  ctx.fillStyle = 'black';
+  ctx.lineWidth = 4;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
 
-		function incrementCounter() {
-			counter++;
-			if ( counter === len ) {
-				var whichType = 'syntheticHuman';//var whichType = chooseFrom(['fiend', 'syntheticHuman']);
-				
-				if(whichType === 'syntheticHuman'){
-					var torso = new part('torsoFront', [syntheticTorsoFront]);//var torso = new part('torsoFront', chooseFrom([[syntheticTorsoFront],[syntheticTorsoFront2]]));
-					var legsFront = new part('legsFront', [syntheticLegFront], torso);
-					var headFront = new part('headFront', [syntheticHeadFront], torso);
-					var armUpper = new part('armUpper', [syntheticArmUpperLe, syntheticArmUpperRi], torso);
-					var armLower = new part('armLower', [syntheticArmLowerLeft, syntheticArmLowerRight], armUpper);
-					var hand = new part('hand', [syntheticHandLeft, syntheticHandRight], armLower);
-				}
-				
-				else if(whichType === 'fiend'){
-					var torso = new part('torsoFront', [redFiendTorsoFront]);
-					var legsFront = new part('legsFront', [redFiendLegFront], torso);
-					var headFront = new part('headFront', [redFiendHeadFront], torso);
-					var armUpper = new part('armUpper', [redFiendArmUpperLe, redFiendArmUpperRi], torso);
-					var armLower = new part('armLower', [redFiendArmLowerLe, redFiendArmLowerRi], armUpper);
-					var hand = new part('hand', [redFiendHandLe, redFiendHandRi], armLower);
-				}
-				
-				player = new character([headFront, hand, armLower, armUpper, legsFront, torso]);
-				
-				worldMap = new gameMap(magmaTerrain0, hellTerrain0, 24);
-				//worldMap.addIsland(24, 24, 6);
-				//worldMap.addColumn(5);
-				//worldMap.addRow(-1);
-				
-				gameUpdate(ctx, cnv);
-			}
-		}
+  for(var i = 0; i < 8; i++){
+    playerModelArray.push([]);
+    for(var i2 = 0; i2 < 14; i2++){
+      playerModelArray[i].push(new Image());
+
+      playerModelArray[i][i2].onload = function(){
+        playerModelCounter = playerModelCounter + 1;
+        
+        ctx.clearRect(0, 0, cnv.width, cnv.height);
+        ctx.fillText('LOADING PLAYERMODELS: ' + playerModelCounter + '/112', $(window).width()/2, $(window).height()/2);
+
+        if(playerModelCounter === 112){
+          function changeSide(rightOrLeft){
+            directionOfCharacter = directionOfCharacter + rightOrLeft;
+            if(directionOfCharacter > 7)directionOfCharacter = 0;
+            if(directionOfCharacter < 0)directionOfCharacter = 7;
+
+            playerModelArray[directionOfCharacter].forEach(function(element){
+              ctx.drawImage(element, 100, 100);
+            });
+          }
+          var directionOfCharacter = 0;
+          
+          //Tile loading now!
+          var numberOfTileImages = 1;
+          for(var i = 0; i < numberOfTileImages; i++){
+            tileArray.push(new Image());
+            
+            tileArray[i].onload = function(){
+              tileCounter = tileCounter + 1;
+              
+              ctx.clearRect(0, 0, cnv.width, cnv.height);
+              ctx.fillText('LOADING IMAGES: ' + tileCounter + '/' + numberOfTileImages, $(window).width()/2, $(window).height()/2);
+              
+              if(tileCounter === numberOfTileImages){
+                //Loading Done!
+                ctx.clearRect(0, 0, cnv.width, cnv.height);
+                
+                var directionBool = true;
+                var timeoutCounter = 0;
+                var mousePos1;
+                var mousePos2;
+                var timeout;
+                $('#gameCanvas').mousedown(function(event){
+                  $('#gameCanvas').on('mousemove', function(event){
+                    if(event.which == 1){
+                      if(directionBool){
+                        mousePos1 = getMousePos(cnv, event);
+                        console.log(mousePos1.x, mousePos1.y, 1);
+                        
+                        if(mousePos2){
+                          ctx.translate(mousePos1.x - mousePos2.x, mousePos1.y-mousePos2.y);
+                        }
+                      }
+
+                      else if(!directionBool){
+                        mousePos2 = getMousePos(cnv, event);
+                        console.log(mousePos1.x, mousePos1.y, 2);
+                        
+                        if(mousePos1){
+                          ctx.translate(mousePos2.x - mousePos1.x, mousePos2.y-mousePos1.y);
+                        }
+                      }
+
+                      directionBool = !directionBool;
+                    }
+                  });
+                });
+
+                $(document).mouseup(function(){
+                  $('#gameCanvas').off('mousemove');
+                  mousePos1 = false;
+                  mousePos2 = false;
+                  return false;
+                });
+
+                worldMap = new gameMap(tileArray[0], tileArray[0], 24);
+
+                gameUpdate(ctx, cnv);
+              }
+            }
+            
+            tileArray[i].src = 'imgs/tiles/' + i + '.png';
+          }
+        }
+      };
+
+
+      playerModelArray[i][i2].src = 'imgs/spritesAndArmor/gameResSprites/humanStandard/' + i + '/' + i2 + '.png';
+      //else if(i == 8)imagesInAnArray[i][i2].src = 'imgs/tiles/' + i + '/' + i2 + '.png';
+    }
+  }
 }
 
 function gameUpdate(ctx, cnv){
@@ -1130,7 +985,7 @@ function gameUpdate(ctx, cnv){
 	
 	
 	worldMap.drawTiles(ctx);
-	player.drawAll(ctx);
+	//player.drawAll(ctx);
 	
 	
 	setTimeout(function(){gameUpdate(ctx, cnv);}, 50);

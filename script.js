@@ -692,7 +692,7 @@ function placeContent(){
     
     
     addMainArea('mortalMaker', mortalName[0] + ' ' + mortalName[1]);
-    $('#mortalMakerTitleBar').append('<h3 style = position:absolute;top:20px;right:50px;>' + profession.capitalize() + '</h3>');
+    $('#mortalMakerTitleBar').append('<h3 style = position:absolute;top:20px;right:5%;>' + profession.capitalize() + '</h3>');
     $('#mortalMakerMainArea').append('<hr id = thickishHr>');
     
     $('#mortalMakerMainArea').append('<div id = firstRowBox style = overflow-y:hidden;overflow-x:scroll;height:365px;width:100%;></div>');
@@ -727,7 +727,7 @@ function placeContent(){
             $('#statsAndStoryRightDiv').empty();
             $('#statsAndStoryRightDiv').append('<p>' + body[element][2] + '</p>');
             $('#statsAndStoryRightDiv').append('<hr id = thinHr>');
-            $('#statsAndStoryRightDiv').append('<p>' + mortalName[0] + " draws the following from his " + body[element][0] + ' ' + (element == 'face' ? 'features' : element) + ':</p>');
+            $('#statsAndStoryRightDiv').append('<p>' + mortalName[0] + " draws the following from his " + body[element][0] + ' ' + (element == 'face' ? 'features' : element) + ' and the experiences leading up to it.</p>');
             for (var attribute in body[element][1]){
               $('#statsAndStoryRightDiv').append('<p>' + (body[element][1][attribute] < 0 ? body[element][1][attribute]*-1 : body[element][1][attribute]) + ' levels ' + (body[element][1][attribute] < 0 ? 'lower' : 'higher') + ' ' + attribute.replace(/([A-Z])/g, ' $1').trim().capitalize() + '</p>');
             }

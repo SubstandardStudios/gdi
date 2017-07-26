@@ -568,7 +568,7 @@ function modifiersForPart(part, race, group, profession, mortalName, gender){
           
           switch(name){
             case 'maimed':
-              var story = "One murky night, " + mortalName[0] + " was traveling alone in the wilderness. " + pronouns[0].capitalize() + " bore a torch in one hand, and held a channeling tome of travel in the other. " + pronouns[0].capitalize() + " heard something stir in a nearby patch of foilage, and, in a fright, " + pronouns[0] + " channeled " + pronouns[1] + " magic into the tome. Fortunately, the tome brought " + pronouns[2] + " home, but channeling all of " + pronouns[1] + " at once had scarred " + pronouns[1] + " torso with deep red welts.";
+              var story = "One murky night, " + mortalName[0] + " was traveling alone in the wilderness. " + pronouns[0].capitalize() + " bore a torch in one hand, and held a channeling tome of travel in the other. " + pronouns[0].capitalize() + " heard something stir in a nearby patch of foilage, and, in a fright, " + pronouns[0] + " channeled " + pronouns[1] + " magic into the tome. Fortunately, the tome brought " + pronouns[2] + " home, but channeling all of " + pronouns[1] + " magic at once had scarred " + pronouns[1] + " torso with deep red welts.";
               var bonusToStats = {generalCharisma:-2, wisdom:3};
               break;
             

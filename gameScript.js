@@ -879,7 +879,7 @@ function gameLoad(ctx, cnv){
   var playerModelCounter = 0;//This counts how many of the playerModel images have been loaded
   var tileArray = [];//All of the tile images will go here
   var tileCounter = 0;//This counts how many of the tiles have been loaded
-
+  $(window).off('resize');
   ctx.fillStyle = 'black';
   ctx.lineWidth = 4;
   ctx.textAlign = 'center';
@@ -929,23 +929,28 @@ function gameLoad(ctx, cnv){
                 var mousePos2;
                 var timeout;
                 $('#gameCanvas').mousedown(function(event){
+                  console.log(event.clientX, event.clientY);
                   $('#gameCanvas').on('mousemove', function(event){
                     if(event.which == 1){
                       if(directionBool){
                         mousePos1 = getMousePos(cnv, event);
-                        console.log(mousePos1.x, mousePos1.y, 1);
                         
                         if(mousePos2){
                           ctx.translate(mousePos1.x - mousePos2.x, mousePos1.y-mousePos2.y);
+                          cameraX = cameraX - (mousePos1.x - mousePos2.x);
+                          cameraY = cameraY - (mousePos1.y - mousePos2.y);
+                          console.log(cameraX, cameraY);
                         }
                       }
 
                       else if(!directionBool){
                         mousePos2 = getMousePos(cnv, event);
-                        console.log(mousePos1.x, mousePos1.y, 2);
                         
                         if(mousePos1){
                           ctx.translate(mousePos2.x - mousePos1.x, mousePos2.y-mousePos1.y);
+                          cameraX = cameraX - (mousePos2.x - mousePos1.x);
+                          cameraY = cameraY - (mousePos2.y - mousePos1.y);
+                          console.log(cameraX, cameraY);
                         }
                       }
 
@@ -981,14 +986,12 @@ function gameLoad(ctx, cnv){
 
 function gameUpdate(ctx, cnv){
 	
-	ctx.clearRect(0, 0, cnv.width, cnv.height);
-	
+	ctx.clearRect(cameraX, cameraY, cnv.width, cnv.height);
 	
 	worldMap.drawTiles(ctx);
 	//player.drawAll(ctx);
 	
-	
-	setTimeout(function(){gameUpdate(ctx, cnv);}, 50);
+	setTimeout(function(){gameUpdate(ctx, cnv);}, 17);
 }
 
 //END OF GAME ENGINE CODE!-------------------------------------------------------------------------------------------------

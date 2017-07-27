@@ -3,6 +3,8 @@
 //Variables for canvas
 var cnv = document.getElementById('gameCanvas');
 var ctx = cnv.getContext('2d');
+var cameraX = 0;
+var cameraY = 0;
 //End of canvas variables
 
 //Start screen variables
@@ -667,6 +669,7 @@ function placeContent(){
   
   
   addLeftBox('Quick Test', 'testBox', 'Test the Graphical Deity Interface', function(){
+    characterSelectionScreen.toggleOff();
     DarkWaves(startGame);
   });
   

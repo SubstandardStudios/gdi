@@ -1,25 +1,6 @@
 //'use strict';//This enforces stricter syntax, throwing more errors more often at even the tiniest mistakes. Great for testing stuff!
 
 //Start of function dictionary
-
-/*
-(function () {
-    var old = console.log;
-    var logger = document.getElementById('log');
-    console.log = function () {
-		for (var i = 0; i < arguments.length; i++) {
-        if (typeof arguments[i] == 'object') {
-            logger.innerHTML += (JSON && JSON.stringify ? JSON.stringify(arguments[i], undefined, 2) : arguments[i]) + '<br />';
-        } else {
-            logger.innerHTML += arguments[i] + '<br />';
-        }
-      }
-    }
-})();
-*/
-function printTest(){
-	console.log("This function prints 'Test!' for testing purposes. Test!");
-}
 function setPixel(x, y, ctx) {
 	ctx.fillRect(x - 0.5, y - 0.5, 1, 1 );	
 }
@@ -122,11 +103,6 @@ function getCoordsOnWayTo(startCoords, endCoords){
   else return 'Coords Same';
 }
 
-function plotArmPart(firstX, firstY, secondX, secondY, innerColor, outerColor, ctx){
-	for(var i = -1; i < 2; i++)plotLine(firstX+i*2, firstY+i, secondX+i*2, secondY+i, (i === 0)?outerColor:innerColor, ctx);
-}
-function logTypeOf(randomValue){console.log(typeof window.randomValue);}
-
 function chooseFrom(anArray){ //This function chooses something from an array.
 	return anArray[Math.floor(Math.random() * anArray.length)];
 }
@@ -170,10 +146,6 @@ function drawRotatedFromCenter(degrees, image, context, axisX, axisY, positionX,
 
   // we’re done with the rotating so restore the unrotated context
   context.restore();
-}
-
-function fillArrayUpTo(anArray, upTo, filler){//The purpose of this function is to create an array full of empty arrays up to the specified number. This function is used in the map system.
-  while(anArray.length !== upTo)anArray.push(filler);
 }
 
 function stringToRGBArray(stringOfRGB){
@@ -258,14 +230,18 @@ http://piskel-imgstore-b.appspot.com/img/85bd4557-01d0-11e7-acaa-c714d3e93f2a.gi
 //START OF GAME ENGINE CODE(Walking, attacking, inventory, stuff like that.) ----------------------------------------------
 
 //Variables for game engine
-var characterModel;
+var worldMap;
+var playerCharacter;
 
-var screenheight;
-var screenwidth;
+var onkeyup;
+var onkeydown;
 
+var keyMap = {};
 //End of variables for game engine.
 
 //Assisting functions for game engine! :D
+
+//DO NOT USE BEFORE IMAGES ARE DONE LOADING: Thanks Braden Best & Stack Overflow!
 
 function raceFromGroup(group){
   var val = Math.floor(Math.random() * 100) + 1;//This code generates a random number, 1-100 inclusive.
@@ -779,8 +755,8 @@ function tile(image, x, y){
 	this.image.height = 32;
 	this.image.width = 64;
 	
-	this.draw = function(canvasContext, x, y){
-		canvasContext.drawImage(this.image, x, y);
+	this.draw = function(x, y){
+		ctx.drawImage(this.image, x, y);
 	}
 }
 
@@ -796,7 +772,7 @@ function gameMap(tileImage1, tileImage2, size){
 		this.arrayForMap.splice(x>-1?x:0, 0, []);
 		
 		for(var i = 0; i < fillUpTo; i++){
-			this.arrayForMap[x>-1?x:0].push(new tile(this.tileImage1));
+			this.arrayForMap[x>-1?x:0].push(new tile(chooseFrom([this.tileImage1, this.tileImage2, this.tileImage2])));
 		}
 	}
 	
@@ -842,7 +818,7 @@ function gameMap(tileImage1, tileImage2, size){
 		for(var rows = 0; rows < size; rows++){
 			this.arrayForMap.push([]);
 			for(var columns = 0; columns < size; columns++){
-				var newTile = new tile(this.tileImage1, rows*32, columns*32);//var newTile = new tile((Math.round(Math.random()*100) !== 1) ? this.tileImage1 : this.tileImage2, rows*25, columns*25);
+				var newTile = new tile(chooseFrom([this.tileImage1, this.tileImage2, this.tileImage2]), rows*32, columns*32);//var newTile = new tile((Math.round(Math.random()*100) !== 1) ? this.tileImage1 : this.tileImage2, rows*25, columns*25);
 				this.arrayForMap[rows].push(newTile);
 			}
 		}
@@ -850,17 +826,122 @@ function gameMap(tileImage1, tileImage2, size){
 	
 	this.makeTiles();
 	
-	this.drawTiles = function(canvasContext){
+	this.drawTiles = function(){
 		this.arrayForMap.forEach(function(element, index){
 			var xIndex = index;
 			element.forEach(function(element, index){
-				element.draw(canvasContext, (xIndex-index)*32-32, ((index+xIndex)/2)*32);
+				element.draw((xIndex-index)*32-32, ((index+xIndex)/2)*32);
 			});
 		});
 	}
 }
 
 //End of assisting functions section! :D
+
+function character(){
+  this.lastFocusedOn = false;
+  this.focusOn = false;
+  this.direction = 0;
+  this.x = 100;
+  this.y = 100;
+  
+  this.modelArray = [];
+  
+  this.movementSettings = {
+    8:[['w'], 5],
+    7:[['s'], 1],
+    6:[['a'], 7],
+    5:[['d'], 3],
+    4:[['a', 'w'], 6],
+    3:[['d', 'w'], 4],
+    2:[['d', 's'], 2],
+    1:[['a', 's'], 0]
+  }
+  this.directionLibrary = {
+    1:function(speed){
+      this.y = this.y + speed;
+    }.bind(this),
+    
+    5:function(speed){
+      this.y = this.y + speed*-1;
+    }.bind(this),
+    
+    3:function(speed){
+      this.x = this.x + speed*2;
+    }.bind(this),
+    
+    7:function(speed){
+      this.x = this.x + speed*-2;
+    }.bind(this)
+  }
+  
+  this.stats = {
+    speed:2
+  };
+  
+  this.load = function(images){
+    this.modelArray = images;
+  }
+  
+  this.update = function(){
+    
+    if(keyMap['Alt']){
+      this.focusOn = !this.lastFocusedOn;
+      setTimeout(function(){
+        this.lastFocusedOn = this.focusOn;
+      }.bind(this), 500);
+    }
+    
+    if(this.focusOn){
+      ctx.translate(
+        cameraX - this.x + $(window).width()/2 - this.modelArray[0][0].width/2,
+        cameraY - this.y + $(window).height()/2 - this.modelArray[0][0].height/2
+      );
+      cameraX = this.x - $(window).width()/2 + this.modelArray[0][0].width/2;
+      cameraY = this.y - $(window).height()/2 + this.modelArray[0][0].height/2; 
+    }
+    
+    for(element in this.movementSettings){
+      if(keyMap[this.movementSettings[element][0]] || keyMap[this.movementSettings[element][0][0]] && keyMap[this.movementSettings[element][0][1]]){
+        this.move(this.movementSettings[element][1]);
+        break;
+      }
+    }
+    
+    this.modelArray[this.direction].forEach(function(element){
+      ctx.drawImage(element, this.x, this.y);
+    }.bind(this));
+  }
+  
+  this.move = function(direction, speed){
+    if(!direction && direction !== 0){
+      var direction = this.direction;
+    }
+    
+    if(!speed){
+      var speed = this.stats.speed;
+    }
+    var directionX = direction;
+    var directionY = direction;
+    
+    if(direction%2 == 0){
+      directionX = this.changeSide(direction, 1);
+      directionY = this.changeSide(direction, -1);
+    }
+    
+    this.directionLibrary[directionX](speed);
+    this.directionLibrary[directionY](speed);
+    
+    this.direction = direction;
+  }
+  
+  this.changeSide = function(direction, rightOrLeft){
+    var newDirection = parseInt(direction) + rightOrLeft;
+    if(newDirection > 7)return 0;
+    if(newDirection < 0)return 7;
+    return newDirection;
+  }
+}
 
 
 //MAIN FUNCTION FOR STARTING UP GAME ENGINE! :D
@@ -869,7 +950,6 @@ function startGame(){
     var cnv = document.getElementById('gameCanvas');
 	var ctx = cnv.getContext('2d');
 	setpixelated(ctx);
-	//ctx.translate(25, 25);
 	
 	gameLoad(ctx, cnv);
 }
@@ -893,43 +973,34 @@ function gameLoad(ctx, cnv){
       playerModelArray[i][i2].onload = function(){
         playerModelCounter = playerModelCounter + 1;
         
+        //Loading screen for playermodels
         ctx.clearRect(0, 0, cnv.width, cnv.height);
         ctx.fillText('LOADING PLAYERMODELS: ' + playerModelCounter + '/112', $(window).width()/2, $(window).height()/2);
-
+        //Done with loading screen for playermodels
+        
         if(playerModelCounter === 112){
-          function changeSide(rightOrLeft){
-            directionOfCharacter = directionOfCharacter + rightOrLeft;
-            if(directionOfCharacter > 7)directionOfCharacter = 0;
-            if(directionOfCharacter < 0)directionOfCharacter = 7;
-
-            playerModelArray[directionOfCharacter].forEach(function(element){
-              ctx.drawImage(element, 100, 100);
-            });
-          }
-          var directionOfCharacter = 0;
           
           //Tile loading now!
-          var numberOfTileImages = 1;
+          var numberOfTileImages = 2;
           for(var i = 0; i < numberOfTileImages; i++){
             tileArray.push(new Image());
             
             tileArray[i].onload = function(){
               tileCounter = tileCounter + 1;
               
+              //Loading screen for tiles
               ctx.clearRect(0, 0, cnv.width, cnv.height);
-              ctx.fillText('LOADING IMAGES: ' + tileCounter + '/' + numberOfTileImages, $(window).width()/2, $(window).height()/2);
+              ctx.fillText('LOADING TILES: ' + tileCounter + '/' + numberOfTileImages, $(window).width()/2, $(window).height()/2);
+              //Done with loading screen for tiles
               
               if(tileCounter === numberOfTileImages){
                 //Loading Done!
                 ctx.clearRect(0, 0, cnv.width, cnv.height);
                 
                 var directionBool = true;
-                var timeoutCounter = 0;
                 var mousePos1;
                 var mousePos2;
-                var timeout;
                 $('#gameCanvas').mousedown(function(event){
-                  console.log(event.clientX, event.clientY);
                   $('#gameCanvas').on('mousemove', function(event){
                     if(event.which == 1){
                       if(directionBool){
@@ -939,7 +1010,6 @@ function gameLoad(ctx, cnv){
                           ctx.translate(mousePos1.x - mousePos2.x, mousePos1.y-mousePos2.y);
                           cameraX = cameraX - (mousePos1.x - mousePos2.x);
                           cameraY = cameraY - (mousePos1.y - mousePos2.y);
-                          console.log(cameraX, cameraY);
                         }
                       }
 
@@ -950,10 +1020,9 @@ function gameLoad(ctx, cnv){
                           ctx.translate(mousePos2.x - mousePos1.x, mousePos2.y-mousePos1.y);
                           cameraX = cameraX - (mousePos2.x - mousePos1.x);
                           cameraY = cameraY - (mousePos2.y - mousePos1.y);
-                          console.log(cameraX, cameraY);
                         }
                       }
-
+                      
                       directionBool = !directionBool;
                     }
                   });
@@ -965,8 +1034,24 @@ function gameLoad(ctx, cnv){
                   mousePos2 = false;
                   return false;
                 });
+                
+                //Thanks Braden Best & Stack Overflow!
+                onkeydown = onkeyup = function(e){
+                  e = e || event; //to deal with IE//Although nothing else is IE proof...
+                  
+                  if(typeof (e.key == 'r' && keyMap['ctrl']) == 'undefined' || typeof (e.key == 'I' && keyMap['ctrl'] && keyMap['shift']) == 'undefined' || e.key == 'f11');
+                  else {
+                    e.preventDefault();
+                  }
+                  keyMap[e.key] = e.type == 'keydown';
+                }
+                
+                $(document).on('keydown', onkeydown)
+                $(document).on('keyup', onkeyup)
 
-                worldMap = new gameMap(tileArray[0], tileArray[0], 24);
+                worldMap = new gameMap(tileArray[0], tileArray[1], 24);
+                playerCharacter = new character();
+                playerCharacter.load(playerModelArray);
 
                 gameUpdate(ctx, cnv);
               }
@@ -985,13 +1070,13 @@ function gameLoad(ctx, cnv){
 }
 
 function gameUpdate(ctx, cnv){
-	
-	ctx.clearRect(cameraX, cameraY, cnv.width, cnv.height);
-	
-	worldMap.drawTiles(ctx);
-	//player.drawAll(ctx);
-	
-	setTimeout(function(){gameUpdate(ctx, cnv);}, 17);
+
+  ctx.clearRect(cameraX, cameraY, cnv.width, cnv.height);
+
+  worldMap.drawTiles(ctx);
+  playerCharacter.update();
+  
+  setTimeout(function(){gameUpdate(ctx, cnv);}, 17);
 }
 
 //END OF GAME ENGINE CODE!-------------------------------------------------------------------------------------------------

@@ -122,8 +122,14 @@ function startScreen() {
   window.addEventListener('resize', function(){
     playButtonRect = {x:$(window).width()/2-75,y:$(window).height()/2+12,width:150,height:50};
     var gameCanvas = document.getElementById("gameCanvas");
+    
     gameCanvas.width = $(window).width();
     gameCanvas.height = $(window).height()-16;
+    
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    cameraX = 0;
+    cameraY = 0;
+    console.log('Set transform, cameraX and cameraY are ' + cameraX, cameraY);
   });
 
   window.addEventListener('resize', titleScreenBubbles.makeMap);

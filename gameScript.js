@@ -25,6 +25,16 @@ function distanceFrom(firstX, firstY, secondX, secondY){
 	return "Your click is " + pixelDistanceX + ' pixels(' + leftOrRight + '), and ' + pixelDistanceY + ' pixels(' + upOrDown + ') from the the top-left corner of the torso image.'
 }
 
+function coordsToIsometric(x, y){
+  return [x+y, y - x/2];
+}
+
+/*
+function coordsToIsometric(x, y, z){
+  return [x - z/Math.sqrt(2), (x+2*y+z)/Math.sqrt(6)]
+}
+*/
+
 function plotLine(xStart, yStart, xEnd, yEnd, color, ctx){ //The start variables are where the lines start, the end variables are where the lines end. ctx is the canvas it's drawn on.
 	var dx =  Math.abs(xEnd-xStart); //Delta X? I think it's the left-right distance between where the line starts and where the line is goin'. Is always positive, because lines are only drawn from left to right.
 	var sx = xStart<xEnd ? 1 : -1;   //If the line goes left front the start point, the variable is -1, while if the line goes right from the starting point, the variable is poisitve one.
@@ -746,94 +756,124 @@ function effect(type){
   }
 }
 
-function tile(image, x, y){
-	
-	ctx.drawImage(image, 0, 0);
-	
-	this.image = image;
-	
-	this.image.height = 32;
-	this.image.width = 64;
-	
-	this.draw = function(x, y){
-		ctx.drawImage(this.image, x, y);
-	}
+function tile(image, x, y, z){
+  //ctx.drawImage(image, 0, 0);
+
+  this.image = image;
+
+  this.x = x;
+  this.y = y;
+  
+  this.rect = {
+  }
+  //(x-y)*(width/2), (y+x)*(height/2)
+  
+  this.draw = function(){
+      ctx.drawImage(this.image, this.x, this.y);
+  }
+  
+  this.drawRect = function(whichLevel){
+    ctx.strokeStyle="rgb(0, 0, 0)";
+    ctx.lineWidth=1;
+    ctx.setLineDash([]);
+    
+    ctx.beginPath();
+    ctx.moveTo((this.x) + this.image.width/2, (this.y) + this.image.height/2 - whichLevel*z);
+    ctx.lineTo((this.x) + this.image.width, (this.y) + this.image.height/4 + this.image.height/2 - whichLevel*z);
+    ctx.lineTo((this.x) + this.image.width/2, (this.y) + this.image.height/2 + this.image.height/2 - whichLevel*z);
+    ctx.lineTo((this.x), (this.y) + this.image.height/4 + this.image.height/2 - whichLevel*z);
+    ctx.closePath();
+    ctx.stroke();
+  }
 }
 
 function gameMap(tileImage1, tileImage2, size){
-	this.tileImage1 = tileImage1;
-	this.tileImage2 = tileImage2;
-	
-	this.arrayForMap = [];
-	
-	this.addRow = function(x){
-		var fillUpTo = this.arrayForMap[0].length;
-		
-		this.arrayForMap.splice(x>-1?x:0, 0, []);
-		
-		for(var i = 0; i < fillUpTo; i++){
-			this.arrayForMap[x>-1?x:0].push(new tile(chooseFrom([this.tileImage1, this.tileImage2, this.tileImage2])));
-		}
-	}
-	
-	
-	this.addColumn = function(y){
-		for(i = 0; i < this.arrayForMap.length;i++){
-			this.arrayForMap[i].splice(y>-1?y:0, 0, new tile(this.tileImage1, i*25, y*25));
-		}
-	}
-	
-	this.addIsland = function(x, y, size){
-		var storedTile = this.arrayForMap[x][y];
-		
-		this.arrayForMap[x][y] = new tile(this.tileImage2, storedTile.x, storedTile.y);
-		
-		this.addThis = function(counter, changeXOrY, addToCounter, makeX){
-			
-			if(changeXOrY){
-				if(typeof this.arrayForMap[x-counter] === 'undefined')this.addRow(x-counter);
-				
-				this.arrayForMap[x-counter > 0 ? x-counter : 0][y] = new tile(this.tileImage2);
-				this.addThis(1, false, 1, x-counter);
-				this.addThis(-1, false, -1, x-counter);
-			}
-			
-			else{
-				if(typeof this.arrayForMap[((makeX ? makeX : x) > 0 ? (makeX ? makeX : x) : 0)][y-counter] === 'undefined')this.addColumn(y-counter);
-				
-				this.arrayForMap[((makeX ? makeX : x) > 0 ? (makeX ? makeX : x) : 0)][y-counter] = new tile(this.tileImage2);
-			}
-			
-			if(Math.round(Math.random()*Math.abs(counter)) < 1*size)this.addThis(counter+addToCounter, changeXOrY, addToCounter, makeX);
-		}
-		
-		this.addThis(1, true, 1, false);
-		this.addThis(1, false, 1, false);
-		this.addThis(-1, true, -1, false);
-		this.addThis(-1, false, -1, false)
-		
-	}
-	
-	this.makeTiles = function(){
-		for(var rows = 0; rows < size; rows++){
-			this.arrayForMap.push([]);
-			for(var columns = 0; columns < size; columns++){
-				var newTile = new tile(chooseFrom([this.tileImage1, this.tileImage2, this.tileImage2]), rows*32, columns*32);//var newTile = new tile((Math.round(Math.random()*100) !== 1) ? this.tileImage1 : this.tileImage2, rows*25, columns*25);
-				this.arrayForMap[rows].push(newTile);
-			}
-		}
-	}
-	
-	this.makeTiles();
-	
-	this.drawTiles = function(){
-		this.arrayForMap.forEach(function(element, index){
-			var xIndex = index;
-			element.forEach(function(element, index){
-				element.draw((xIndex-index)*32-32, ((index+xIndex)/2)*32);
-			});
-		});
-	}
+  this.tileImage1 = tileImage1;
+  this.tileImage2 = tileImage2;
+
+  this.arrayForMap = [];
+
+/*
+  this.addRow = function(x){
+      var fillUpTo = this.arrayForMap[0].length;
+
+      this.arrayForMap.splice(x>-1?x:0, 0, []);
+
+      for(var i = 0; i < fillUpTo; i++){
+          this.arrayForMap[x>-1?x:0].push(new tile(chooseFrom([this.tileImage1, this.tileImage2, this.tileImage2])));
+      }
+  }
+
+
+  this.addColumn = function(y){
+      for(i = 0; i < this.arrayForMap.length;i++){
+          this.arrayForMap[i].splice(y>-1?y:0, 0, new tile(this.tileImage1, i*25, y*25));
+      }
+  }
+
+  this.addIsland = function(x, y, size){
+      var storedTile = this.arrayForMap[x][y];
+
+      this.arrayForMap[x][y] = new tile(this.tileImage2, storedTile.x, storedTile.y);
+
+      this.addThis = function(counter, changeXOrY, addToCounter, makeX){
+
+          if(changeXOrY){
+              if(typeof this.arrayForMap[x-counter] === 'undefined')this.addRow(x-counter);
+
+              this.arrayForMap[x-counter > 0 ? x-counter : 0][y] = new tile(this.tileImage2);
+              this.addThis(1, false, 1, x-counter);
+              this.addThis(-1, false, -1, x-counter);
+          }
+
+          else{
+              if(typeof this.arrayForMap[((makeX ? makeX : x) > 0 ? (makeX ? makeX : x) : 0)][y-counter] === 'undefined')this.addColumn(y-counter);
+
+              this.arrayForMap[((makeX ? makeX : x) > 0 ? (makeX ? makeX : x) : 0)][y-counter] = new tile(this.tileImage2);
+          }
+
+          if(Math.round(Math.random()*Math.abs(counter)) < 1*size)this.addThis(counter+addToCounter, changeXOrY, addToCounter, makeX);
+      }
+
+      this.addThis(1, true, 1, false);
+      this.addThis(1, false, 1, false);
+      this.addThis(-1, true, -1, false);
+      this.addThis(-1, false, -1, false)
+
+  }
+  */
+  this.makeTiles = function(){
+    for(var rows = 0; rows < size; rows++){
+      this.arrayForMap.push([]);
+      for(var columns = 0; columns < size; columns++){
+        var newTile = new tile(chooseFrom([this.tileImage1, this.tileImage2, this.tileImage2]), (rows-columns)*32-32, ((columns+rows)/2)*32, 32);//var newTile = new tile((Math.round(Math.random()*100) !== 1) ? this.tileImage1 : this.tileImage2, rows*25, columns*25);
+        newTile.cartesianX = rows;
+        newTile.cartesionY = columns;
+        this.arrayForMap[rows].push(newTile);
+      }
+    }
+  }
+
+  this.makeTiles();
+
+  this.drawTiles = function(){
+    this.arrayForMap.forEach(function(element){
+      element.forEach(function(element){
+        //element.drawRect(0);
+        element.draw();
+        //element.drawRect(1);
+      });
+    });
+  }
+  
+  this.addElement = function(image, frequency){
+    this.arrayForMap.push([]);
+    for(var i = 0; i < frequency*0.1*size; i++){
+      var x = Math.floor(Math.random() * (size*2))-2;
+      var y = Math.floor(Math.random() * (size*2))-2;
+      this.arrayForMap[this.arrayForMap.length - 1].push(new tile(image, (x-y)*16-32, ((y+x)/2)*16, 32));
+    }
+  }
 }
 
 //End of assisting functions section! :D
@@ -981,7 +1021,7 @@ function gameLoad(ctx, cnv){
         if(playerModelCounter === 112){
           
           //Tile loading now!
-          var numberOfTileImages = 2;
+          var numberOfTileImages = 3;
           for(var i = 0; i < numberOfTileImages; i++){
             tileArray.push(new Image());
             
@@ -1049,7 +1089,8 @@ function gameLoad(ctx, cnv){
                 $(document).on('keydown', onkeydown)
                 $(document).on('keyup', onkeyup)
 
-                worldMap = new gameMap(tileArray[0], tileArray[1], 24);
+                worldMap = new gameMap(tileArray[0], tileArray[1], 50);
+                worldMap.addElement(tileArray[2], 1);
                 playerCharacter = new character();
                 playerCharacter.load(playerModelArray);
 

@@ -1,4 +1,4 @@
-//'use strict';//This enforces stricter syntax, throwing more errors more often at even the tiniest mistakes. Great for testing stuff!
+//'use strict';//This enforces stricter syntax, throwing more errors more often at even the tiniest mistake or infraction of good practice. Great for testing stuff!
 
 //Start of function dictionary
 function setPixel(x, y, ctx) {
@@ -13,16 +13,16 @@ function roundToMaxOrMin(value, max, min){
 
 //Thanks disfated! :D
 String.prototype.capitalize = function(lower) {
-    return (lower ? this.toLowerCase() : this).replace(/(?:^|\s)\S/g, function(a) { return a.toUpperCase(); });
+  return (lower ? this.toLowerCase() : this).replace(/(?:^|\s)\S/g, function(a) { return a.toUpperCase(); });
 };
 
 function distanceFrom(firstX, firstY, secondX, secondY){
-	var leftOrRight = (firstX<secondX)? 'left' : 'right';
-	var upOrDown = (firstY<secondY)? 'up' : 'down';
-	var pixelDistanceX = secondX - firstX;
-	var pixelDistanceY = secondY - firstY;
-	
-	return "Your click is " + pixelDistanceX + ' pixels(' + leftOrRight + '), and ' + pixelDistanceY + ' pixels(' + upOrDown + ') from the the top-left corner of the torso image.'
+  var leftOrRight = (firstX<secondX)? 'left' : 'right';
+  var upOrDown = (firstY<secondY)? 'up' : 'down';
+  var pixelDistanceX = secondX - firstX;
+  var pixelDistanceY = secondY - firstY;
+
+  return "Your click is " + pixelDistanceX + ' pixels(' + leftOrRight + '), and ' + pixelDistanceY + ' pixels(' + upOrDown + ') from the the top-left corner of the torso image.'
 }
 
 function coordsToIsometric(x, y){
@@ -36,37 +36,37 @@ function coordsToIsometric(x, y, z){
 */
 
 function plotLine(xStart, yStart, xEnd, yEnd, color, ctx){ //The start variables are where the lines start, the end variables are where the lines end. ctx is the canvas it's drawn on.
-	var dx =  Math.abs(xEnd-xStart); //Delta X? I think it's the left-right distance between where the line starts and where the line is goin'. Is always positive, because lines are only drawn from left to right.
-	var sx = xStart<xEnd ? 1 : -1;   //If the line goes left front the start point, the variable is -1, while if the line goes right from the starting point, the variable is poisitve one.
-	var dy = -Math.abs(yEnd-yStart); //Delta Y? I think it's the up-down distance between where the line starts and where the line is goin'. Is always negative, because lines are only drawn from top to bottom.
-	var sy = yStart<yEnd ? 1 : -1;   //If the starting point is below the ending point, this value is -1. If the starting point is above the ending point, the value is 1.
-	
-	var err = dx+dy;                 //How far it has to go on the x, and the y combined.
-	var e2;                          //Right now we are just going to say that this this variable exists, and not give it a value. That I completely understand, it's the value in the loop that confuses me.
-	
-	ctx.fillStyle = color;
-	
-	while (true){                                  //This will loop!
-																								 
-		setPixel(xStart,yStart, ctx);                //And draw pixels!
-		
-		if (xStart == xEnd && yStart == yEnd) break; //Until we've reached the end of the line.
-		
-		
-		
-		e2 = 2*err;                                  //This assigns a variable, e2, to double the sum of the distance to go on both axis. This variable is assigned inside the loop, instead of outside because it needs to change too, if err is changed.
-		
-		if (e2 >= dy) {                              //If double the sum of the distance to go on both axis is more than or equal to the distance to go on the y axis...
-			err += dy;                                 //Add the distance that we have to go on the y axis to double the sum of the distance to go on both axis. Why?
-			xStart += sx;                              //Increase xStart by 1 if xEnd is to the right of xStart, or by -1 if it's to the left. TL;DR: make it closer by one pixel.
-		}
-		
-		if (e2 <= dx) {                              //If double the sum of the distance to go on both axis is less than or equal to the distance to go on the x axis...                         
-			err += dx;                                 //Add the distance that we have to go on the x axis to double the sum of the distance to go on both axis. Why?
-			yStart += sy;                              //Increase xStart by 1 if xEnd is to the right of xStart, or by -1 if it's to the left. TL;DR: make it closer by one pixel.
-		}
-   
-	}
+  var dx =  Math.abs(xEnd-xStart); //Delta X? I think it's the left-right distance between where the line starts and where the line is goin'. Is always positive, because lines are only drawn from left to right.
+  var sx = xStart<xEnd ? 1 : -1;   //If the line goes left front the start point, the variable is -1, while if the line goes right from the starting point, the variable is poisitve one.
+  var dy = -Math.abs(yEnd-yStart); //Delta Y? I think it's the up-down distance between where the line starts and where the line is goin'. Is always negative, because lines are only drawn from top to bottom.
+  var sy = yStart<yEnd ? 1 : -1;   //If the starting point is below the ending point, this value is -1. If the starting point is above the ending point, the value is 1.
+  
+  var err = dx+dy;                 //How far it has to go on the x, and the y combined.
+  var e2;                          //Right now we are just going to say that this this variable exists, and not give it a value. That I completely understand, it's the value in the loop that confuses me.
+  
+  ctx.fillStyle = color;
+  
+  while (true){                                  //This will loop!
+
+    setPixel(xStart,yStart, ctx);                //And draw pixels!
+
+    if (xStart == xEnd && yStart == yEnd) break; //Until we've reached the end of the line.
+
+
+
+    e2 = 2*err;                                  //This assigns a variable, e2, to double the sum of the distance to go on both axis. This variable is assigned inside the loop, instead of outside because it needs to change too, if err is changed.
+
+    if (e2 >= dy) {                              //If double the sum of the distance to go on both axis is more than or equal to the distance to go on the y axis...
+      err += dy;                                 //Add the distance that we have to go on the y axis to double the sum of the distance to go on both axis. Why?
+      xStart += sx;                              //Increase xStart by 1 if xEnd is to the right of xStart, or by -1 if it's to the left. TL;DR: make it closer by one pixel.
+    }
+
+    if (e2 <= dx) {                              //If double the sum of the distance to go on both axis is less than or equal to the distance to go on the x axis...                         
+      err += dx;                                 //Add the distance that we have to go on the x axis to double the sum of the distance to go on both axis. Why?
+      yStart += sy;                              //Increase xStart by 1 if xEnd is to the right of xStart, or by -1 if it's to the left. TL;DR: make it closer by one pixel.
+    }
+
+  }
 }
 //The comments display what I do understand. What I don't understand is the err and e2 situation, specifically why err is doubled, and what e2 and err represent(mathmatically?). 
 //I'm also completly baffled as to why the if statements compare e2 to delta y and x, but I partially understand why they reassign e2 to err*2 each time in the loop, because they increase err and want e2 to represent err*2 even when err changes.
@@ -114,19 +114,23 @@ function getCoordsOnWayTo(startCoords, endCoords){
 }
 
 function chooseFrom(anArray){ //This function chooses something from an array.
-	return anArray[Math.floor(Math.random() * anArray.length)];
+  return anArray[Math.floor(Math.random() * anArray.length)];
 }
 //This function grabs the mouse position!
 function getMousePos(canvas, event) {
-    var rect = canvas.getBoundingClientRect();
-    return {
-        x: event.clientX - rect.left,
-        y: event.clientY - rect.top
-    };
+  var rect = canvas.getBoundingClientRect();
+  return {
+    x: event.clientX - rect.left,
+    y: event.clientY - rect.top
+  };
 }
 //Function to check whether a point is inside a rectangle!
 function isInside(pos, rect){
     return pos.x > rect.x && pos.x < rect.x+rect.width && pos.y < rect.y+rect.height && pos.y > rect.y;
+}
+
+function isInside4Points(array1, array2, array3, array4){
+  
 }
 
 function setpixelated(context){
@@ -135,27 +139,6 @@ function setpixelated(context){
     context['oImageSmoothingEnabled'] = false;      /* Opera */
     context['webkitImageSmoothingEnabled'] = false; /* Safari */
     context['msImageSmoothingEnabled'] = false;     /* IE */
-}
-
-function drawRotatedFromCenter(degrees, image, context, axisX, axisY, positionX, positionY){
-  context.clearRect(0,0,600,600);
-
-  // save the unrotated context of the canvas so we can restore it later
-  // the alternative is to untranslate & unrotate after drawing
-  context.save();
-
-  // move to the center of the canvas
-  context.translate(axisX, axisY);
-
-  // rotate the canvas to the specified degrees
-  context.rotate(degrees*Math.PI/180);
-
-  // draw the image
-  // since the context is rotated, the image will be rotated also
-  context.drawImage(image,-image.width/2 + positionX,-image.height/2 + positionY);
-
-  // we’re done with the rotating so restore the unrotated context
-  context.restore();
 }
 
 function stringToRGBArray(stringOfRGB){
@@ -756,7 +739,7 @@ function effect(type){
   }
 }
 
-function tile(image, x, y, z){
+function tile(image, x, y, zHeight){
   //ctx.drawImage(image, 0, 0);
 
   this.image = image;
@@ -765,6 +748,10 @@ function tile(image, x, y, z){
   this.y = y;
   
   this.rect = {
+    coords0:[(this.x) + this.image.width/2, (this.y) + this.image.height/2],
+    coords1:[(this.x) + this.image.width, (this.y) + this.image.height/4 + this.image.height/2],
+    coords2:[(this.x) + this.image.width/2, (this.y) + this.image.height/2 + this.image.height/2],
+    coords3:[(this.x), (this.y) + this.image.height/4 + this.image.height/2]
   }
   //(x-y)*(width/2), (y+x)*(height/2)
   
@@ -778,10 +765,11 @@ function tile(image, x, y, z){
     ctx.setLineDash([]);
     
     ctx.beginPath();
-    ctx.moveTo((this.x) + this.image.width/2, (this.y) + this.image.height/2 - whichLevel*z);
-    ctx.lineTo((this.x) + this.image.width, (this.y) + this.image.height/4 + this.image.height/2 - whichLevel*z);
-    ctx.lineTo((this.x) + this.image.width/2, (this.y) + this.image.height/2 + this.image.height/2 - whichLevel*z);
-    ctx.lineTo((this.x), (this.y) + this.image.height/4 + this.image.height/2 - whichLevel*z);
+    ctx.moveTo(this.rect.coords0[0], this.rect.coords0[1] - whichLevel*zHeight);
+    for(var i = 1; i < 4; i++){ 
+      ctx.lineTo(this.rect['coords' + i][0], this.rect['coords' + i][1] - whichLevel*zHeight);
+    }
+    
     ctx.closePath();
     ctx.stroke();
   }
@@ -791,7 +779,11 @@ function gameMap(tileImage1, tileImage2, size){
   this.tileImage1 = tileImage1;
   this.tileImage2 = tileImage2;
 
-  this.arrayForMap = [];
+  this.mapIndex = {
+    0:[],
+  };//Includes z-index one.
+  
+  this.size = size;
 
 /*
   this.addRow = function(x){
@@ -843,21 +835,21 @@ function gameMap(tileImage1, tileImage2, size){
   }
   */
   this.makeTiles = function(){
-    for(var rows = 0; rows < size; rows++){
-      this.arrayForMap.push([]);
-      for(var columns = 0; columns < size; columns++){
-        var newTile = new tile(chooseFrom([this.tileImage1, this.tileImage2, this.tileImage2]), (rows-columns)*32-32, ((columns+rows)/2)*32, 32);//var newTile = new tile((Math.round(Math.random()*100) !== 1) ? this.tileImage1 : this.tileImage2, rows*25, columns*25);
+    for(var rows = 0; rows < this.size; rows++){
+      this.mapIndex[0].push([]);
+      for(var columns = 0; columns < this.size; columns++){
+        var newTile = new tile(chooseFrom([this.tileImage1, this.tileImage2, this.tileImage2]), (rows-columns)*32-32, ((columns+rows)/2)*32, 32);
         newTile.cartesianX = rows;
         newTile.cartesionY = columns;
-        this.arrayForMap[rows].push(newTile);
+        this.mapIndex[0][rows].push(newTile);
       }
     }
   }
 
   this.makeTiles();
 
-  this.drawTiles = function(){
-    this.arrayForMap.forEach(function(element){
+  this.drawMap = function(zIndex){
+    this.mapIndex[zIndex].forEach(function(element){
       element.forEach(function(element){
         //element.drawRect(0);
         element.draw();
@@ -866,12 +858,15 @@ function gameMap(tileImage1, tileImage2, size){
     });
   }
   
-  this.addElement = function(image, frequency){
-    this.arrayForMap.push([]);
-    for(var i = 0; i < frequency*0.1*size; i++){
-      var x = Math.floor(Math.random() * (size*2))-2;
-      var y = Math.floor(Math.random() * (size*2))-2;
-      this.arrayForMap[this.arrayForMap.length - 1].push(new tile(image, (x-y)*16-32, ((y+x)/2)*16, 32));
+  this.addElement = function(image, zIndex, frequency){
+    if(!this.mapIndex[zIndex]){
+      this.mapIndex[zIndex] = [];
+    }
+    this.mapIndex[zIndex].push([]);
+    for(var i = 0; i < frequency*0.1*this.size; i++){
+      var x = Math.floor(Math.random() * (this.size*2))-2;
+      var y = Math.floor(Math.random() * (this.size*2))-2;
+      this.mapIndex[zIndex][this.mapIndex[zIndex].length - 1].push(new tile(image, (x-y)*16-32, ((y+x)/2)*16, 32));
     }
   }
 }
@@ -884,6 +879,7 @@ function character(){
   this.direction = 0;
   this.x = 100;
   this.y = 100;
+  this.zIndex = 1;
   
   this.modelArray = [];
   
@@ -915,12 +911,48 @@ function character(){
     }.bind(this)
   }
   
+  this.base = {
+    width:32,
+    height:32,
+    zHeight:122
+  }
+  
   this.stats = {
     speed:2
   };
   
   this.load = function(images){
     this.modelArray = images;
+  }
+  
+  this.draw = function(){
+    this.modelArray[this.direction].forEach(function(element){
+      ctx.drawImage(element, this.x, this.y);
+    }.bind(this));
+  }
+  
+  this.drawRect = function(whichLevel){
+    this.updateRect();
+    ctx.strokeStyle="rgb(0, 0, 0)";
+    ctx.lineWidth=1;
+    ctx.setLineDash([]);
+    
+    ctx.beginPath();
+    ctx.moveTo(this.rect.coords0[0], this.rect.coords0[1] - whichLevel*this.base.zHeight);
+    for(var i = 1; i < 4; i++){ 
+      ctx.lineTo(this.rect['coords'+i][0], this.rect['coords'+i][1] - whichLevel*this.base.zHeight);
+    }
+    ctx.closePath();
+    ctx.stroke();
+  }
+  
+  this.updateRect = function(){
+    this.rect = {
+      coords0:[(this.x) + this.base.width/2 + this.base.width/2, (this.y) + this.base.zHeight-this.base.height + this.base.height/2],
+      coords1:[(this.x) + this.base.width + this.base.width/2, (this.y) + this.base.zHeight-this.base.height + this.base.height/4 + this.base.height/2],
+      coords2:[(this.x) + this.base.width/2 + this.base.width/2, (this.y) + this.base.zHeight-this.base.height + this.base.height/2 + this.base.height/2],
+      coords3:[(this.x) + this.base.width/2, (this.y) + this.base.zHeight-this.base.height + this.base.height/4 + this.base.height/2]
+    }
   }
   
   this.update = function(){
@@ -933,27 +965,30 @@ function character(){
     }
     
     if(this.focusOn){
-      ctx.translate(
-        cameraX - this.x + $(window).width()/2 - this.modelArray[0][0].width/2,
-        cameraY - this.y + $(window).height()/2 - this.modelArray[0][0].height/2
-      );
-      cameraX = this.x - $(window).width()/2 + this.modelArray[0][0].width/2;
-      cameraY = this.y - $(window).height()/2 + this.modelArray[0][0].height/2; 
+      this.cameraFocus();
     }
     
-    for(element in this.movementSettings){
-      if(keyMap[this.movementSettings[element][0]] || keyMap[this.movementSettings[element][0][0]] && keyMap[this.movementSettings[element][0][1]]){
+    for(var element in this.movementSettings){
+      if(keyMap[this.movementSettings[element][0]] || keyMap[this.movementSettings[element][0][0]] && keyMap[this.movementSettings[element][0][1]]){;
         this.move(this.movementSettings[element][1]);
         break;
       }
     }
-    
-    this.modelArray[this.direction].forEach(function(element){
-      ctx.drawImage(element, this.x, this.y);
-    }.bind(this));
   }
   
+  this.cameraFocus = function(){
+    ctx.translate(
+      cameraX - this.x + $(window).width()/2 - this.modelArray[0][0].width/2,
+      cameraY - this.y + $(window).height()/2 - this.modelArray[0][0].height/2
+    );
+    cameraX = this.x - $(window).width()/2 + this.modelArray[0][0].width/2;
+    cameraY = this.y - $(window).height()/2 + this.modelArray[0][0].height/2; 
+  }
+  
+  
   this.move = function(direction, speed){
+    var xBefore = this.x;
+    var yBefore = this.y;
     if(!direction && direction !== 0){
       var direction = this.direction;
     }
@@ -973,6 +1008,22 @@ function character(){
     this.directionLibrary[directionY](speed);
     
     this.direction = direction;
+    
+    this.updateRect();
+    for(var subFolder in worldMap.mapIndex[this.zIndex]){
+      for(var element in worldMap.mapIndex[this.zIndex][subFolder]){
+        var element = worldMap.mapIndex[this.zIndex][subFolder][element];
+        for(var i = 0; i < 4; i++){
+          if(this.rect['coords' + i][0] < element.rect.coords1[0] && this.rect['coords' + i][0] > element.rect.coords3[0]){
+            if(this.rect['coords' + i][1] < element.rect.coords2[1] && this.rect['coords' + i][1] > element.rect.coords0[1]){
+              console.log("You're inside of the element!");
+              this.x = xBefore;
+              this.y = yBefore;
+            }
+          }
+        }
+      }
+    }
   }
   
   this.changeSide = function(direction, rightOrLeft){
@@ -1090,9 +1141,13 @@ function gameLoad(ctx, cnv){
                 $(document).on('keyup', onkeyup)
 
                 worldMap = new gameMap(tileArray[0], tileArray[1], 50);
-                worldMap.addElement(tileArray[2], 1);
+                worldMap.addElement(tileArray[2], 1, 1);
                 playerCharacter = new character();
                 playerCharacter.load(playerModelArray);
+                
+                playerCharacter.x = worldMap.mapIndex[0][25][25].x;
+                playerCharacter.y = worldMap.mapIndex[0][25][25].y;
+                playerCharacter.cameraFocus();
 
                 gameUpdate(ctx, cnv);
               }
@@ -1113,9 +1168,36 @@ function gameLoad(ctx, cnv){
 function gameUpdate(ctx, cnv){
 
   ctx.clearRect(cameraX, cameraY, cnv.width, cnv.height);
-
-  worldMap.drawTiles(ctx);
-  playerCharacter.update();
+  
+  //World rendering code
+  for(var element in worldMap.mapIndex){
+    
+    if(playerCharacter.zIndex == element){
+      var drawAfter = [];
+      worldMap.mapIndex[element][0].forEach(
+        function(environmentalElement){
+          if (environmentalElement.y-environmentalElement.image.height < playerCharacter.y){
+            environmentalElement.draw();
+          }
+          
+          else drawAfter.push(environmentalElement);
+        }
+      );
+      
+      playerCharacter.draw();
+      
+      drawAfter.forEach(
+        function(element){
+          element.draw();
+        }
+      );
+      
+      playerCharacter.update();
+    }
+    
+    else worldMap.drawMap(element);
+  }
+  //End of world render
   
   setTimeout(function(){gameUpdate(ctx, cnv);}, 17);
 }

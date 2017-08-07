@@ -129,7 +129,7 @@ function startScreen() {
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     cameraX = 0;
     cameraY = 0;
-    console.log('Set transform, cameraX and cameraY are ' + cameraX, cameraY);
+    playerCharacter.cameraFocus();
   });
 
   window.addEventListener('resize', titleScreenBubbles.makeMap);
@@ -553,8 +553,67 @@ var animationCode = [
     console.log('My tongue is sharp, but my arrow is sharper!');
   },
 	
-  function(){//Sparkle: a somewhat feminine, useful nonetheless, particle effect!
-    console.log('Twinkle twinkle little star!');
+  function(){
+    if(typeof magicalOrb == "undefined"){
+      magicalOrb = new effect('chaos magic');
+      magicalOrb.frequencyOfColorChange = 1;
+      magicalOrb.speed = 10;
+      magicalOrb.maxSize = 25;
+      magicalOrb.minSize = 15;
+      magicalOrb.size = 1;
+      orbUpdateLoop();
+      
+      $('#canvasCan').mouseover(
+        function(event){
+          var rect = cnv.getBoundingClientRect();
+          magicalOrb.glideX = event.clientX - rect.left;
+          magicalOrb.glideY = event.clientY - rect.top;
+          magicalOrb.isGliding = true;
+        }
+      );
+    }
+    else {
+      magicalOrb.alive = !magicalOrb.alive;
+      
+      if(magicalOrb.alive){
+        orbUpdateLoop();
+        $('#canvasCan').mouseover(
+          function(event){
+            var rect = cnv.getBoundingClientRect();
+            magicalOrb.glideX = event.clientX - rect.left;
+            magicalOrb.glideY = event.clientY - rect.top;
+            magicalOrb.isGliding = true;
+          }
+        );
+      }
+    }
+    
+    function orbUpdateLoop(){
+      if(!magicalOrb.alive){
+        ctx.globalAlpha = 1;
+        stonePillar.alive = true;
+        woodenBackground.alive = true;
+        woodenBackground.drawPlanks();
+        stonePillar.drawPlanks();
+        
+        $('#canvasCan').off("mouseover");
+        return;
+      }
+      
+      ctx.globalAlpha = .5;
+      stonePillar.alive = true;
+      woodenBackground.alive = true;
+      woodenBackground.drawPlanks();
+      ctx.globalAlpha = 1;
+      stonePillar.drawPlanks();
+      
+      magicalOrb.degreeOfWobble = magicalOrb.size*1.25;
+      magicalOrb.speed = magicalOrb.size*1.75;
+      magicalOrb.alphaTransparency = (0.01 * magicalOrb.size*1.5)+0.15;
+      magicalOrb.draw();
+      
+      setTimeout(orbUpdateLoop, magicalOrb.updateRate);
+    }
   },
   
   function(){

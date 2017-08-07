@@ -153,7 +153,6 @@ function circularArray(array, direction, currentIndex){
   
   return currentIndex;
 }
-
 //End of function dictionary
 
 
@@ -387,7 +386,7 @@ function modifiersForPart(part, race, group, profession, mortalName, gender){
   var pronouns;
   if(gender === 'male')pronouns = ['he', 'his', 'him'];
   else if (gender === 'female')pronouns = ['she', 'her', 'her'];
-  else pronouns = ['they', 'their']
+  else pronouns = ['they', 'them', 'their']
   
   switch(part){
     case 'face':
@@ -652,6 +651,17 @@ function effect(type){
         this.glideY = Math.floor(Math.random()*$(window).height());
       }
       
+      //This is different than this.draw because it only draws the shape, instead of dealing with all of the surrounding foofoo like color and shape changing.
+      this.drawShape = function(){
+        for(var i = 0;i < this.loops;i++){
+          ctx.globalAlpha = this.alphaTransparency;
+          ctx.beginPath();
+          ctx.arc(this.x + ((this.shouldWobble) ? Math.floor(Math.random()*(this.degreeOfWobble*2)-this.degreeOfWobble) : 0),this.y + ((this.shouldWobble) ? Math.floor(Math.random()*this.degreeOfWobble) : 0), this.size*2/(i/2+1),0,Math.PI * 2,true);
+          ctx.closePath();
+          ctx.fill();
+        }
+      }
+      
       
       this.draw = function(){
         if(this.alive && this.shouldAutoUpdate)ctx.clearRect(0, 0, $(window).width(), $(window).height());
@@ -720,18 +730,27 @@ function effect(type){
         
         ctx.fillStyle = this.activeColor;
         
-        for(var i = 0;i < this.loops;i++){
-          ctx.globalAlpha = this.alphaTransparency;
-          ctx.beginPath();
-          ctx.arc(this.x + ((this.shouldWobble) ? Math.floor(Math.random()*(this.degreeOfWobble*2)-this.degreeOfWobble) : 0),this.y + ((this.shouldWobble) ? Math.floor(Math.random()*this.degreeOfWobble) : 0), this.size*2/(i/2+1),0,Math.PI * 2,true);
-          ctx.closePath();
-          ctx.fill();
-        }
+        this.drawShape();
       }
       
-      this.draw.bind(this)
+      this.draw.bind(this);
       
       break;
+      
+    case 'chaos magic':
+      orb = new effect('magical orb');
+      orb.drawShape = function(){
+        ctx.beginPath();
+        ctx.moveTo(this.x + ((this.shouldWobble) ? Math.floor(Math.random()*(this.degreeOfWobble*2+this.size*2)-(this.degreeOfWobble+this.size)) : 0), this.y + ((this.shouldWobble) ? Math.floor(Math.random()*(this.degreeOfWobble*2+this.size*2)-(this.degreeOfWobble+this.size)) : 0));
+        
+        for(i = 0; i < 5; i++){
+          ctx.lineTo(this.x + ((this.shouldWobble) ? Math.floor(Math.random()*(this.degreeOfWobble*2+this.size*2)-(this.degreeOfWobble+this.size)) : 0), this.y + ((this.shouldWobble) ? Math.floor(Math.random()*(this.degreeOfWobble*2+this.size*2)-(this.degreeOfWobble+this.size)) : 0));
+        }
+        ctx.fill();
+        ctx.closePath();
+      }
+      
+      return orb;
       
     default:
       console.log('Oh deity, ye must be oh so very confused: such an effect is not within our realm of existence.');
@@ -784,63 +803,14 @@ function gameMap(tileImage1, tileImage2, size){
   };//Includes z-index one.
   
   this.size = size;
-
-/*
-  this.addRow = function(x){
-      var fillUpTo = this.arrayForMap[0].length;
-
-      this.arrayForMap.splice(x>-1?x:0, 0, []);
-
-      for(var i = 0; i < fillUpTo; i++){
-          this.arrayForMap[x>-1?x:0].push(new tile(chooseFrom([this.tileImage1, this.tileImage2, this.tileImage2])));
-      }
-  }
-
-
-  this.addColumn = function(y){
-      for(i = 0; i < this.arrayForMap.length;i++){
-          this.arrayForMap[i].splice(y>-1?y:0, 0, new tile(this.tileImage1, i*25, y*25));
-      }
-  }
-
-  this.addIsland = function(x, y, size){
-      var storedTile = this.arrayForMap[x][y];
-
-      this.arrayForMap[x][y] = new tile(this.tileImage2, storedTile.x, storedTile.y);
-
-      this.addThis = function(counter, changeXOrY, addToCounter, makeX){
-
-          if(changeXOrY){
-              if(typeof this.arrayForMap[x-counter] === 'undefined')this.addRow(x-counter);
-
-              this.arrayForMap[x-counter > 0 ? x-counter : 0][y] = new tile(this.tileImage2);
-              this.addThis(1, false, 1, x-counter);
-              this.addThis(-1, false, -1, x-counter);
-          }
-
-          else{
-              if(typeof this.arrayForMap[((makeX ? makeX : x) > 0 ? (makeX ? makeX : x) : 0)][y-counter] === 'undefined')this.addColumn(y-counter);
-
-              this.arrayForMap[((makeX ? makeX : x) > 0 ? (makeX ? makeX : x) : 0)][y-counter] = new tile(this.tileImage2);
-          }
-
-          if(Math.round(Math.random()*Math.abs(counter)) < 1*size)this.addThis(counter+addToCounter, changeXOrY, addToCounter, makeX);
-      }
-
-      this.addThis(1, true, 1, false);
-      this.addThis(1, false, 1, false);
-      this.addThis(-1, true, -1, false);
-      this.addThis(-1, false, -1, false)
-
-  }
-  */
+  
   this.makeTiles = function(){
     for(var rows = 0; rows < this.size; rows++){
       this.mapIndex[0].push([]);
       for(var columns = 0; columns < this.size; columns++){
         var newTile = new tile(chooseFrom([this.tileImage1, this.tileImage2, this.tileImage2]), (rows-columns)*32-32, ((columns+rows)/2)*32, 32);
         newTile.cartesianX = rows;
-        newTile.cartesionY = columns;
+        newTile.cartesianY = columns;
         this.mapIndex[0][rows].push(newTile);
       }
     }
@@ -876,10 +846,13 @@ function gameMap(tileImage1, tileImage2, size){
 function character(){
   this.lastFocusedOn = false;
   this.focusOn = false;
+  
+  this.overTiles = [worldMap.mapIndex[0][25][25]];
+  
   this.direction = 0;
   this.x = 100;
   this.y = 100;
-  this.zIndex = 1;
+  this.zIndex = 'clutter';
   
   this.modelArray = [];
   
@@ -918,7 +891,8 @@ function character(){
   }
   
   this.stats = {
-    speed:2
+    speed:2,
+    sight:1
   };
   
   this.load = function(images){
@@ -944,15 +918,6 @@ function character(){
     }
     ctx.closePath();
     ctx.stroke();
-  }
-  
-  this.updateRect = function(){
-    this.rect = {
-      coords0:[(this.x) + this.base.width/2 + this.base.width/2, (this.y) + this.base.zHeight-this.base.height + this.base.height/2],
-      coords1:[(this.x) + this.base.width + this.base.width/2, (this.y) + this.base.zHeight-this.base.height + this.base.height/4 + this.base.height/2],
-      coords2:[(this.x) + this.base.width/2 + this.base.width/2, (this.y) + this.base.zHeight-this.base.height + this.base.height/2 + this.base.height/2],
-      coords3:[(this.x) + this.base.width/2, (this.y) + this.base.zHeight-this.base.height + this.base.height/4 + this.base.height/2]
-    }
   }
   
   this.update = function(){
@@ -989,13 +954,14 @@ function character(){
   this.move = function(direction, speed){
     var xBefore = this.x;
     var yBefore = this.y;
+    
     if(!direction && direction !== 0){
       var direction = this.direction;
     }
-    
     if(!speed){
       var speed = this.stats.speed;
     }
+    
     var directionX = direction;
     var directionY = direction;
     
@@ -1016,7 +982,6 @@ function character(){
         for(var i = 0; i < 4; i++){
           if(this.rect['coords' + i][0] < element.rect.coords1[0] && this.rect['coords' + i][0] > element.rect.coords3[0]){
             if(this.rect['coords' + i][1] < element.rect.coords2[1] && this.rect['coords' + i][1] > element.rect.coords0[1]){
-              console.log("You're inside of the element!");
               this.x = xBefore;
               this.y = yBefore;
             }
@@ -1031,6 +996,41 @@ function character(){
     if(newDirection > 7)return 0;
     if(newDirection < 0)return 7;
     return newDirection;
+  }
+  
+  this.updateOverTiles = function(){
+    var lastOverTile = this.overTiles[0];
+    this.overTiles = [];
+    this.updateRect();
+    for(var x = -4; x < 5; x++){
+      for(var y = -4; y < 5; y++){
+        var element = worldMap.mapIndex[0][lastOverTile.cartesianX + x][lastOverTile.cartesianY + y];
+        var elementRect = {
+          x:element.x,
+          y:element.y,
+          width:element.image.width,
+          height:element.image.height
+        }
+        for(var coordSet in this.rect){
+          var coordSetObject = {
+            x:this.rect[coordSet][0],
+            y:this.rect[coordSet][1]
+          }
+          if(isInside(coordSetObject, elementRect) && !(this.overTiles.includes(element))){
+            this.overTiles.push(element);
+          }
+        }
+      }
+    }
+  }
+  
+  this.updateRect = function(){
+    this.rect = {
+      coords0:[(this.x) + this.base.width/2 + this.base.width/2, (this.y) + this.base.zHeight-this.base.height + this.base.height/2],
+      coords1:[(this.x) + this.base.width + this.base.width/2, (this.y) + this.base.zHeight-this.base.height + this.base.height/4 + this.base.height/2],
+      coords2:[(this.x) + this.base.width/2 + this.base.width/2, (this.y) + this.base.zHeight-this.base.height + this.base.height/2 + this.base.height/2],
+      coords3:[(this.x) + this.base.width/2, (this.y) + this.base.zHeight-this.base.height + this.base.height/4 + this.base.height/2]
+    }
   }
 }
 
@@ -1092,31 +1092,33 @@ function gameLoad(ctx, cnv){
                 var mousePos1;
                 var mousePos2;
                 $('#gameCanvas').mousedown(function(event){
-                  $('#gameCanvas').on('mousemove', function(event){
-                    if(event.which == 1){
-                      if(directionBool){
-                        mousePos1 = getMousePos(cnv, event);
-                        
-                        if(mousePos2){
-                          ctx.translate(mousePos1.x - mousePos2.x, mousePos1.y-mousePos2.y);
-                          cameraX = cameraX - (mousePos1.x - mousePos2.x);
-                          cameraY = cameraY - (mousePos1.y - mousePos2.y);
-                        }
-                      }
+                  if(!playerCharacter.focusOn){
+                    $('#gameCanvas').on('mousemove', function(event){
+                      if(event.which == 1){
+                        if(directionBool){
+                          mousePos1 = getMousePos(cnv, event);
 
-                      else if(!directionBool){
-                        mousePos2 = getMousePos(cnv, event);
-                        
-                        if(mousePos1){
-                          ctx.translate(mousePos2.x - mousePos1.x, mousePos2.y-mousePos1.y);
-                          cameraX = cameraX - (mousePos2.x - mousePos1.x);
-                          cameraY = cameraY - (mousePos2.y - mousePos1.y);
+                          if(mousePos2){
+                            ctx.translate(mousePos1.x - mousePos2.x, mousePos1.y-mousePos2.y);
+                            cameraX = cameraX - (mousePos1.x - mousePos2.x);
+                            cameraY = cameraY - (mousePos1.y - mousePos2.y);
+                          }
                         }
+
+                        else if(!directionBool){
+                          mousePos2 = getMousePos(cnv, event);
+
+                          if(mousePos1){
+                            ctx.translate(mousePos2.x - mousePos1.x, mousePos2.y-mousePos1.y);
+                            cameraX = cameraX - (mousePos2.x - mousePos1.x);
+                            cameraY = cameraY - (mousePos2.y - mousePos1.y);
+                          }
+                        }
+
+                        directionBool = !directionBool;
                       }
-                      
-                      directionBool = !directionBool;
-                    }
-                  });
+                    });
+                  }
                 });
 
                 $(document).mouseup(function(){
@@ -1126,11 +1128,11 @@ function gameLoad(ctx, cnv){
                   return false;
                 });
                 
-                //Thanks Braden Best & Stack Overflow!
+                //Thanks Braden Best & Stack Overflow for this awesome key checking system.
                 onkeydown = onkeyup = function(e){
                   e = e || event; //to deal with IE//Although nothing else is IE proof...
                   
-                  if(typeof (e.key == 'r' && keyMap['ctrl']) == 'undefined' || typeof (e.key == 'I' && keyMap['ctrl'] && keyMap['shift']) == 'undefined' || e.key == 'f11');
+                  if(typeof (e.key == 'r' && keyMap['ctrl']) == 'undefined' || typeof (e.key == 'I' && keyMap['ctrl'] && keyMap['shift']) == 'undefined' || e.key == 'F11');
                   else {
                     e.preventDefault();
                   }
@@ -1139,14 +1141,15 @@ function gameLoad(ctx, cnv){
                 
                 $(document).on('keydown', onkeydown)
                 $(document).on('keyup', onkeyup)
-
+                
                 worldMap = new gameMap(tileArray[0], tileArray[1], 50);
-                worldMap.addElement(tileArray[2], 1, 1);
+                worldMap.addElement(tileArray[2], 'clutter', 1);
                 playerCharacter = new character();
                 playerCharacter.load(playerModelArray);
                 
-                playerCharacter.x = worldMap.mapIndex[0][25][25].x;
-                playerCharacter.y = worldMap.mapIndex[0][25][25].y;
+                playerCharacter.x = worldMap.mapIndex[0][25][25].x + 32;
+                playerCharacter.y = worldMap.mapIndex[0][25][25].y - 96;
+                
                 playerCharacter.cameraFocus();
 
                 gameUpdate(ctx, cnv);
@@ -1172,17 +1175,17 @@ function gameUpdate(ctx, cnv){
   //World rendering code
   for(var element in worldMap.mapIndex){
     
-    if(playerCharacter.zIndex == element){
+    if(element === 'clutter'){
       var drawAfter = [];
-      worldMap.mapIndex[element][0].forEach(
-        function(environmentalElement){
-          if (environmentalElement.y-environmentalElement.image.height < playerCharacter.y){
-            environmentalElement.draw();
-          }
-          
-          else drawAfter.push(environmentalElement);
+      for(environmentalElementIndex in worldMap.mapIndex[element][0]){
+        environmentalElement = worldMap.mapIndex[element][0][environmentalElementIndex]
+        if (environmentalElement.y-environmentalElement.image.height < playerCharacter.y){
+          environmentalElement.draw();
         }
-      );
+
+        else drawAfter.push(environmentalElement);
+      }
+      
       
       playerCharacter.draw();
       
@@ -1195,7 +1198,24 @@ function gameUpdate(ctx, cnv){
       playerCharacter.update();
     }
     
-    else worldMap.drawMap(element);
+    else {
+      
+      playerCharacter.updateOverTiles();
+      
+      for(element in playerCharacter.overTiles){
+        playerCharacter.overTiles[element].draw = function(){};
+      }
+      
+      /*
+      for(var x = -1*playerCharacter.stats.sight; x < playerCharacter.stats.sight; x++){
+        for(var y = -1*playerCharacter.stats.sight; y < playerCharacter.stats.sight; y++){
+          if(!worldMap.mapIndex[element][tileY][tileX])worldMap.makeTile(tileX, tileY, 0);
+          //worldMap.mapIndex[element][tileY][tileX].draw()
+        }
+      }*/
+      
+      worldMap.drawMap(0);
+    }
   }
   //End of world render
   

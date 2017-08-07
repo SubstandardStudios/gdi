@@ -753,8 +753,7 @@ function effect(type){
       return orb;
       
     default:
-      console.log('Oh deity, ye must be oh so very confused: such an effect is not within our realm of existence.');
-      break;
+      return undefined;
   }
 }
 

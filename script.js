@@ -523,7 +523,7 @@ function DarkWaves(callback){//Dark Wave!
 var animationTitles = [
   'Dark Waves Transition',
   'Yzy Bow Firing',
-  'Sparkle',
+  'Chaos Magic',
   'Magic Orb',
   "Don't Press!"
 ];
@@ -553,72 +553,15 @@ var animationCode = [
     console.log('My tongue is sharp, but my arrow is sharper!');
   },
 	
-  function(){
-    if(typeof magicalOrb == "undefined"){
-      magicalOrb = new effect('chaos magic');
-      magicalOrb.frequencyOfColorChange = 1;
-      magicalOrb.speed = 10;
-      magicalOrb.maxSize = 25;
-      magicalOrb.minSize = 15;
-      magicalOrb.size = 1;
-      orbUpdateLoop();
-      
-      $('#canvasCan').mouseover(
-        function(event){
-          var rect = cnv.getBoundingClientRect();
-          magicalOrb.glideX = event.clientX - rect.left;
-          magicalOrb.glideY = event.clientY - rect.top;
-          magicalOrb.isGliding = true;
-        }
-      );
-    }
-    else {
-      magicalOrb.alive = !magicalOrb.alive;
-      
-      if(magicalOrb.alive){
-        orbUpdateLoop();
-        $('#canvasCan').mouseover(
-          function(event){
-            var rect = cnv.getBoundingClientRect();
-            magicalOrb.glideX = event.clientX - rect.left;
-            magicalOrb.glideY = event.clientY - rect.top;
-            magicalOrb.isGliding = true;
-          }
-        );
-      }
-    }
-    
-    function orbUpdateLoop(){
-      if(!magicalOrb.alive){
-        ctx.globalAlpha = 1;
-        stonePillar.alive = true;
-        woodenBackground.alive = true;
-        woodenBackground.drawPlanks();
-        stonePillar.drawPlanks();
-        
-        $('#canvasCan').off("mouseover");
-        return;
-      }
-      
-      ctx.globalAlpha = .5;
-      stonePillar.alive = true;
-      woodenBackground.alive = true;
-      woodenBackground.drawPlanks();
-      ctx.globalAlpha = 1;
-      stonePillar.drawPlanks();
-      
-      magicalOrb.degreeOfWobble = magicalOrb.size*1.25;
-      magicalOrb.speed = magicalOrb.size*1.75;
-      magicalOrb.alphaTransparency = (0.01 * magicalOrb.size*1.5)+0.15;
-      magicalOrb.draw();
-      
-      setTimeout(orbUpdateLoop, magicalOrb.updateRate);
-    }
+  function(){//Sparkle: a somewhat feminine, useful nonetheless, particle effect!
+    animationCode[3]('chaos magic');
   },
   
-  function(){
+  function(magicType){
+    if(typeof magicType != 'string')magicType = 'magical orb';
     if(typeof magicalOrb == "undefined"){
-      magicalOrb = new effect('magical orb');
+      console.log(magicType);
+      magicalOrb = new effect(magicType);
       magicalOrb.frequencyOfColorChange = 1;
       magicalOrb.speed = 10;
       magicalOrb.maxSize = 25;
@@ -636,6 +579,8 @@ var animationCode = [
       );
     }
     else {
+      magicalOrb = undefined;
+      /*
       magicalOrb.alive = !magicalOrb.alive;
       
       if(magicalOrb.alive){
@@ -648,11 +593,11 @@ var animationCode = [
             magicalOrb.isGliding = true;
           }
         );
-      }
+      }*/
     }
     
     function orbUpdateLoop(){
-      if(!magicalOrb.alive){
+      if(!magicalOrb){
         ctx.globalAlpha = 1;
         stonePillar.alive = true;
         woodenBackground.alive = true;

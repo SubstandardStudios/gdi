@@ -560,7 +560,6 @@ var animationCode = [
   function(magicType){
     if(typeof magicType != 'string')magicType = 'magical orb';
     if(typeof magicalOrb == "undefined"){
-      console.log(magicType);
       magicalOrb = new effect(magicType);
       magicalOrb.frequencyOfColorChange = 1;
       magicalOrb.speed = 10;

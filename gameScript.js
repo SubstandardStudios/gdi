@@ -310,7 +310,7 @@ function nameFromRace(race, raisedBy){
         return completeName;
       }
       else {
-        //console.log('Name blacklisted!');
+        //If this happened, then the name was blacklisted. So...
         return nameFromRace('Human');
       }
       break;
@@ -802,6 +802,13 @@ function gameMap(tileImage1, tileImage2, size){
   };//Includes z-index one.
   
   this.size = size;
+  this.moreSizeStats = {
+    widthTotal:size,
+    widthAddedPos:size,
+    widthAddedNeg:0,
+    lengthAddedPos:size,
+    lengthAddedNeg:0
+  }
   
   this.makeTiles = function(){
     for(var rows = 0; rows < this.size; rows++){
@@ -816,6 +823,61 @@ function gameMap(tileImage1, tileImage2, size){
   }
 
   this.makeTiles();
+  
+  //0 for top, 1 for back.
+  this.addRow = function(whichSide){
+    var length = (whichSide) ? this.moreSizeStats.lengthAddedPos : this.moreSizeStats.lengthAddedNeg;
+    this.mapIndex[0].splice(length*whichSide + ((whichSide) ? this.moreSizeStats.lengthAddedNeg : 0), 0, [])
+    for(var i = 0; i < this.moreSizeStats.widthTotal; i++){
+      var newTile = new tile(chooseFrom([this.tileImage1, this.tileImage2, this.tileImage2]), 0, 0, 32);
+      
+      newTile.cartesianX = (length*whichSide) - ((whichSide) ? 0 : length+1);
+      newTile.cartesianY = i;
+      
+      newTile.x = (newTile.cartesianX-newTile.cartesianY)*32-32;
+      newTile.y = ((newTile.cartesianY+newTile.cartesianX)/2)*32;
+      
+      this.mapIndex[0][length*whichSide + ((whichSide) ? this.moreSizeStats.lengthAddedNeg : 0)].push(newTile);
+    }
+    if(whichSide){
+      this.moreSizeStats.lengthAddedPos = this.moreSizeStats.lengthAddedPos + 1;
+    }
+    
+    else {
+      this.moreSizeStats.lengthAddedNeg = this.moreSizeStats.lengthAddedNeg + 1;
+    }
+  }
+  
+  //0 for left, 1 for right
+  this.addColumn = function(whichSide){
+    
+    var length = (whichSide) ? this.moreSizeStats.widthAddedPos : this.moreSizeStats.widthAddedNeg;
+    
+    for(var row = 0; row < Object.keys(this.mapIndex[0]).length; row++){
+      var newTile = new tile(chooseFrom([this.tileImage1, this.tileImage2, this.tileImage2]), 0, 0, 32);
+      
+      newTile.cartesianX = row - this.moreSizeStats.lengthAddedNeg;
+      newTile.cartesianY = (whichSide) ? this.moreSizeStats.widthAddedPos : 0-this.moreSizeStats.widthAddedNeg-1;
+      
+      newTile.cartesianY = parseInt(newTile.cartesianY);
+      newTile.cartesianX = parseInt(newTile.cartesianX);
+      
+      newTile.x = (newTile.cartesianX-newTile.cartesianY)*32-32;
+      newTile.y = ((newTile.cartesianY+newTile.cartesianX)/2)*32;
+      
+      if(whichSide)this.mapIndex[0][row].push(newTile);
+      else this.mapIndex[0][row].unshift(newTile);
+    }
+    if(whichSide){
+      this.moreSizeStats.widthAddedPos = this.moreSizeStats.widthAddedPos + 1;
+    }
+    
+    else {
+      this.moreSizeStats.widthAddedNeg = this.moreSizeStats.widthAddedNeg + 1;
+    }
+    
+    this.moreSizeStats.widthTotal = this.moreSizeStats.widthTotal + 1;
+  }
 
   this.drawMap = function(zIndex){
     this.mapIndex[zIndex].forEach(function(element){
@@ -891,7 +953,7 @@ function character(){
   
   this.stats = {
     speed:2,
-    sight:1
+    sight:25
   };
   
   this.load = function(images){
@@ -1003,7 +1065,7 @@ function character(){
     this.updateRect();
     for(var x = -4; x < 5; x++){
       for(var y = -4; y < 5; y++){
-        var element = worldMap.mapIndex[0][lastOverTile.cartesianX + x][lastOverTile.cartesianY + y];
+        var element = worldMap.mapIndex[0][lastOverTile.cartesianX + x + worldMap.moreSizeStats.lengthAddedNeg][lastOverTile.cartesianY + y + worldMap.moreSizeStats.widthAddedNeg];
         var elementRect = {
           x:element.x,
           y:element.y,
@@ -1201,17 +1263,54 @@ function gameUpdate(ctx, cnv){
       
       playerCharacter.updateOverTiles();
       
-      for(element in playerCharacter.overTiles){
-        playerCharacter.overTiles[element].draw = function(){};
-      }
+      //The following (commented out) code empties out drawing function for any tile underneath the character, effectively turning the game into an epic Etch-A-Sketch.
+      //playerCharacter.overTiles.forEach(function(element){
+        //element.draw = function(){};
+      //});
       
-      /*
+      
+      
+      var tileX = playerCharacter.overTiles[0].cartesianX + worldMap.moreSizeStats.lengthAddedNeg;
+      var tileY = playerCharacter.overTiles[0].cartesianY;
+      
+      loop1:
       for(var x = -1*playerCharacter.stats.sight; x < playerCharacter.stats.sight; x++){
         for(var y = -1*playerCharacter.stats.sight; y < playerCharacter.stats.sight; y++){
-          if(!worldMap.mapIndex[element][tileY][tileX])worldMap.makeTile(tileX, tileY, 0);
-          //worldMap.mapIndex[element][tileY][tileX].draw()
+          if(worldMap.mapIndex[element][tileX+x] &&  worldMap.mapIndex[element][tileX+x][tileY+y]);//worldMap.mapIndex[element][tileX+x][tileY+y].draw();
+          else {
+            
+            //This if checks to see if a row is needed :D
+            if(!worldMap.mapIndex[element][tileX+x]){
+              
+              //If the row needs to be added to the front,
+              if(tileX+x > worldMap.moreSizeStats.lengthAddedPos){
+                worldMap.addRow(1);//Do so
+              }
+              
+              //Or if it needs to be added to the back,
+              else {
+                worldMap.addRow(0);//Then do that.
+                break;
+              }
+            }
+            
+            //This if checks to see if a column is needed
+            
+            else if(worldMap.mapIndex[element][tileX+x].indexOf([tileY+x]) === -1){
+              if(tileY+y > worldMap.moreSizeStats.widthAddedPos){
+                worldMap.addColumn(0);
+                break loop1;
+              }
+              
+              //Or if it needs to be added to the back,
+              else if(tileY+y < worldMap.moreSizeStats.widthAddedNeg*-1){
+                worldMap.addColumn(1);//Then do that.
+                break loop1;
+              }
+            }
+          }
         }
-      }*/
+      }
       
       worldMap.drawMap(0);
     }

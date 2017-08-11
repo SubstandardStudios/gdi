@@ -1289,7 +1289,6 @@ function gameUpdate(ctx, cnv){
               //Or if it needs to be added to the back,
               else {
                 worldMap.addRow(0);//Then do that.
-                break;
               }
             }
             

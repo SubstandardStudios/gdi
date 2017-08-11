@@ -908,7 +908,7 @@ function character(){
   this.lastFocusedOn = false;
   this.focusOn = false;
   
-  this.overTiles = [worldMap.mapIndex[0][25][25]];
+  this.overTiles = [worldMap.mapIndex[0][26][22]];
   
   this.direction = 0;
   this.x = 100;

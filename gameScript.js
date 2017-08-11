@@ -832,7 +832,7 @@ function gameMap(tileImage1, tileImage2, size){
       var newTile = new tile(chooseFrom([this.tileImage1, this.tileImage2, this.tileImage2]), 0, 0, 32);
       
       newTile.cartesianX = (length*whichSide) - ((whichSide) ? 0 : length+1);
-      newTile.cartesianY = i;
+      newTile.cartesianY = i + this.moreSizeStats.widthAddedNeg;
       
       newTile.x = (newTile.cartesianX-newTile.cartesianY)*32-32;
       newTile.y = ((newTile.cartesianY+newTile.cartesianX)/2)*32;

@@ -1269,9 +1269,9 @@ function gameUpdate(ctx, cnv){
       //});
       
       
-      
+      //Adding widthAddedNeg and lengthAddedNeg make the coordinates zero indexed, so you can pull them from the map indexes.
       var tileX = playerCharacter.overTiles[0].cartesianX + worldMap.moreSizeStats.lengthAddedNeg;
-      var tileY = playerCharacter.overTiles[0].cartesianY;
+      var tileY = playerCharacter.overTiles[0].cartesianY + worldMap.moreSizeStats.widthAddedNeg;
       
       loop1:
       for(var x = -1*playerCharacter.stats.sight; x < playerCharacter.stats.sight; x++){

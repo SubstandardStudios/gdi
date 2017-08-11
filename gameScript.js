@@ -1298,13 +1298,11 @@ function gameUpdate(ctx, cnv){
             else if(worldMap.mapIndex[element][tileX+x].indexOf([tileY+x]) === -1){
               if(tileY+y > worldMap.moreSizeStats.widthAddedPos){
                 worldMap.addColumn(0);
-                break;
               }
               
               //Or if it needs to be added to the back,
               else if(tileY+y < worldMap.moreSizeStats.widthAddedNeg*-1){
                 worldMap.addColumn(1);//Then do that.
-                break;
               }
             }
           }

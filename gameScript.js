@@ -1273,10 +1273,9 @@ function gameUpdate(ctx, cnv){
       var tileX = playerCharacter.overTiles[0].cartesianX + worldMap.moreSizeStats.lengthAddedNeg;
       var tileY = playerCharacter.overTiles[0].cartesianY + worldMap.moreSizeStats.widthAddedNeg;
       
-      loop1:
       for(var x = -1*playerCharacter.stats.sight; x < playerCharacter.stats.sight; x++){
         for(var y = -1*playerCharacter.stats.sight; y < playerCharacter.stats.sight; y++){
-          if(worldMap.mapIndex[element][tileX+x] &&  worldMap.mapIndex[element][tileX+x][tileY+y]);//worldMap.mapIndex[element][tileX+x][tileY+y].draw();
+          if(worldMap.mapIndex[element][tileX+x] &&  worldMap.mapIndex[element][tileX+x][tileY+y])worldMap.mapIndex[element][tileX+x][tileY+y].draw();
           else {
             
             //This if checks to see if a row is needed :D
@@ -1299,20 +1298,20 @@ function gameUpdate(ctx, cnv){
             else if(worldMap.mapIndex[element][tileX+x].indexOf([tileY+x]) === -1){
               if(tileY+y > worldMap.moreSizeStats.widthAddedPos){
                 worldMap.addColumn(0);
-                break loop1;
+                break;
               }
               
               //Or if it needs to be added to the back,
               else if(tileY+y < worldMap.moreSizeStats.widthAddedNeg*-1){
                 worldMap.addColumn(1);//Then do that.
-                break loop1;
+                break;
               }
             }
           }
         }
       }
       
-      worldMap.drawMap(0);
+      //worldMap.drawMap(0);
     }
   }
   //End of world render

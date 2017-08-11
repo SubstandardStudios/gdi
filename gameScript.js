@@ -953,7 +953,7 @@ function character(){
   
   this.stats = {
     speed:2,
-    sight:25
+    sight:10
   };
   
   this.load = function(images){

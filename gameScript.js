@@ -1275,7 +1275,7 @@ function gameUpdate(ctx, cnv){
       
       for(var x = -1*playerCharacter.stats.sight; x < playerCharacter.stats.sight; x++){
         for(var y = -1*playerCharacter.stats.sight; y < playerCharacter.stats.sight; y++){
-          if(worldMap.mapIndex[element][tileX+x] &&  worldMap.mapIndex[element][tileX+x][tileY+y])worldMap.mapIndex[element][tileX+x][tileY+y].draw();
+          if(worldMap.mapIndex[element][tileX+x] &&  worldMap.mapIndex[element][tileX+x][tileY+y]);//worldMap.mapIndex[element][tileX+x][tileY+y].draw();
           else {
             
             //This if checks to see if a row is needed :D
@@ -1311,7 +1311,7 @@ function gameUpdate(ctx, cnv){
         }
       }
       
-      //worldMap.drawMap(0);
+      worldMap.drawMap(0);
     }
   }
   //End of world render

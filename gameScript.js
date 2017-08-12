@@ -796,9 +796,7 @@ function tile(image, x, y, zHeight){
 function gameMap(tileImage1, tileImage2, size){
   this.tileImage1 = tileImage1;
   this.tileImage2 = tileImage2;
-  
-  this.elementList = [];//Element list is a list that stores info needed to add bits of clutter.
-  
+
   this.mapIndex = {
     0:[],
   };//Includes z-index one.
@@ -891,22 +889,17 @@ function gameMap(tileImage1, tileImage2, size){
     });
   }
   
-  //Frequency is a percentage.
-  this.addElement = function(image, zIndex, frequency, onClick){
+  this.addElement = function(image, zIndex, frequency){
     if(!this.mapIndex[zIndex]){
       this.mapIndex[zIndex] = [];
     }
-    
-    this.elementList.push([image, zIndex, frequency, onClick]);
-    
-    /*
     this.mapIndex[zIndex].push([]);
     for(var i = 0; i < frequency*0.1*this.size; i++){
       var x = Math.floor(Math.random() * (this.size*2))-2;
       var y = Math.floor(Math.random() * (this.size*2))-2;
       this.mapIndex[zIndex][this.mapIndex[zIndex].length - 1].push(new tile(image, (x-y)*16-32, ((y+x)/2)*16, 32));
     }
-  }*/
+  }
 }
 
 //End of assisting functions section! :D

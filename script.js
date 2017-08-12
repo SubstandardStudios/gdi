@@ -659,7 +659,17 @@ function placeContent(){
           $('#'+id).append('<p id = characterSubTitle>' + title + '</p>');
         }
       );
-      if(onClick)$('#'+id).click(onClick);
+      function clickAndCleanUp(){
+        if(typeof magicalOrb !== typeof undefined)magicalOrb = undefined;
+        ctx.globalAlpha = 1;
+        stonePillar.alive = true;
+        woodenBackground.alive = true;
+        woodenBackground.drawPlanks();
+        stonePillar.drawPlanks();
+        setTimeout(onClick, 50);
+      }
+    
+      if(onClick)$('#'+id).click(clickAndCleanUp);
     
     $('#leftSideBar').append('<hr style = margin-top:8px;width:90%; id = thinHr>');
   }

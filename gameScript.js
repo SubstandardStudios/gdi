@@ -796,7 +796,9 @@ function tile(image, x, y, zHeight){
 function gameMap(tileImage1, tileImage2, size){
   this.tileImage1 = tileImage1;
   this.tileImage2 = tileImage2;
-
+  
+  this.elementList = [];//Element list is a list that stores info needed to add bits of clutter.
+  
   this.mapIndex = {
     0:[],
   };//Includes z-index one.
@@ -832,7 +834,7 @@ function gameMap(tileImage1, tileImage2, size){
       var newTile = new tile(chooseFrom([this.tileImage1, this.tileImage2, this.tileImage2]), 0, 0, 32);
       
       newTile.cartesianX = (length*whichSide) - ((whichSide) ? 0 : length+1);
-      newTile.cartesianY = i;
+      newTile.cartesianY = i - this.moreSizeStats.widthAddedNeg;
       
       newTile.x = (newTile.cartesianX-newTile.cartesianY)*32-32;
       newTile.y = ((newTile.cartesianY+newTile.cartesianX)/2)*32;
@@ -889,17 +891,22 @@ function gameMap(tileImage1, tileImage2, size){
     });
   }
   
-  this.addElement = function(image, zIndex, frequency){
+  //Frequency is a percentage.
+  this.addElement = function(image, zIndex, frequency, onClick){
     if(!this.mapIndex[zIndex]){
       this.mapIndex[zIndex] = [];
     }
+    
+    this.elementList.push([image, zIndex, frequency, onClick]);
+    
+    /*
     this.mapIndex[zIndex].push([]);
     for(var i = 0; i < frequency*0.1*this.size; i++){
       var x = Math.floor(Math.random() * (this.size*2))-2;
       var y = Math.floor(Math.random() * (this.size*2))-2;
       this.mapIndex[zIndex][this.mapIndex[zIndex].length - 1].push(new tile(image, (x-y)*16-32, ((y+x)/2)*16, 32));
     }
-  }
+  }*/
 }
 
 //End of assisting functions section! :D
@@ -1269,50 +1276,61 @@ function gameUpdate(ctx, cnv){
       //});
       
       
-      
+      //Adding the Neg value allows you to get zero indexed map coords, which you can then fish out of the map arrays.
       var tileX = playerCharacter.overTiles[0].cartesianX + worldMap.moreSizeStats.lengthAddedNeg;
-      var tileY = playerCharacter.overTiles[0].cartesianY;
+      var tileY = playerCharacter.overTiles[0].cartesianY + worldMap.moreSizeStats.widthAddedNeg;
+      
+      //worldMap.mapIndex[0][tileX][tileY].draw = function(){};
       
       loop1:
       for(var x = -1*playerCharacter.stats.sight; x < playerCharacter.stats.sight; x++){
         for(var y = -1*playerCharacter.stats.sight; y < playerCharacter.stats.sight; y++){
-          if(worldMap.mapIndex[element][tileX+x] &&  worldMap.mapIndex[element][tileX+x][tileY+y]);//worldMap.mapIndex[element][tileX+x][tileY+y].draw();
+          
+          if(worldMap.mapIndex[element][tileX+x] &&  worldMap.mapIndex[element][tileX+x][tileY+y])worldMap.mapIndex[element][tileX+x][tileY+y].draw();
+         
           else {
             
             //This if checks to see if a row is needed :D
             if(!worldMap.mapIndex[element][tileX+x]){
               
               //If the row needs to be added to the front,
-              if(tileX+x > worldMap.moreSizeStats.lengthAddedPos){
+              if((tileX+x) > worldMap.moreSizeStats.lengthAddedPos){
                 worldMap.addRow(1);//Do so
               }
               
               //Or if it needs to be added to the back,
-              else {
+              if((tileX + x) < 0){//(zero and not worldMap.moreSizeStats.lengthAddedNeg*-1 because the coords are already zero indexed)
                 worldMap.addRow(0);//Then do that.
-                break;
               }
+              
+              //These two have to be updated so that columns and rows aren't added unnecessarily.
+              var tileX = playerCharacter.overTiles[0].cartesianX + worldMap.moreSizeStats.lengthAddedNeg;
+              var tileY = playerCharacter.overTiles[0].cartesianY + worldMap.moreSizeStats.widthAddedNeg;
             }
             
-            //This if checks to see if a column is needed
             
-            else if(worldMap.mapIndex[element][tileX+x].indexOf([tileY+x]) === -1){
+            //This if checks to see if a column is needed
+            if(worldMap.mapIndex[element][tileX+x] && !(worldMap.mapIndex[element][tileX+x][tileY+y])){
               if(tileY+y > worldMap.moreSizeStats.widthAddedPos){
-                worldMap.addColumn(0);
-                break loop1;
+                worldMap.addColumn(1);
               }
               
               //Or if it needs to be added to the back,
-              else if(tileY+y < worldMap.moreSizeStats.widthAddedNeg*-1){
-                worldMap.addColumn(1);//Then do that.
-                break loop1;
+              console.log((tileY + y));
+              if((tileY + y) < 0){//(zero and not worldMap.moreSizeStats.widthAddedNeg*-1 because the coords are already zero indexed)
+                worldMap.addColumn(0);//Then do that.
               }
+              
+              //These two have to be updated so that columns and rows aren't added unnecessarily.
+              var tileX = playerCharacter.overTiles[0].cartesianX + worldMap.moreSizeStats.lengthAddedNeg;
+              var tileY = playerCharacter.overTiles[0].cartesianY + worldMap.moreSizeStats.widthAddedNeg;
             }
           }
+          
+          
         }
       }
-      
-      worldMap.drawMap(0);
+      //worldMap.drawMap(0);
     }
   }
   //End of world render

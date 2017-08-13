@@ -757,13 +757,24 @@ function effect(type){
   }
 }
 
-function tile(image, x, y, zHeight){
+function tile(image, x, y, zHeight, shouldAddElements){
   //ctx.drawImage(image, 0, 0);
 
   this.image = image;
 
   this.x = x;
   this.y = y;
+  
+  //if(typeof shouldAddElements == typeof undefined)shouldAddElements = true;
+  
+  if(shouldAddElements){
+    worldMap.elementTypes.forEach(function(element){
+      if(Math.random()*100 < element.frequency){
+        var newElement = new tile(element.image, this.x, this.y, element.zHeight, false);
+        worldMap.mapIndex[element.zIndex][0].push(newElement);
+      }
+    }.bind(this));
+  }
   
   this.rect = {
     coords0:[(this.x) + this.image.width/2, (this.y) + this.image.height/2],
@@ -801,6 +812,9 @@ function gameMap(tileImage1, tileImage2, size){
     0:[],
   };//Includes z-index one.
   
+  //This list is appended to when an element is added, and helps to store the information needed for adding elements when the map is expanded.
+  this.elementTypes = [];
+  
   this.size = size;
   this.moreSizeStats = {
     widthTotal:size,
@@ -814,28 +828,32 @@ function gameMap(tileImage1, tileImage2, size){
     for(var rows = 0; rows < this.size; rows++){
       this.mapIndex[0].push([]);
       for(var columns = 0; columns < this.size; columns++){
-        var newTile = new tile(chooseFrom([this.tileImage1, this.tileImage2, this.tileImage2]), (rows-columns)*32-32, ((columns+rows)/2)*32, 32);
+        var newTile = new tile(chooseFrom([this.tileImage1, this.tileImage2, this.tileImage2]), (rows-columns)*32-32, ((columns+rows)/2)*32, 32, true);
         newTile.cartesianX = rows;
         newTile.cartesianY = columns;
         this.mapIndex[0][rows].push(newTile);
       }
     }
   }
-
-  this.makeTiles();
   
   //0 for top, 1 for back.
   this.addRow = function(whichSide){
     var length = (whichSide) ? this.moreSizeStats.lengthAddedPos : this.moreSizeStats.lengthAddedNeg;
     this.mapIndex[0].splice(length*whichSide + ((whichSide) ? this.moreSizeStats.lengthAddedNeg : 0), 0, [])
     for(var i = 0; i < this.moreSizeStats.widthTotal; i++){
-      var newTile = new tile(chooseFrom([this.tileImage1, this.tileImage2, this.tileImage2]), 0, 0, 32);
       
-      newTile.cartesianX = (length*whichSide) - ((whichSide) ? 0 : length+1);
-      newTile.cartesianY = i - this.moreSizeStats.widthAddedNeg;
+      var tileStats = {};
       
-      newTile.x = (newTile.cartesianX-newTile.cartesianY)*32-32;
-      newTile.y = ((newTile.cartesianY+newTile.cartesianX)/2)*32;
+      tileStats.cartesianX = (length*whichSide) - ((whichSide) ? 0 : length+1);
+      tileStats.cartesianY = i - this.moreSizeStats.widthAddedNeg;
+      
+      tileStats.x = (tileStats.cartesianX-tileStats.cartesianY)*32-32;
+      tileStats.y = ((tileStats.cartesianY+tileStats.cartesianX)/2)*32;
+      
+      var newTile = new tile(chooseFrom([this.tileImage1, this.tileImage2, this.tileImage2]), tileStats.x, tileStats.y, 32, true);
+      
+      newTile.cartesianX = tileStats.cartesianX;
+      newTile.cartesianY = tileStats.cartesianY;
       
       this.mapIndex[0][length*whichSide + ((whichSide) ? this.moreSizeStats.lengthAddedNeg : 0)].push(newTile);
     }
@@ -854,16 +872,20 @@ function gameMap(tileImage1, tileImage2, size){
     var length = (whichSide) ? this.moreSizeStats.widthAddedPos : this.moreSizeStats.widthAddedNeg;
     
     for(var row = 0; row < Object.keys(this.mapIndex[0]).length; row++){
-      var newTile = new tile(chooseFrom([this.tileImage1, this.tileImage2, this.tileImage2]), 0, 0, 32);
+      var tileStats = {};
+      tileStats.cartesianX = row - this.moreSizeStats.lengthAddedNeg;
+      tileStats.cartesianY = (whichSide) ? this.moreSizeStats.widthAddedPos : 0-this.moreSizeStats.widthAddedNeg-1;
       
-      newTile.cartesianX = row - this.moreSizeStats.lengthAddedNeg;
-      newTile.cartesianY = (whichSide) ? this.moreSizeStats.widthAddedPos : 0-this.moreSizeStats.widthAddedNeg-1;
+      tileStats.cartesianY = parseInt(tileStats.cartesianY);
+      tileStats.cartesianX = parseInt(tileStats.cartesianX);
       
-      newTile.cartesianY = parseInt(newTile.cartesianY);
-      newTile.cartesianX = parseInt(newTile.cartesianX);
+      tileStats.x = (tileStats.cartesianX-tileStats.cartesianY)*32-32;
+      tileStats.y = ((tileStats.cartesianY+tileStats.cartesianX)/2)*32;
       
-      newTile.x = (newTile.cartesianX-newTile.cartesianY)*32-32;
-      newTile.y = ((newTile.cartesianY+newTile.cartesianX)/2)*32;
+      var newTile = new tile(chooseFrom([this.tileImage1, this.tileImage2, this.tileImage2]), tileStats.x, tileStats.y, 32, true);
+      
+      newTile.cartesianX = tileStats.cartesianX;
+      newTile.cartesianY = tileStats.cartesianY;
       
       if(whichSide)this.mapIndex[0][row].push(newTile);
       else this.mapIndex[0][row].unshift(newTile);
@@ -889,16 +911,30 @@ function gameMap(tileImage1, tileImage2, size){
     });
   }
   
-  this.addElement = function(image, zIndex, frequency){
+  //Image and zIndex are self explanatory. Frequency is the percentage chance the element has of spawning when a new tile is created.
+  this.addElement = function(image, zIndex, frequency, onClick, zHeight){
     if(!this.mapIndex[zIndex]){
       this.mapIndex[zIndex] = [];
+      this.mapIndex[zIndex][0] = [];
     }
+    
+    this.elementTypes.push(
+      {
+        image:image,
+        zIndex:zIndex,
+        zHeight:zHeight,
+        frequency:frequency,
+        onClick:onClick
+      }
+    );
+    
+    /*
     this.mapIndex[zIndex].push([]);
     for(var i = 0; i < frequency*0.1*this.size; i++){
       var x = Math.floor(Math.random() * (this.size*2))-2;
       var y = Math.floor(Math.random() * (this.size*2))-2;
       this.mapIndex[zIndex][this.mapIndex[zIndex].length - 1].push(new tile(image, (x-y)*16-32, ((y+x)/2)*16, 32));
-    }
+    }*/
   }
 }
 
@@ -1204,7 +1240,9 @@ function gameLoad(ctx, cnv){
                 $(document).on('keyup', onkeyup)
                 
                 worldMap = new gameMap(tileArray[0], tileArray[1], 50);
-                worldMap.addElement(tileArray[2], 'clutter', 1);
+                worldMap.addElement(tileArray[2], 'clutter', 0.15, undefined, 32);
+                worldMap.makeTiles();
+                
                 playerCharacter = new character();
                 playerCharacter.load(playerModelArray);
                 
@@ -1309,7 +1347,6 @@ function gameUpdate(ctx, cnv){
               }
               
               //Or if it needs to be added to the back,
-              console.log((tileY + y));
               if((tileY + y) < 0){//(zero and not worldMap.moreSizeStats.widthAddedNeg*-1 because the coords are already zero indexed)
                 worldMap.addColumn(0);//Then do that.
               }

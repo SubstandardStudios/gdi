@@ -129,7 +129,7 @@ function startScreen() {
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     cameraX = 0;
     cameraY = 0;
-    playerCharacter.cameraFocus();
+    if(playerCharacter)playerCharacter.cameraFocus();
   });
 
   window.addEventListener('resize', titleScreenBubbles.makeMap);

@@ -129,18 +129,6 @@ function isInside(pos, rect){
     return pos.x > rect.x && pos.x < rect.x+rect.width && pos.y < rect.y+rect.height && pos.y > rect.y;
 }
 
-function isInside4Points(array1, array2, array3, array4){
-  
-}
-
-function setpixelated(context){
-    context['imageSmoothingEnabled'] = false;       /* standard */
-    context['mozImageSmoothingEnabled'] = false;    /* Firefox */
-    context['oImageSmoothingEnabled'] = false;      /* Opera */
-    context['webkitImageSmoothingEnabled'] = false; /* Safari */
-    context['msImageSmoothingEnabled'] = false;     /* IE */
-}
-
 function stringToRGBArray(stringOfRGB){
   return stringOfRGB.replace(/[^\d,]/g, '').split(',');
 }
@@ -1138,12 +1126,35 @@ function character(){
 
 //MAIN FUNCTION FOR STARTING UP GAME ENGINE! :D
 function startGame(){
-	//$('#gameCanvas').replaceWith('<canvas id="gameCanvas" width="600" height="600">This human\'s web browser is incapable of using the graphical deity interface I have created...</canvas>');
-    var cnv = document.getElementById('gameCanvas');
-	var ctx = cnv.getContext('2d');
-	setpixelated(ctx);
-	
-	gameLoad(ctx, cnv);
+  //$('#gameCanvas').replaceWith('<canvas id="gameCanvas" width="600" height="600">This human\'s web browser is incapable of using the graphical deity interface I have created...</canvas>');
+  var cnv = document.getElementById('gameCanvas');
+  var ctx = cnv.getContext('2d');
+  
+  $('#canvasCan').append('<div class = tabBottom id = settingsTab style = right:10px;><img src="imgs/icons/settingsIcon.png" alt="Settings" style = display:block;margin:auto;></div>');
+  
+  $('#canvasCan').append('<div class = inGameWindow id = settingsWindow> <h3 style = margin-left:100px;margin-right:100px;margin-top:20px;> Settings </h3> <h4 style = position:absolute;top:0px;right:15px; > Drag Me! </h4> <hr id = thinHr> </div>');
+  $('#settingsWindow').hide();
+  
+  $('#settingsWindow').mousedown(function(event){
+    event.preventDefault();
+    $('#gameCanvas').on('mousemove', function(event){
+      event.preventDefault();
+      var mouseCoords = getMousePos(cnv, event);
+      $('#settingsWindow').css('left', mouseCoords.x - $('#settingsWindow').width()/2);
+      $('#settingsWindow').css('top', mouseCoords.y - $('#settingsWindow').height()/2);
+    });
+  });
+  
+  $('#settingsWindow').mouseup(function(event){
+    $('#settingsWindow').off('mousemove');
+  });
+  
+  $('#settingsTab').click(function(){
+    $('#settingsWindow').toggle();
+  });
+  $('#canvasCan').append('<div class = tabBottom id = mortalInfoTab style = right:120px;><img src="imgs/icons/mortalIcon.png" alt="Mortal Info" style = display:block;margin:auto;></div>');
+  
+  gameLoad(ctx, cnv);
 }
 
 function gameLoad(ctx, cnv){

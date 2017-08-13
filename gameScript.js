@@ -771,6 +771,10 @@ function tile(image, x, y, zHeight, shouldAddElements){
     worldMap.elementTypes.forEach(function(element){
       if(Math.random()*100 < element.frequency){
         var newElement = new tile(element.image, this.x, this.y, element.zHeight, false);
+        
+        newElement.cartesianX = (this.x / 32 + this.y / 16) /2;
+        newElement.cartesianY = (this.y / 16 -(this.x / 32)) /2;
+        
         worldMap.mapIndex[element.zIndex][0].push(newElement);
       }
     }.bind(this));
@@ -1271,18 +1275,38 @@ function gameUpdate(ctx, cnv){
 
   ctx.clearRect(cameraX, cameraY, cnv.width, cnv.height);
   
+  playerCharacter.updateOverTiles();
+  
   //World rendering code
   for(var element in worldMap.mapIndex){
     
     if(element === 'clutter'){
+      
       var drawAfter = [];
+      
       for(environmentalElementIndex in worldMap.mapIndex[element][0]){
-        environmentalElement = worldMap.mapIndex[element][0][environmentalElementIndex]
-        if (environmentalElement.y-environmentalElement.image.height < playerCharacter.y){
-          environmentalElement.draw();
-        }
+        
+        environmentalElement = worldMap.mapIndex[element][0][environmentalElementIndex];
+        
+        if(isInside(
+            {
+              x:environmentalElement.cartesianX,
+              y:environmentalElement.cartesianY
+            },
+            {
+              x:playerCharacter.overTiles[0].cartesianX - playerCharacter.stats.sight,
+              y:playerCharacter.overTiles[0].cartesianY - playerCharacter.stats.sight,
+              width:playerCharacter.stats.sight*2,
+              height:playerCharacter.stats.sight*2
+            }
+          )){
+          
+          if (environmentalElement.y-environmentalElement.image.height < playerCharacter.y){
+            environmentalElement.draw();
+          }
 
-        else drawAfter.push(environmentalElement);
+          else drawAfter.push(environmentalElement);
+        }
       }
       
       
@@ -1298,8 +1322,6 @@ function gameUpdate(ctx, cnv){
     }
     
     else {
-      
-      playerCharacter.updateOverTiles();
       
       //The following (commented out) code empties out drawing function for any tile underneath the character, effectively turning the game into an epic Etch-A-Sketch.
       //playerCharacter.overTiles.forEach(function(element){
@@ -1360,7 +1382,7 @@ function gameUpdate(ctx, cnv){
           
         }
       }
-      //worldMap.drawMap(0);
+      //worldMap.drawMap(0);(ignores sight)
     }
   }
   //End of world render

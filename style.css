@@ -293,7 +293,7 @@ h3 {
   width:100px;
   height:20px;
   
-  background:url('imgs/fillerPixelArt/StoneTile.gif');
+  background-image:url('imgs/fillerPixelArt/StoneTile.gif');
 }
 
 .genericButton{

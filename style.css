@@ -122,7 +122,7 @@ h3 {
     width: 200px;
     padding: 10px;
     /*background-color:Burlywood;*/
-    background:url('imgs/fillerPixelArt/WoodenPlank.gif');
+    background:url('imgs/fillerPixelArt/StoneTile.gif');
 }
 
 .inGameWindow{
@@ -136,7 +136,7 @@ h3 {
   padding:10px;
   padding-top:0px;
   
-  background:url('imgs/fillerPixelArt/WoodenPlank.gif');
+  background:url('imgs/fillerPixelArt/StoneTile.gif');
 }
 
 .outer {
@@ -277,11 +277,13 @@ h3 {
 
 .tabBottom{
   
+  border-top:3px solid black;
+  border-left:3px solid black;
+  border-right:3px solid black;
+  
   position:absolute;
   
   bottom:5px;
-  
-  background:url('imgs/fillerPixelArt/WoodenPlank.gif');
   
   border-top-left-radius:10px;
   border-top-right-radius:10px;
@@ -290,6 +292,8 @@ h3 {
   
   width:100px;
   height:20px;
+  
+  background:url('imgs/fillerPixelArt/StoneTile.gif');
 }
 
 .genericButton{

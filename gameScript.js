@@ -981,6 +981,7 @@ function character(){
   
   this.stats = {
     speed:2,
+    maxSight:25,
     sight:25
   };
   
@@ -1135,20 +1136,24 @@ function startGame(){
   $('#canvasCan').append('<div class = inGameWindow id = settingsWindow> <h3 style = margin-left:100px;margin-right:100px;margin-top:20px;> Settings </h3> <h4 style = position:absolute;top:0px;right:15px; > Drag Me! </h4> <hr id = thinHr> </div>');
   $('#settingsWindow').hide();
   
-  $('#settingsWindow').mousedown(function(event){
-    event.preventDefault();
-    $('#gameCanvas').on('mousemove', function(event){
-      var mousePos = getMousePos(cnv, event);
-      $('#settingsWindow').css('left', mousePos.x - $('#settingsWindow').width()/2);
-      $('#settingsWindow').css('top', mousePos.y - $('#settingsWindow').height()/2);
+  
+  function makeDraggable(id){
+    $(id).mousedown(function(event){
+      $('#gameCanvas').on('mousemove', function(event){
+        var mousePos = getMousePos(cnv, event);
+        $(id).css('left', mousePos.x - $(id).width()/2);
+        $(id).css('top', mousePos.y - $(id).height()/2);
+      });
     });
-  });
-  $('#settingsWindow').mouseup(function(event){
-    $('#settingsWindow').off('mousemove');
-    var mousePos = getMousePos(cnv, event);
-    $('#settingsWindow').css('left', mousePos.x - $('#settingsWindow').width()/2);
-    $('#settingsWindow').css('top', mousePos.y - $('#settingsWindow').height()/2);
-  });
+    $(id).mouseup(function(event){
+      $(id).off('mousemove');
+      //var mousePos = getMousePos(cnv, event);
+      //  $(id).css('left', mousePos.x - $(id).width()/2);
+      //  $(id).css('top', mousePos.y - $(id).height()/2);
+    });
+  }
+  
+  makeDraggable('#settingsWindow');
   
   $('#settingsTab').click(function(){
     $('#settingsWindow').toggle();
@@ -1263,6 +1268,17 @@ function gameLoad(ctx, cnv){
                 
                 playerCharacter.x = worldMap.mapIndex[0][25][25].x + 32;
                 playerCharacter.y = worldMap.mapIndex[0][25][25].y - 96;
+                
+                $('#settingsWindow').append('<div style=margin:auto;display:block;> <h4 style = margin-top:13px;float:left;display:block;>Sight:</h4> <input id=sightInput type=range style = margin-top:10px;float:right;display:block;></input></div>');
+                $('#sightInput').min = 0;
+                $('#sightInput').max = 25;
+                console.log($('#sightInput').max);
+                
+                $('#sightInput').on('input', function () {
+                  $(this).trigger('change');
+                  playerCharacter.stats.sight = $(this).val();
+                  console.log($(this).val());
+                });
                 
                 playerCharacter.cameraFocus();
 

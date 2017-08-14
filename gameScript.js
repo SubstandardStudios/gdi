@@ -1138,15 +1138,16 @@ function startGame(){
   $('#settingsWindow').mousedown(function(event){
     event.preventDefault();
     $('#gameCanvas').on('mousemove', function(event){
-      event.preventDefault();
-      var mouseCoords = getMousePos(cnv, event);
-      $('#settingsWindow').css('left', mouseCoords.x - $('#settingsWindow').width()/2);
-      $('#settingsWindow').css('top', mouseCoords.y - $('#settingsWindow').height()/2);
+      var mousePos = getMousePos(cnv, event);
+      $('#settingsWindow').css('left', mousePos.x - $('#settingsWindow').width()/2);
+      $('#settingsWindow').css('top', mousePos.y - $('#settingsWindow').height()/2);
     });
   });
-  
   $('#settingsWindow').mouseup(function(event){
     $('#settingsWindow').off('mousemove');
+    var mousePos = getMousePos(cnv, event);
+    $('#settingsWindow').css('left', mousePos.x - $('#settingsWindow').width()/2);
+    $('#settingsWindow').css('top', mousePos.y - $('#settingsWindow').height()/2);
   });
   
   $('#settingsTab').click(function(){
@@ -1237,7 +1238,6 @@ function gameLoad(ctx, cnv){
                   $('#gameCanvas').off('mousemove');
                   mousePos1 = false;
                   mousePos2 = false;
-                  return false;
                 });
                 
                 //Thanks Braden Best & Stack Overflow for this awesome key checking system.

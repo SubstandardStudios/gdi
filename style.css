@@ -1,6 +1,6 @@
 body {
   /*background-color:LightGray;*/
-  background: url(http://piskel-imgstore-b.appspot.com/img/1c118591-e431-11e6-8a51-b98bdf48deb5.gif);
+  background: url('imgs/fillerPixelArt/StoneTile.gif');
   
   font-family: 'Aclonica';
   
@@ -88,8 +88,6 @@ h3 {
   
 	width:160px;
 	height:20px;
-  
-    background:url(http://piskel-imgstore-b.appspot.com/img/1c118591-e431-11e6-8a51-b98bdf48deb5.gif);
     
     border-radius:7px;
     border:2px solid black;
@@ -150,8 +148,8 @@ h3 {
     
     padding: 15px;
     /*background-color:LightGray;*/
-    background:url(http://piskel-imgstore-b.appspot.com/img/1c118591-e431-11e6-8a51-b98bdf48deb5.gif);
 }
+
 .outermost {
     margin: auto;
     margin-top:50px;
@@ -162,7 +160,6 @@ h3 {
     padding: 20px;
     padding-bottom:0px;
     /*background-color:Burlywood;*/
-    background:url(http://piskel-imgstore-b.appspot.com/img/be5d630f-e430-11e6-a821-b98bdf48deb5.gif);
 }
 
 #canvasCan {
@@ -272,7 +269,6 @@ h3 {
 #fullScreenButton{
   border: 1px solid black;
   border-radius:5px;
-  background:url(http://piskel-imgstore-b.appspot.com/img/be5d630f-e430-11e6-a821-b98bdf48deb5.gif);
 }
 
 .tabBottom{
@@ -387,13 +383,13 @@ h3 {
 }
 
 body::-webkit-scrollbar-track {
-    background:url(http://piskel-imgstore-b.appspot.com/img/be5d630f-e430-11e6-a821-b98bdf48deb5.gif);
+    background:url('imgs/fillerPixelArt/woodenPlank.gif');
     border-radius:10px;
     border: 2px solid black;
 }
 ::-webkit-scrollbar-thumb
 {
- background:url(http://piskel-imgstore-b.appspot.com/img/1c118591-e431-11e6-8a51-b98bdf48deb5.gif);
+ background:url('imgs/fillerPixelArt/StoneTile.gif');
  border-radius:10px;
  border: 2px solid black;
 }

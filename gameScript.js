@@ -147,24 +147,24 @@ function circularArray(array, direction, currentIndex){
 //Image dictionary
 
 var woodenPlank = new Image();
-woodenPlank.src = 'imgs/FillerPixelArt/WoodenPlank.gif';
+woodenPlank.src = 'imgs/fillerPixelArt/WoodenPlank.gif';
 
 var stoneTile = new Image();
-stoneTile.src = 'imgs/FillerPixelArt/StoneTile.gif';
+stoneTile.src = 'imgs/fillerPixelArt/StoneTile.gif';
 
 
 //Plank Images
 var plankOddsAndEnds = new Image();
-plankOddsAndEnds.src = 'imgs/FillerPixelArt/PlankOddsAndEnds.gif';
+plankOddsAndEnds.src = 'imgs/fillerPixelArt/PlankOddsAndEnds.gif';
 
 var plankStart = new Image();
-plankStart.src = 'imgs/FillerPixelArt/PlankStart.gif';
+plankStart.src = 'imgs/fillerPixelArt/PlankStart.gif';
 
 var plankEnd = new Image();
-plankEnd.src = 'imgs/FillerPixelArt/PlankEnd.gif';
+plankEnd.src = 'imgs/fillerPixelArt/PlankEnd.gif';
 
 var plankMiddle = new Image();
-plankMiddle.src = 'imgs/FillerPixelArt/PlankMiddle.gif';
+plankMiddle.src = 'imgs/fillerPixelArt/PlankMiddle.gif';
 //End of Plank Images
 
 /*

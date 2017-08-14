@@ -383,7 +383,7 @@ h3 {
 }
 
 body::-webkit-scrollbar-track {
-    background:url('imgs/fillerPixelArt/woodenPlank.gif');
+    background:url('imgs/fillerPixelArt/WoodenPlank.gif');
     border-radius:10px;
     border: 2px solid black;
 }

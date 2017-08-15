@@ -1015,6 +1015,7 @@ function character(){
     if(keyMap['Alt']){
       this.focusOn = !this.lastFocusedOn;
       setTimeout(function(){
+        $('#camTrackInput').attr('checked', this.lastFocusedOn);
         this.lastFocusedOn = this.focusOn;
       }.bind(this), 500);
     }
@@ -1269,16 +1270,39 @@ function gameLoad(ctx, cnv){
                 playerCharacter.x = worldMap.mapIndex[0][25][25].x + 32;
                 playerCharacter.y = worldMap.mapIndex[0][25][25].y - 96;
                 
-                $('#settingsWindow').append('<div style=margin:auto;display:block;> <h4 style = margin-top:13px;float:left;display:block;>Sight:</h4> <input id=sightInput type=range style = margin-top:10px;float:right;display:block;></input></div>');
-                $('#sightInput').min = 0;
-                $('#sightInput').max = 25;
-                console.log($('#sightInput').max);
+                $('#settingsWindow').append('<div style=margin:auto;display:block;> <h4 style = margin-top:13px;margin-right:50px;float:left;display:block;>Sight:</h4> <input id=sightInput type=range style = margin-top:10px;float:right;display:block;></input></div>');
+                $('#sightInput').attr('min', 0);
+                $('#sightInput').attr('max', playerCharacter.stats.maxSight);
                 
-                $('#sightInput').on('input', function () {
+                $('#sightInput').on('input', function (){
                   $(this).trigger('change');
                   playerCharacter.stats.sight = $(this).val();
-                  console.log($(this).val());
+                  $('#sightInput').attr('max', playerCharacter.stats.maxSight);
                 });
+                
+                $('#settingsWindow').append('<div style=margin:auto;display:block;> <h4 style = margin-top:3px;margin-right:0px;float:left;display:block;>Camera Tracking(Alt):</h4> <input type = checkBox style=float:right; id = camTrackInput></div>');
+                
+                $('#camTrackInput').on('change', function(){
+                  playerCharacter.focusOn = $(this).is(':checked');
+                });
+                /*
+                $('#settingsWindow').append('<div style=margin:auto;display:block;> <h4 style = position:absolute;left:10px;top:72px;>Zoom:</h4> <input id=zoomInput type=range style = margin-top:10px;float:right;display:block;></input></div>');
+                $('#zoomInput').attr('min', -2);
+                $('#zoomInput').attr('max', 2);
+                $('#zoomInput').val(0);
+                
+                $('#zoomInput').on('input', function () {
+                  ctx.setTransform(1, 0, 0, 1, 0, 0);
+                  cameraX = 0;
+                  cameraY = 0;
+                  if(playerCharacter)playerCharacter.cameraFocus();
+                  
+                  ctx.scale($(this).val(), $(this).val());
+                  
+                  cameraX = 0;
+                  cameraY = 0;
+                  if(playerCharacter)playerCharacter.cameraFocus();
+                });*/
                 
                 playerCharacter.cameraFocus();
 

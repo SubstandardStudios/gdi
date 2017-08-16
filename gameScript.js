@@ -745,7 +745,7 @@ function effect(type){
   }
 }
 
-function tile(image, x, y, zHeight, shouldAddElements){
+function tile(image, x, y, zHeight, shouldAddElements, size){
   //ctx.drawImage(image, 0, 0);
 
   this.image = image;
@@ -758,7 +758,7 @@ function tile(image, x, y, zHeight, shouldAddElements){
   if(shouldAddElements){
     worldMap.elementTypes.forEach(function(element){
       if(Math.random()*100 < element.frequency){
-        var newElement = new tile(element.image, this.x, this.y, element.zHeight, false);
+        var newElement = new tile(chooseFrom(element.image), this.x, this.y, element.zHeight, false, element.size);
         
         newElement.cartesianX = (this.x / 32 + this.y / 16) /2;
         newElement.cartesianY = (this.y / 16 -(this.x / 32)) /2;
@@ -768,13 +768,24 @@ function tile(image, x, y, zHeight, shouldAddElements){
     }.bind(this));
   }
   
-  this.rect = {
-    coords0:[(this.x) + this.image.width/2, (this.y) + this.image.height/2],
-    coords1:[(this.x) + this.image.width, (this.y) + this.image.height/4 + this.image.height/2],
-    coords2:[(this.x) + this.image.width/2, (this.y) + this.image.height/2 + this.image.height/2],
-    coords3:[(this.x), (this.y) + this.image.height/4 + this.image.height/2]
+  if(size && ((size.width || size.width == 0) && (size.height || size.height == 0))){
+    this.size = size;
   }
-  //(x-y)*(width/2), (y+x)*(height/2)
+    
+  else this.size = {
+    width:this.image.width,
+    height:this.image.height
+  }
+  
+  this.updateRect = function(){
+    this.rect = {
+      coords0:[(this.x) + this.size.width/2, (this.y) + this.size.height/2],
+      coords1:[(this.x) + this.size.width, (this.y) + this.size.height/4 + this.size.height/2],
+      coords2:[(this.x) + this.size.width/2, (this.y) + this.size.height/2 + this.size.height/2],
+      coords3:[(this.x), (this.y) + this.size.height/4 + this.size.height/2]
+    }
+  }
+  this.updateRect();
   
   this.draw = function(){
       ctx.drawImage(this.image, this.x, this.y);
@@ -904,7 +915,7 @@ function gameMap(tileImage1, tileImage2, size){
   }
   
   //Image and zIndex are self explanatory. Frequency is the percentage chance the element has of spawning when a new tile is created.
-  this.addElement = function(image, zIndex, frequency, onClick, zHeight){
+  this.addElement = function(image, zIndex, frequency, onClick, zHeight, size){
     if(!this.mapIndex[zIndex]){
       this.mapIndex[zIndex] = [];
       this.mapIndex[zIndex][0] = [];
@@ -916,17 +927,10 @@ function gameMap(tileImage1, tileImage2, size){
         zIndex:zIndex,
         zHeight:zHeight,
         frequency:frequency,
-        onClick:onClick
+        onClick:onClick,
+        size:size
       }
     );
-    
-    /*
-    this.mapIndex[zIndex].push([]);
-    for(var i = 0; i < frequency*0.1*this.size; i++){
-      var x = Math.floor(Math.random() * (this.size*2))-2;
-      var y = Math.floor(Math.random() * (this.size*2))-2;
-      this.mapIndex[zIndex][this.mapIndex[zIndex].length - 1].push(new tile(image, (x-y)*16-32, ((y+x)/2)*16, 32));
-    }*/
   }
 }
 
@@ -1015,8 +1019,8 @@ function character(){
     if(keyMap['Alt']){
       this.focusOn = !this.lastFocusedOn;
       setTimeout(function(){
-        $('#camTrackInput').attr('checked', this.lastFocusedOn);
         this.lastFocusedOn = this.focusOn;
+        $('#camTrackInput').prop('checked', playerCharacter.focusOn);
       }.bind(this), 500);
     }
     
@@ -1191,7 +1195,7 @@ function gameLoad(ctx, cnv){
         if(playerModelCounter === 112){
           
           //Tile loading now!
-          var numberOfTileImages = 3;
+          var numberOfTileImages = 11;
           for(var i = 0; i < numberOfTileImages; i++){
             tileArray.push(new Image());
             
@@ -1248,7 +1252,7 @@ function gameLoad(ctx, cnv){
                 
                 //Thanks Braden Best & Stack Overflow for this awesome key checking system.
                 onkeydown = onkeyup = function(e){
-                  e = e || event; //to deal with IE//Although nothing else is IE proof...
+                  e = e || event; //to deal with IE//Although nothing else is IE proof... :D
                   
                   if(typeof (e.key == 'r' && keyMap['ctrl']) == 'undefined' || typeof (e.key == 'I' && keyMap['ctrl'] && keyMap['shift']) == 'undefined' || e.key == 'F11');
                   else {
@@ -1260,8 +1264,19 @@ function gameLoad(ctx, cnv){
                 $(document).on('keydown', onkeydown)
                 $(document).on('keyup', onkeyup)
                 
+                //This makes the starting map
                 worldMap = new gameMap(tileArray[0], tileArray[1], 50);
-                worldMap.addElement(tileArray[2], 'clutter', 0.15, undefined, 32);
+                
+                //These add the rocks and other enviromental elements
+                var rockArray = [];
+                for(var rock = 2; rock < 11; rock++){
+                  rockArray.push(tileArray[rock]);
+                }
+                
+                worldMap.addElement([tileArray[2]], 'clutter', 0.15, undefined, 32, undefined);
+                worldMap.addElement(rockArray, 'clutter', .5, undefined, 0, {width:0, height:0})
+                
+                //This adds a few tiles to said starting map
                 worldMap.makeTiles();
                 
                 playerCharacter = new character();
@@ -1283,7 +1298,8 @@ function gameLoad(ctx, cnv){
                 $('#settingsWindow').append('<div style=margin:auto;display:block;> <h4 style = margin-top:3px;margin-right:0px;float:left;display:block;>Camera Tracking(Alt):</h4> <input type = checkBox style=float:right; id = camTrackInput></div>');
                 
                 $('#camTrackInput').on('change', function(){
-                  playerCharacter.focusOn = $(this).is(':checked');
+                  playerCharacter.focusOn = !playerCharacter.focusOn;
+                  $(this).prop('checked', playerCharacter.focusOn);
                 });
                 /*
                 $('#settingsWindow').append('<div style=margin:auto;display:block;> <h4 style = position:absolute;left:10px;top:72px;>Zoom:</h4> <input id=zoomInput type=range style = margin-top:10px;float:right;display:block;></input></div>');

@@ -753,6 +753,8 @@ function tile(image, x, y, zHeight, shouldAddElements, size){
   this.x = x;
   this.y = y;
   
+  this.elementsOnScreen = [];
+  
   //if(typeof shouldAddElements == typeof undefined)shouldAddElements = true;
   
   if(shouldAddElements){
@@ -762,6 +764,18 @@ function tile(image, x, y, zHeight, shouldAddElements, size){
         
         newElement.cartesianX = (this.x / 32 + this.y / 16) /2;
         newElement.cartesianY = (this.y / 16 -(this.x / 32)) /2;
+        
+        if(!element.clickRect){
+          newElement.clickRect = {};
+          newElement.clickRect.x = newElement.x;
+          newElement.clickRect.y = newElement.y;
+          newElement.clickRect.width = newElement.image.width;
+          newElement.clickRect.height = newElement.image.height;
+        }
+        
+        else newElement.clickRect = element.clickRect;
+        
+        newElement.onClick = element.onClick;
         
         worldMap.mapIndex[element.zIndex][0].push(newElement);
       }
@@ -915,7 +929,7 @@ function gameMap(tileImage1, tileImage2, size){
   }
   
   //Image and zIndex are self explanatory. Frequency is the percentage chance the element has of spawning when a new tile is created.
-  this.addElement = function(image, zIndex, frequency, onClick, zHeight, size){
+  this.addElement = function(image, zIndex, frequency, onClick, zHeight, size, clickRect){
     if(!this.mapIndex[zIndex]){
       this.mapIndex[zIndex] = [];
       this.mapIndex[zIndex][0] = [];
@@ -928,7 +942,8 @@ function gameMap(tileImage1, tileImage2, size){
         zHeight:zHeight,
         frequency:frequency,
         onClick:onClick,
-        size:size
+        size:size,
+        clickRect:clickRect
       }
     );
   }
@@ -1195,7 +1210,7 @@ function gameLoad(ctx, cnv){
         if(playerModelCounter === 112){
           
           //Tile loading now!
-          var numberOfTileImages = 11;
+          var numberOfTileImages = 5;
           for(var i = 0; i < numberOfTileImages; i++){
             tileArray.push(new Image());
             
@@ -1215,6 +1230,19 @@ function gameLoad(ctx, cnv){
                 var mousePos1;
                 var mousePos2;
                 $('#gameCanvas').mousedown(function(event){
+                  
+                  event.preventDefault();
+                  
+                  var mousePos = getMousePos(cnv, event);
+                  mousePos.x = mousePos.x + cameraX;
+                  mousePos.y = mousePos.y + cameraY;
+                  console.log(mousePos);
+                  worldMap.elementsOnScreen.forEach(function(element){
+                    if(isInside(mousePos, element.clickRect)){
+                      element.onClick();
+                    }
+                  });
+                  
                   if(!playerCharacter.focusOn){
                     $('#gameCanvas').on('mousemove', function(event){
                       if(event.which == 1){
@@ -1268,13 +1296,13 @@ function gameLoad(ctx, cnv){
                 worldMap = new gameMap(tileArray[0], tileArray[1], 50);
                 
                 //These add the rocks and other enviromental elements
-                var rockArray = [];
-                for(var rock = 2; rock < 11; rock++){
-                  rockArray.push(tileArray[rock]);
+                
+                function smallRockPickup(){
+                  
                 }
                 
-                worldMap.addElement([tileArray[2]], 'clutter', 0.15, undefined, 32, undefined);
-                worldMap.addElement(rockArray, 'clutter', .5, undefined, 0, {width:0, height:0})
+                worldMap.addElement([tileArray[2], tileArray[3]], 'clutter', 0.15, undefined, 32, undefined, undefined);
+                worldMap.addElement([tileArray[4]], 'clutter', .5, smallRockPickup, 0, {width:0, height:0}, undefined)
                 
                 //This adds a few tiles to said starting map
                 worldMap.makeTiles();
@@ -1350,6 +1378,7 @@ function gameUpdate(ctx, cnv){
     if(element === 'clutter'){
       
       var drawAfter = [];
+      worldMap.elementsOnScreen = [];
       
       for(environmentalElementIndex in worldMap.mapIndex[element][0]){
         
@@ -1367,6 +1396,8 @@ function gameUpdate(ctx, cnv){
               height:playerCharacter.stats.sight*2
             }
           )){
+          
+          if(environmentalElement.onClick)worldMap.elementsOnScreen.push(environmentalElement);
           
           if (environmentalElement.y-environmentalElement.image.height < playerCharacter.y){
             environmentalElement.draw();

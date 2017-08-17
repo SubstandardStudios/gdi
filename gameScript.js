@@ -1020,16 +1020,24 @@ function character(){
   this.inventoryUpdate = function(){
     var spaceOut = 0;
     $('#canvasCan').children().each(function(){
-      if($(this).attr('class') == 'handInventorySlot')console.log('Tab bottom detected!');
+      if($(this).attr('class') == 'handInventorySlot')$(this).remove();
     });
     for(var encapsulationDevice in this.inventory){
       if(this.inventory[encapsulationDevice].type === 'hand'){
         
-        $('#canvasCan').append('<div class = handInventorySlot id = ' + encapsulationDevice + ' style = left:' + 15+75*spaceOut + 'px;> </div>');
+        $('#canvasCan').append('<div class = handInventorySlot id = ' + encapsulationDevice + ' style = left:' + (75*spaceOut) + 'px;> </div>');
         
-        for(item in this.inventory[encapsulationDevice]['holding']){
-          $('#' + encpsulationDevice).append('<p> ' + item.name + ': </p>');
-          //$('#' + encpsulationDevice).append('<img src = ' + item.imgSrc + '>');
+        for(itemIndex in this.inventory[encapsulationDevice]['holding']){
+          var item = this.inventory[encapsulationDevice]['holding'][itemIndex];
+          
+          console.log(item.imgSrc);
+          
+          $('#' + encapsulationDevice).append('<p style = margin-top:5px;margin-bottom:0px;font-size:12px> ' + item.name + ' </p>');
+          $('#' + encapsulationDevice).append('<img margin-top:0px; src = ' + item.imgSrc + '>');
+        }
+        
+        if(this.inventory[encapsulationDevice]['holding'].length === 0){
+          $('#' + encapsulationDevice).css('height', '5px');
         }
         
         spaceOut = spaceOut + 1;
@@ -1333,7 +1341,7 @@ function gameLoad(ctx, cnv){
                 //These add the rocks and other enviromental elements
                 
                 worldMap.addElement([tileArray[2], tileArray[3]], 'clutter', 0.15, undefined, 32, undefined, undefined);
-                worldMap.addElement([tileArray[4]], 'clutter', .5, smallRockPickup, 0, {width:0, height:0}, undefined);
+                worldMap.addElement([tileArray[4]], 'clutter', .5, smallRockPickup, 10, {width:0, height:0}, undefined);
                 
                 //This function is called when the small rock is clicked ^
                 function smallRockPickup(){
@@ -1351,9 +1359,10 @@ function gameLoad(ctx, cnv){
                       var encapsulationDevice = playerCharacter.inventory[encapsulationDeviceIndex];
                       if(encapsulationDevice.type == 'hand'){
                         if(encapsulationDevice.size > encapsulationDevice.holding.length){
-                          encapsulationDevice.holding.push({name:'rock', imgSrc:this.image.src.replace(/tiles/i, 'inventoryIcons')});
+                          encapsulationDevice.holding.push({name:'Rock', imgSrc:this.image.src.replace(/tiles/i, 'inventoryIcons')});
                           playerCharacter.inventoryUpdate();
                           worldMap.mapIndex['clutter'][0].splice(worldMap.mapIndex['clutter'][0].indexOf(this), 1);
+                          break;
                         }
                       }
                     }

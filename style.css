@@ -302,13 +302,15 @@ h3 {
   
   bottom:5px;
   
+  text-align:center;
+  
   border-top-left-radius:10px;
   border-top-right-radius:10px;
   
   display:inline-block;
   
-  width:50px;
-  height:30px;
+  width:60px;
+  height:60px;
   
   background-image:url('imgs/fillerPixelArt/WoodenPlank.gif');
 }

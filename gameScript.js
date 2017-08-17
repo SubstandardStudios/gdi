@@ -1353,7 +1353,7 @@ function gameLoad(ctx, cnv){
                         if(encapsulationDevice.size > encapsulationDevice.holding.length){
                           encapsulationDevice.holding.push({name:'rock', imgSrc:this.image.src.replace(/tiles/i, 'inventoryIcons')});
                           playerCharacter.inventoryUpdate();
-                          console.log('Added one!');
+                          worldMap.mapIndex['clutter'][0].splice(worldMap.mapIndex['clutter'][0].indexOf(this), 1);
                         }
                       }
                     }

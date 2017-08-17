@@ -1029,13 +1029,15 @@ function character(){
         
         for(item in this.inventory[encapsulationDevice]['holding']){
           $('#' + encpsulationDevice).append('<p> ' + item.name + ': </p>');
-          $('#' + encpsulationDevice).append('<img src = ' + item.imgSrc + '>');
+          //$('#' + encpsulationDevice).append('<img src = ' + item.imgSrc + '>');
         }
         
         spaceOut = spaceOut + 1;
       }
     }
   }
+  
+  this.inventoryUpdate();
   
   this.load = function(images){
     this.modelArray = images;

@@ -1004,6 +1004,39 @@ function character(){
     sight:25
   };
   
+  this.inventory = {
+    "leftHand":{
+      type:'hand',
+      size:1,
+      holding:[]
+    },
+    "rightHand":{
+      type:'hand',
+      size:1,
+      holding:[]
+    }
+  }
+  
+  this.inventoryUpdate = function(){
+    var spaceOut = 0;
+    $('#canvasCan').children().each(function(){
+      if($(this).attr('class') == 'handInventorySlot')console.log('Tab bottom detected!');
+    });
+    for(var encapsulationDevice in this.inventory){
+      if(this.inventory[encapsulationDevice].type === 'hand'){
+        
+        $('#canvasCan').append('<div class = handInventorySlot id = ' + encapsulationDevice + ' style = left:' + 15+75*spaceOut + 'px;> </div>');
+        
+        for(item in this.inventory[encapsulationDevice]['holding']){
+          $('#' + encpsulationDevice).append('<p> ' + item.name + ': </p>');
+          $('#' + encpsulationDevice).append('<img src = ' + item.imgSrc + '>');
+        }
+        
+        spaceOut = spaceOut + 1;
+      }
+    }
+  }
+  
   this.load = function(images){
     this.modelArray = images;
   }
@@ -1297,12 +1330,33 @@ function gameLoad(ctx, cnv){
                 
                 //These add the rocks and other enviromental elements
                 
-                function smallRockPickup(){
-                  
-                }
-                
                 worldMap.addElement([tileArray[2], tileArray[3]], 'clutter', 0.15, undefined, 32, undefined, undefined);
-                worldMap.addElement([tileArray[4]], 'clutter', .5, smallRockPickup, 0, {width:0, height:0}, undefined)
+                worldMap.addElement([tileArray[4]], 'clutter', .5, smallRockPickup, 0, {width:0, height:0}, undefined);
+                
+                //This function is called when the small rock is clicked ^
+                function smallRockPickup(){
+                  var upperBound = {
+                    x:playerCharacter.overTiles[0].cartesianX + 2,
+                    y:playerCharacter.overTiles[0].cartesianY + 2,
+                  }
+                  var lowerBound = {
+                    x:playerCharacter.overTiles[0].cartesianX - 2,
+                    y:playerCharacter.overTiles[0].cartesianY - 2,
+                  }
+                  if((this.cartesianX > lowerBound.x && this.cartesianX < upperBound.x) && (this.cartesianY > lowerBound.y && this.cartesianY < upperBound.y)){
+                    console.log('Click!');
+                    for(var encapsulationDeviceIndex in playerCharacter.inventory){
+                      var encapsulationDevice = playerCharacter.inventory[encapsulationDeviceIndex];
+                      if(encapsulationDevice.type == 'hand'){
+                        if(encapsulationDevice.size > encapsulationDevice.holding.length){
+                          encapsulationDevice.holding.push({name:'rock', imgSrc:this.image.src.replace(/tiles/i, 'inventoryIcons')});
+                          playerCharacter.inventoryUpdate();
+                          console.log('Added one!');
+                        }
+                      }
+                    }
+                  }
+                }
                 
                 //This adds a few tiles to said starting map
                 worldMap.makeTiles();

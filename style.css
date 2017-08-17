@@ -292,6 +292,27 @@ h3 {
   background-image:url('imgs/fillerPixelArt/WoodenPlank.gif');
 }
 
+.handInventorySlot{
+  
+  border-top:3px solid black;
+  border-left:3px solid black;
+  border-right:3px solid black;
+  
+  position:absolute;
+  
+  bottom:5px;
+  
+  border-top-left-radius:10px;
+  border-top-right-radius:10px;
+  
+  display:inline-block;
+  
+  width:50px;
+  height:30px;
+  
+  background-image:url('imgs/fillerPixelArt/WoodenPlank.gif');
+}
+
 .genericButton{
   width:20px;
   height:17px;

@@ -1033,7 +1033,22 @@ function character(){
           $('#' + encapsulationDevice).append('<p style = margin-top:5px;margin-bottom:0px;font-size:12px> ' + item.name + ' </p>');
           $('#' + encapsulationDevice).append('<img margin-top:0px; src = ' + item.imgSrc + '>');
           $('#' + encapsulationDevice).append('<p style = margin-top:0px;margin-bottom:0px;font-size:9px> ' + encapsulationDevice.replace(/([A-Z])/g, ' $1').trim().capitalize() + ' </p>');
-        }
+        
+	  $('#' + encapsulationDevice).click(function(){
+		  
+	    var tile = this.inventory[encapsulationDevice]['holding'][itemIndex];
+	    
+	    tile.cartesianY = parseInt(this.overTiles[0].cartesianY);
+            tile.cartesianX = parseInt(this.overTiles[0].cartesianX);
+      
+            tile.x = (this.overTiles[0].cartesianX-this.overTiles[0].cartesianY)*32-32;
+            tile.y = ((this.overTiles[0].cartesianY+this.overTiles[0].cartesianX)/2)*32;
+	    
+	    worldMap.mapIndex['clutter'][0].push(tile);
+	    
+	    this.inventory[encapsulationDevice]['holding'] = [];
+	  });
+	}
         
         if(this.inventory[encapsulationDevice]['holding'].length === 0){
           $('#' + encapsulationDevice).css('height', '5px');
@@ -1357,7 +1372,7 @@ function gameLoad(ctx, cnv){
                       var encapsulationDevice = playerCharacter.inventory[encapsulationDeviceIndex];
                       if(encapsulationDevice.type == 'hand'){
                         if(encapsulationDevice.size > encapsulationDevice.holding.length){
-                          encapsulationDevice.holding.push({name:'Rock', imgSrc:this.image.src.replace(/tiles/i, 'inventoryIcons')});
+                          encapsulationDevice.holding.push({name:'Rock', imgSrc:this.image.src.replace(/tiles/i, 'inventoryIcons'), tile:this});
                           playerCharacter.inventoryUpdate();
                           worldMap.mapIndex['clutter'][0].splice(worldMap.mapIndex['clutter'][0].indexOf(this), 1);
                           break;

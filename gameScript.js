@@ -1005,12 +1005,12 @@ function character(){
   };
   
   this.inventory = {
-    "leftHand":{
+    "rightHand":{
       type:'hand',
       size:1,
       holding:[]
     },
-    "rightHand":{
+    "leftHand":{
       type:'hand',
       size:1,
       holding:[]
@@ -1030,10 +1030,9 @@ function character(){
         for(itemIndex in this.inventory[encapsulationDevice]['holding']){
           var item = this.inventory[encapsulationDevice]['holding'][itemIndex];
           
-          console.log(item.imgSrc);
-          
           $('#' + encapsulationDevice).append('<p style = margin-top:5px;margin-bottom:0px;font-size:12px> ' + item.name + ' </p>');
           $('#' + encapsulationDevice).append('<img margin-top:0px; src = ' + item.imgSrc + '>');
+          $('#' + encapsulationDevice).append('<p style = margin-top:0px;margin-bottom:0px;font-size:9px> ' + encapsulationDevice.replace(/([A-Z])/g, ' $1').trim().capitalize() + ' </p>');
         }
         
         if(this.inventory[encapsulationDevice]['holding'].length === 0){
@@ -1279,7 +1278,7 @@ function gameLoad(ctx, cnv){
                   var mousePos = getMousePos(cnv, event);
                   mousePos.x = mousePos.x + cameraX;
                   mousePos.y = mousePos.y + cameraY;
-                  console.log(mousePos);
+                  
                   worldMap.elementsOnScreen.forEach(function(element){
                     if(isInside(mousePos, element.clickRect)){
                       element.onClick();
@@ -1354,7 +1353,6 @@ function gameLoad(ctx, cnv){
                     y:playerCharacter.overTiles[0].cartesianY - 2,
                   }
                   if((this.cartesianX > lowerBound.x && this.cartesianX < upperBound.x) && (this.cartesianY > lowerBound.y && this.cartesianY < upperBound.y)){
-                    console.log('Click!');
                     for(var encapsulationDeviceIndex in playerCharacter.inventory){
                       var encapsulationDevice = playerCharacter.inventory[encapsulationDeviceIndex];
                       if(encapsulationDevice.type == 'hand'){

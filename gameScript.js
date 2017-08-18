@@ -1047,7 +1047,9 @@ function character(){
 	    worldMap.mapIndex['clutter'][0].push(tile);
 	    
 	    this.inventory[encapsulationDevice]['holding'] = [];
-	  });
+		  
+	    this.inventoryUpdate();
+	  }.bind(this));
 	}
         
         if(this.inventory[encapsulationDevice]['holding'].length === 0){

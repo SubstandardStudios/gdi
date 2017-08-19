@@ -1027,35 +1027,38 @@ function character(){
         
         $('#canvasCan').append('<div class = handInventorySlot id = ' + encapsulationDevice + ' style = left:' + (75*spaceOut) + 'px;> </div>');
         
-        for(itemIndex in this.inventory[encapsulationDevice]['holding']){
-          var item = this.inventory[encapsulationDevice]['holding'][itemIndex];
+        this.inventory[encapsulationDevice]['holding'].forEach(function(item){
           
           $('#' + encapsulationDevice).append('<p style = margin-top:5px;margin-bottom:0px;font-size:12px> ' + item.name + ' </p>');
           $('#' + encapsulationDevice).append('<img margin-top:0px; src = ' + item.imgSrc + '>');
           $('#' + encapsulationDevice).append('<p style = margin-top:0px;margin-bottom:0px;font-size:9px> ' + encapsulationDevice.replace(/([A-Z])/g, ' $1').trim().capitalize() + ' </p>');
-        
-	  $('#' + encapsulationDevice).click(function(){
-		  
-	    var tile = this.inventory[encapsulationDevice]['holding'][itemIndex];
-	    
-	    tile.cartesianY = parseInt(this.overTiles[0].cartesianY);
-            tile.cartesianX = parseInt(this.overTiles[0].cartesianX);
-      
-            tile.x = (this.overTiles[0].cartesianX-this.overTiles[0].cartesianY)*32-32;
-            tile.y = ((this.overTiles[0].cartesianY+this.overTiles[0].cartesianX)/2)*32;
-	    
-	    worldMap.mapIndex['clutter'][0].push(tile);
-	    
-	    this.inventory[encapsulationDevice]['holding'] = [];
-		  
-	    this.inventoryUpdate();
-	  }.bind(this));
-	}
+          
+          $('#' + encapsulationDevice).click(function(){
+            
+            var encapsulationDevice = $(this).attr('id');
+
+            item.tile.cartesianY = parseInt(playerCharacter.overTiles[0].cartesianY);
+            item.tile.cartesianX = parseInt(playerCharacter.overTiles[0].cartesianX);
+
+            item.tile.x = (playerCharacter.overTiles[0].cartesianX-playerCharacter.overTiles[0].cartesianY)*32-32;
+            item.tile.y = ((playerCharacter.overTiles[0].cartesianY+playerCharacter.overTiles[0].cartesianX)/2)*32;
+            
+            item.tile.clickRect.x = item.tile.x;
+            item.tile.clickRect.y = item.tile.y;
+
+            worldMap.mapIndex['clutter'][0].push(item.tile);
+            
+            playerCharacter.inventory[encapsulationDevice].holding = [];
+
+            playerCharacter.inventoryUpdate();
+           });
+         })
         
         if(this.inventory[encapsulationDevice]['holding'].length === 0){
-          $('#' + encapsulationDevice).css('height', '5px');
+          $('#' + encapsulationDevice).css('height', '15px');
+          $('#' + encapsulationDevice).append('<p style = margin-top:5px;margin-bottom:0px;font-size:9px> ' + encapsulationDevice.replace(/([A-Z])/g, ' $1').trim().capitalize() + ' </p>');
         }
-        
+
         spaceOut = spaceOut + 1;
       }
     }
@@ -1299,6 +1302,7 @@ function gameLoad(ctx, cnv){
                   worldMap.elementsOnScreen.forEach(function(element){
                     if(isInside(mousePos, element.clickRect)){
                       element.onClick();
+                      return;
                     }
                   });
                   
@@ -1361,23 +1365,31 @@ function gameLoad(ctx, cnv){
                 
                 //This function is called when the small rock is clicked ^
                 function smallRockPickup(){
-                  var upperBound = {
-                    x:playerCharacter.overTiles[0].cartesianX + 2,
-                    y:playerCharacter.overTiles[0].cartesianY + 2,
+                  if(this.onDrop){
+                    playerCharacter.overTiles.forEach(function(tile){
+                      
+                    });
                   }
-                  var lowerBound = {
-                    x:playerCharacter.overTiles[0].cartesianX - 2,
-                    y:playerCharacter.overTiles[0].cartesianY - 2,
-                  }
-                  if((this.cartesianX > lowerBound.x && this.cartesianX < upperBound.x) && (this.cartesianY > lowerBound.y && this.cartesianY < upperBound.y)){
-                    for(var encapsulationDeviceIndex in playerCharacter.inventory){
-                      var encapsulationDevice = playerCharacter.inventory[encapsulationDeviceIndex];
-                      if(encapsulationDevice.type == 'hand'){
-                        if(encapsulationDevice.size > encapsulationDevice.holding.length){
-                          encapsulationDevice.holding.push({name:'Rock', imgSrc:this.image.src.replace(/tiles/i, 'inventoryIcons'), tile:this});
-                          playerCharacter.inventoryUpdate();
-                          worldMap.mapIndex['clutter'][0].splice(worldMap.mapIndex['clutter'][0].indexOf(this), 1);
-                          break;
+                  
+                  else {
+                    var upperBound = {
+                      x:playerCharacter.overTiles[0].cartesianX + 2,
+                      y:playerCharacter.overTiles[0].cartesianY + 2,
+                    }
+                    var lowerBound = {
+                      x:playerCharacter.overTiles[0].cartesianX - 2,
+                      y:playerCharacter.overTiles[0].cartesianY - 2,
+                    }
+                    if((this.cartesianX > lowerBound.x && this.cartesianX < upperBound.x) && (this.cartesianY > lowerBound.y && this.cartesianY < upperBound.y)){
+                      for(var encapsulationDeviceIndex in playerCharacter.inventory){
+                        var encapsulationDevice = playerCharacter.inventory[encapsulationDeviceIndex];
+                        if(encapsulationDevice.type == 'hand'){
+                          if(encapsulationDevice.size > encapsulationDevice.holding.length){
+                            encapsulationDevice.holding.push({name:'Rock', imgSrc:this.image.src.replace(/tiles/i, 'inventoryIcons'), tile:this});
+                            playerCharacter.inventoryUpdate();
+                            worldMap.mapIndex['clutter'][0].splice(worldMap.mapIndex['clutter'][0].indexOf(this), 1);
+                            break;
+                          }
                         }
                       }
                     }

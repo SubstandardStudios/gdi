@@ -955,6 +955,8 @@ function character(){
   this.lastFocusedOn = false;
   this.focusOn = false;
   
+  this.explanations = true;
+  
   this.overTiles = [worldMap.mapIndex[0][25][25]];
   
   this.direction = 0;
@@ -1035,22 +1037,61 @@ function character(){
           
           $('#' + encapsulationDevice).click(function(){
             
+            if(playerCharacter.busy)return;
+            
             var encapsulationDevice = $(this).attr('id');
-
-            item.tile.cartesianY = parseInt(playerCharacter.overTiles[0].cartesianY);
-            item.tile.cartesianX = parseInt(playerCharacter.overTiles[0].cartesianX);
-
-            item.tile.x = (playerCharacter.overTiles[0].cartesianX-playerCharacter.overTiles[0].cartesianY)*32-32;
-            item.tile.y = ((playerCharacter.overTiles[0].cartesianY+playerCharacter.overTiles[0].cartesianX)/2)*32;
             
-            item.tile.clickRect.x = item.tile.x;
-            item.tile.clickRect.y = item.tile.y;
-
-            worldMap.mapIndex['clutter'][0].push(item.tile);
+            if(playerCharacter.explanations){
+              $('#canvasCan').append('<div class = inGameWindow id = dropAlert' + encapsulationDevice + ' style = padding:5px;left:10px;top:10px;> <h5 style = margin:0px;> Click near the mortal to drop the ' + item.name + ' in their ' + encapsulationDevice.replace(/([A-Z])/g, ' $1').trim().capitalize() + '. </h5> </div>');
+              setTimeout(function(){
+                $('#dropAlert' + encapsulationDevice).fadeOut(3000, function(){
+                  $(this).remove();
+                });
+              }, 3000);
+            }
             
-            playerCharacter.inventory[encapsulationDevice].holding = [];
+            function dropOffAtClick(event){
+              var mousePos = getMousePos(cnv, event);
+              mousePos.x = mousePos.x + cameraX;
+              mousePos.y = mousePos.y + cameraY;
+              
+              for(var index = 0; index < playerCharacter.overTiles.length; index++){
+                var element = playerCharacter.overTiles[index];
+                
+                if(isInside(mousePos, {x:element.x, y:element.y, width:element.image.width, height:element.image.height})){
+                  
+                  //The following code sticks the rock into the map system
+                  item.tile.cartesianY = parseInt(element.cartesianY);
+                  item.tile.cartesianX = parseInt(element.cartesianX);
 
-            playerCharacter.inventoryUpdate();
+                  item.tile.x = Math.round(mousePos.x - item.tile.image.width/2);
+                  item.tile.y = Math.round(mousePos.y - item.tile.image.height/2)-10;
+
+                  item.tile.clickRect.x = item.tile.x;
+                  item.tile.clickRect.y = item.tile.y;
+
+                  worldMap.mapIndex['clutter'][0].push(item.tile);
+                  //Done with rock-sticking code.
+                  
+                  //These cleanup stuff setup to see if the character was click and to prevent him from picking up a rock while trying to put one down.
+                  $('#canvasCan').off('click', dropOffAtClick);
+                  playerCharacter.busy = false;
+                  //Done with cleanup
+                  
+                  //These two remove the rock from the inventory and display it to be so
+                  playerCharacter.inventory[encapsulationDevice].holding = [];
+                  playerCharacter.inventoryUpdate();
+                  //Done with inventory stuff, now we'll end the loop
+                  
+                  break;
+                }
+              }
+            }
+            
+            setTimeout(function(){$('#canvasCan').on('click', dropOffAtClick);}, 10);
+            
+            playerCharacter.busy = true;
+            
            });
          })
         
@@ -1299,12 +1340,13 @@ function gameLoad(ctx, cnv){
                   mousePos.x = mousePos.x + cameraX;
                   mousePos.y = mousePos.y + cameraY;
                   
-                  worldMap.elementsOnScreen.forEach(function(element){
+                  for(var index = 0; index < worldMap.elementsOnScreen.length; index++){
+                    var element = worldMap.elementsOnScreen[index];
                     if(isInside(mousePos, element.clickRect)){
-                      element.onClick();
-                      return;
+                      if(!playerCharacter.busy)element.onClick();
+                      break;
                     }
-                  });
+                  }
                   
                   if(!playerCharacter.focusOn){
                     $('#gameCanvas').on('mousemove', function(event){
@@ -1349,6 +1391,21 @@ function gameLoad(ctx, cnv){
                   else {
                     e.preventDefault();
                   }
+                  
+                  if(e.key == '1' || e.key == '2'){
+                    var handCount = 0;
+                    for(var encapsulationDeviceIndex in playerCharacter.inventory){
+                      var encapsulationDevice = playerCharacter.inventory[encapsulationDeviceIndex];
+                      if(encapsulationDevice.type == 'hand'){
+                        handCount = handCount + 1;
+                        if(handCount == e.key){
+                          $('#' + encapsulationDeviceIndex).click();
+                          break;
+                        }
+                      }
+                    }
+                  }
+                  
                   keyMap[e.key] = e.type == 'keydown';
                 }
                 
@@ -1365,31 +1422,23 @@ function gameLoad(ctx, cnv){
                 
                 //This function is called when the small rock is clicked ^
                 function smallRockPickup(){
-                  if(this.onDrop){
-                    playerCharacter.overTiles.forEach(function(tile){
-                      
-                    });
+                  var upperBound = {
+                    x:playerCharacter.overTiles[0].cartesianX + 2,
+                    y:playerCharacter.overTiles[0].cartesianY + 2,
                   }
-                  
-                  else {
-                    var upperBound = {
-                      x:playerCharacter.overTiles[0].cartesianX + 2,
-                      y:playerCharacter.overTiles[0].cartesianY + 2,
-                    }
-                    var lowerBound = {
-                      x:playerCharacter.overTiles[0].cartesianX - 2,
-                      y:playerCharacter.overTiles[0].cartesianY - 2,
-                    }
-                    if((this.cartesianX > lowerBound.x && this.cartesianX < upperBound.x) && (this.cartesianY > lowerBound.y && this.cartesianY < upperBound.y)){
-                      for(var encapsulationDeviceIndex in playerCharacter.inventory){
-                        var encapsulationDevice = playerCharacter.inventory[encapsulationDeviceIndex];
-                        if(encapsulationDevice.type == 'hand'){
-                          if(encapsulationDevice.size > encapsulationDevice.holding.length){
-                            encapsulationDevice.holding.push({name:'Rock', imgSrc:this.image.src.replace(/tiles/i, 'inventoryIcons'), tile:this});
-                            playerCharacter.inventoryUpdate();
-                            worldMap.mapIndex['clutter'][0].splice(worldMap.mapIndex['clutter'][0].indexOf(this), 1);
-                            break;
-                          }
+                  var lowerBound = {
+                    x:playerCharacter.overTiles[0].cartesianX - 2,
+                    y:playerCharacter.overTiles[0].cartesianY - 2,
+                  }
+                  if((this.cartesianX > lowerBound.x && this.cartesianX < upperBound.x) && (this.cartesianY > lowerBound.y && this.cartesianY < upperBound.y)){
+                    for(var encapsulationDeviceIndex in playerCharacter.inventory){
+                      var encapsulationDevice = playerCharacter.inventory[encapsulationDeviceIndex];
+                      if(encapsulationDevice.type == 'hand'){
+                        if(encapsulationDevice.size > encapsulationDevice.holding.length){
+                          encapsulationDevice.holding.push({name:'Rock', imgSrc:this.image.src.replace(/tiles/i, 'inventoryIcons'), tile:this});
+                          playerCharacter.inventoryUpdate();
+                          worldMap.mapIndex['clutter'][0].splice(worldMap.mapIndex['clutter'][0].indexOf(this), 1);
+                          break;
                         }
                       }
                     }
@@ -1421,24 +1470,13 @@ function gameLoad(ctx, cnv){
                   playerCharacter.focusOn = !playerCharacter.focusOn;
                   $(this).prop('checked', playerCharacter.focusOn);
                 });
-                /*
-                $('#settingsWindow').append('<div style=margin:auto;display:block;> <h4 style = position:absolute;left:10px;top:72px;>Zoom:</h4> <input id=zoomInput type=range style = margin-top:10px;float:right;display:block;></input></div>');
-                $('#zoomInput').attr('min', -2);
-                $('#zoomInput').attr('max', 2);
-                $('#zoomInput').val(0);
                 
-                $('#zoomInput').on('input', function () {
-                  ctx.setTransform(1, 0, 0, 1, 0, 0);
-                  cameraX = 0;
-                  cameraY = 0;
-                  if(playerCharacter)playerCharacter.cameraFocus();
-                  
-                  ctx.scale($(this).val(), $(this).val());
-                  
-                  cameraX = 0;
-                  cameraY = 0;
-                  if(playerCharacter)playerCharacter.cameraFocus();
-                });*/
+                $('#settingsWindow').append('<div style=margin:auto;display:block;> <h4 style = margin-top:3px;margin-right:0px;float:left;display:block;>Explanations:</h4> <input type = checkBox style=float:right; id = explanationsInput></div>');
+                $('#explanationsInput').prop('checked', true);
+                
+                $('#explanationsInput').on('change', function(){
+                  playerCharacter.explanations = $(this).attr('checked');
+                });
                 
                 playerCharacter.cameraFocus();
 

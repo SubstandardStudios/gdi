@@ -11,6 +11,22 @@ function roundToMaxOrMin(value, max, min){
   else return value;  
 }
 
+function makeDraggable(id, exceptions){
+  $(id).mousedown(function(event){
+    $(id).on('mousemove', function(event){
+      for(var index = 0; index < exceptions.length; index++){
+        if($(exceptions[index]).is(':hover'))return;
+      }
+      var mousePos = getMousePos(cnv, event);
+      $(id).css('left', mousePos.x - $(id).width()/2);
+      $(id).css('top', mousePos.y - $(id).height()/2);
+    });
+  });
+  $(id).mouseup(function(event){
+    $(id).off('mousemove');
+  });
+};
+
 //Thanks disfated! :D
 String.prototype.capitalize = function(lower) {
   return (lower ? this.toLowerCase() : this).replace(/(?:^|\s)\S/g, function(a) { return a.toUpperCase(); });
@@ -1039,61 +1055,145 @@ function character(){
             
             if(playerCharacter.busy)return;
             
+            function killFunction(){
+              $('#canvasCan').off('mousemove', optionsBoxToMousePos);
+              $('#optionsBox' + encapsulationDevice).off('mouseleave', killFunction)
+              $('#optionsBox' + encapsulationDevice).remove();
+            }
+            
             var encapsulationDevice = $(this).attr('id');
             
-            if(playerCharacter.explanations){
-              $('#canvasCan').append('<div class = inGameWindow id = dropAlert' + encapsulationDevice + ' style = padding:5px;left:10px;top:10px;> <h5 style = margin:0px;> Click near the mortal to drop the ' + item.name + ' in their ' + encapsulationDevice.replace(/([A-Z])/g, ' $1').trim().capitalize() + '. </h5> </div>');
-              setTimeout(function(){
-                $('#dropAlert' + encapsulationDevice).fadeOut(3000, function(){
-                  $(this).remove();
-                });
-              }, 3000);
-            }
             
-            function dropOffAtClick(event){
+            
+            //The following code facilitates that little box that appears when you press a number key or click on a hand.
+            $('#canvasCan').append('<div class = inGameWindow id = optionsBox' + encapsulationDevice + ' style = padding:5px;text-align:center;font-size:15px;width:100px;position:absolute;> </div>');
+              $('#optionsBox' + encapsulationDevice).append('<div style = width:100%; id = drop' + encapsulationDevice + '> <h4 style = margin:0px;> Drop </h4> </div>');
+              $('#optionsBox' + encapsulationDevice).append('<hr id = thinHr>');
+              $('#optionsBox' + encapsulationDevice).append('<div style = width:100%; id = examine' + encapsulationDevice + '> <h4 style = margin:0px;> Examine </h4> </div>');
+              //$('#optionsBox' + encapsulationDevice).append('<hr id = thinHr>');
+            
+              $('#optionsBox' + encapsulationDevice).hide();
+            
+              $('#optionsBox' + encapsulationDevice).children().hover(function(){
+                $(this).css('font-size', '17px');
+              },
+              function(){
+                $(this).css('font-size', '15px');
+              });
+            
+              $('#optionsBox' + encapsulationDevice).children().click(killFunction);
+            
+            function optionsBoxToMousePos(event){
               var mousePos = getMousePos(cnv, event);
-              mousePos.x = mousePos.x + cameraX;
-              mousePos.y = mousePos.y + cameraY;
+              $('#optionsBox' + encapsulationDevice).show();
               
-              for(var index = 0; index < playerCharacter.overTiles.length; index++){
-                var element = playerCharacter.overTiles[index];
-                
-                if(isInside(mousePos, {x:element.x, y:element.y, width:element.image.width, height:element.image.height})){
-                  
-                  //The following code sticks the rock into the map system
-                  item.tile.cartesianY = parseInt(element.cartesianY);
-                  item.tile.cartesianX = parseInt(element.cartesianX);
+              var width = $('#optionsBox' + encapsulationDevice).width();
+              var height = $('#optionsBox' + encapsulationDevice).height();
+              
+              $('#optionsBox' + encapsulationDevice).css('left', (mousePos.x - width/2)+ 'px');
+              $('#optionsBox' + encapsulationDevice).css('top', (mousePos.y - height/2)+ 'px');
+              setTimeout(function(){$('#canvasCan').off('mousemove', optionsBoxToMousePos)}, 100);
+              $('#optionsBox' + encapsulationDevice).on('mouseleave', function(){ 
+                playerCharacter.busy = false;
+                killFunction()
+              });
+            }
+            $('#canvasCan').on('mousemove', optionsBoxToMousePos);
+            //Finished with the little box code!
+            
+            
+            
+            //The following code facilitates the examine function.
+            $('#examine' + encapsulationDevice).click(function(){
+              console.log(item);
+              $('#canvasCan').append('<div class = inGameWindow id = examineWindow' + encapsulationDevice + ' style = padding:0px;width:500px;height:200px;> </div>');
+              
+              $('#examineWindow' + encapsulationDevice).append('<div id = leftSideDiv' + encapsulationDevice + ' style = text-align:center;display:inline-block;margin:0px;height:100%;width:150px;></div>');
+              $('#examineWindow' + encapsulationDevice).append('<div id = rightSideDiv' + encapsulationDevice + ' style = text-align:center;display:inline-block;margin:0px;height:100%;width:347px;float:right; class = rightSideDiv></div>');
+              
+              $('#leftSideDiv' + encapsulationDevice).append('<h4 style = margin-bottom:0px;margin-top:12px;text-align:center;>' + encapsulationDevice.replace(/([A-Z])/g, ' $1').trim().capitalize() + '</h4>');
+              $('#leftSideDiv' + encapsulationDevice).append('<img src = ' + item.tile.image.src.replace(/tiles/i, 'examinationIcons') + '>');
+              $('#leftSideDiv' + encapsulationDevice).append('<h4 style = margin-top:10px;>' + item.name + '</h4>');
+              
+              $('#rightSideDiv' + encapsulationDevice).append('<div id = examineWindowExit' + encapsulationDevice + ' style = float:left;margin:5px;margin-top:10px;margin-bottom:0px;font-size:20px;> X </div>');
+              $('#examineWindowExit' + encapsulationDevice).click(function(){
+                $(this).parent().parent().fadeOut(500, function(){$(this).remove();});
+                playerCharacter.busy = false;
+              });
+              
+              $('#rightSideDiv' + encapsulationDevice).append('<div class = genericButton style = margin:5px;margin-right:10px;width:auto;float:right;padding:5px;padding-bottom:0px;padding-top:2px;>Tool-></div>');
+              $('#rightSideDiv' + encapsulationDevice).append('<h3 style = margin-top:10px;>Material</h3>');
+              $('#rightSideDiv' + encapsulationDevice).append('<hr id = thinHr style = margin-top:5px;>');
+              
+              makeDraggable('#examineWindow' + encapsulationDevice, $('#settingsWindow' + encapsulationDevice).children());
+              
+              var width = $('#examineWindow' + encapsulationDevice).width();
+              var height = $('#examineWindow' + encapsulationDevice).height();
+              $('#examineWindow' + encapsulationDevice).css('left', Math.round(cnv.width/2 - width/2) + 'px');
+              $('#examineWindow' + encapsulationDevice).css('top', Math.round(cnv.height/2 - height/2) + 'px');
+            });
+            //End of examine-function code.
+            
+            
+            
+            //The following code facilitates the drop function
+            $('#drop' + encapsulationDevice).click(function(){
+              if(playerCharacter.explanations){
+                $('#canvasCan').append('<div class = inGameWindow id = dropAlert' + encapsulationDevice + ' style = padding:5px;left:10px;top:10px;> <h5 style = margin:0px;> Click near the mortal to drop the ' + item.name + ' that is in their ' + encapsulationDevice.replace(/([A-Z])/g, ' $1').trim().capitalize() + '. </h5> </div>');
+                setTimeout(function(){
+                  $('#dropAlert' + encapsulationDevice).fadeOut(3000, function(){
+                    $(this).remove();
+                  });
+                }, 3000);
+              }
 
-                  item.tile.x = Math.round(mousePos.x - item.tile.image.width/2);
-                  item.tile.y = Math.round(mousePos.y - item.tile.image.height/2)-10;
+              function dropOffAtClick(event){
+                var mousePos = getMousePos(cnv, event);
+                mousePos.x = mousePos.x + cameraX;
+                mousePos.y = mousePos.y + cameraY;
 
-                  item.tile.clickRect.x = item.tile.x;
-                  item.tile.clickRect.y = item.tile.y;
+                for(var index = 0; index < playerCharacter.overTiles.length; index++){
+                  var element = playerCharacter.overTiles[index];
 
-                  worldMap.mapIndex['clutter'][0].push(item.tile);
-                  //Done with rock-sticking code.
-                  
-                  //These cleanup stuff setup to see if the character was click and to prevent him from picking up a rock while trying to put one down.
-                  $('#canvasCan').off('click', dropOffAtClick);
-                  playerCharacter.busy = false;
-                  //Done with cleanup
-                  
-                  //These two remove the rock from the inventory and display it to be so
-                  playerCharacter.inventory[encapsulationDevice].holding = [];
-                  playerCharacter.inventoryUpdate();
-                  //Done with inventory stuff, now we'll end the loop
-                  
-                  break;
+                  if(isInside(mousePos, {x:element.x, y:element.y, width:element.image.width, height:element.image.height})){
+
+                    //The following code sticks the rock into the map system
+                    item.tile.cartesianY = parseInt(element.cartesianY);
+                    item.tile.cartesianX = parseInt(element.cartesianX);
+
+                    item.tile.x = Math.round(mousePos.x - item.tile.image.width/2);
+                    item.tile.y = Math.round(mousePos.y - item.tile.image.height/2)-10;
+
+                    item.tile.clickRect.x = item.tile.x;
+                    item.tile.clickRect.y = item.tile.y;
+
+                    worldMap.mapIndex['clutter'][0].push(item.tile);
+                    //Done with rock-sticking code.
+
+                    //These cleanup stuff setup to see if the character was click and to prevent him from picking up a rock while trying to put one down.
+                    $('#canvasCan').off('click', dropOffAtClick);
+                    playerCharacter.busy = false;
+                    //Done with cleanup
+
+                    //These two remove the rock from the inventory and display it to be so
+                    playerCharacter.inventory[encapsulationDevice].holding = [];
+                    playerCharacter.inventoryUpdate();
+                    //Done with inventory stuff, now we'll end the loop and the window
+                    
+                    break;
+                  }
                 }
               }
-            }
+
+              setTimeout(function(){$('#canvasCan').on('click', dropOffAtClick);}, 10);
+            });
+            //That's the end of the drop function code.
             
-            setTimeout(function(){$('#canvasCan').on('click', dropOffAtClick);}, 10);
+            
             
             playerCharacter.busy = true;
-            
-           });
-         })
+          });
+        });
         
         if(this.inventory[encapsulationDevice]['holding'].length === 0){
           $('#' + encapsulationDevice).css('height', '15px');
@@ -1259,25 +1359,6 @@ function startGame(){
   $('#canvasCan').append('<div class = inGameWindow id = settingsWindow> <h3 style = margin-left:100px;margin-right:100px;margin-top:20px;> Settings </h3> <h4 style = position:absolute;top:0px;right:15px; > Drag Me! </h4> <hr id = thinHr> </div>');
   $('#settingsWindow').hide();
   
-  
-  function makeDraggable(id){
-    $(id).mousedown(function(event){
-      $('#gameCanvas').on('mousemove', function(event){
-        var mousePos = getMousePos(cnv, event);
-        $(id).css('left', mousePos.x - $(id).width()/2);
-        $(id).css('top', mousePos.y - $(id).height()/2);
-      });
-    });
-    $(id).mouseup(function(event){
-      $(id).off('mousemove');
-      //var mousePos = getMousePos(cnv, event);
-      //  $(id).css('left', mousePos.x - $(id).width()/2);
-      //  $(id).css('top', mousePos.y - $(id).height()/2);
-    });
-  }
-  
-  makeDraggable('#settingsWindow');
-  
   $('#settingsTab').click(function(){
     $('#settingsWindow').toggle();
   });
@@ -1422,6 +1503,28 @@ function gameLoad(ctx, cnv){
                 
                 //This function is called when the small rock is clicked ^
                 function smallRockPickup(){
+                  
+                  if(!this.crafting){
+                    
+                    this.crafting = {
+                      asMaterial:{//A stone is a material
+                        resemblance:{//Over 70, then a tool is usable. Higher the resemblance, the better the tool.
+                          axe:Math.floor(Math.random()*50),
+                          point:Math.floor(Math.random()*50)
+                        },
+                        material:'mineral'//Only tools with 'mineral' listed in their asTools.materials will have an effect on this material
+                      },
+                      asTool:{//And a tool.
+                        durability:100,
+                        precision:10,//precision is roughly how much resemblance is added each strike. The higher resemblance gets, the less resemblance is added.
+                        bluntness:10,//coarse is roughly how much durability is lost each strike. The higher the resemblance, the more durability is harmed.
+                        materials:['mineral', 'metal']//A stone is able to affect these materials.
+                      }
+                    }
+                    this.crafting.asMaterial.resemblance.blade = Math.floor(this.crafting.point/4 + Math.random()*12.5);
+                    
+                  }
+                  
                   var upperBound = {
                     x:playerCharacter.overTiles[0].cartesianX + 2,
                     y:playerCharacter.overTiles[0].cartesianY + 2,
@@ -1454,7 +1557,7 @@ function gameLoad(ctx, cnv){
                 playerCharacter.x = worldMap.mapIndex[0][25][25].x + 32;
                 playerCharacter.y = worldMap.mapIndex[0][25][25].y - 96;
                 
-                $('#settingsWindow').append('<div style=margin:auto;display:block;> <h4 style = margin-top:13px;margin-right:50px;float:left;display:block;>Sight:</h4> <input id=sightInput type=range style = margin-top:10px;float:right;display:block;></input></div>');
+                $('#settingsWindow').append('<div id = sightDiv style = border:1px;padding:1px;> <h4 style = margin-top:13px;margin-right:50px;float:left;display:block; id = sightTitle>Sight:</h4> <input id=sightInput type=range style = margin-top:10px;float:right;display:block;></input></div>');
                 $('#sightInput').attr('min', 0);
                 $('#sightInput').attr('max', playerCharacter.stats.maxSight);
                 
@@ -1477,6 +1580,8 @@ function gameLoad(ctx, cnv){
                 $('#explanationsInput').on('change', function(){
                   playerCharacter.explanations = $(this).attr('checked');
                 });
+                
+                makeDraggable('#settingsWindow', ['#sightDiv']);
                 
                 playerCharacter.cameraFocus();
 

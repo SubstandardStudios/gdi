@@ -49,6 +49,10 @@ h3 {
     
 }
 
+.rightSideDiv {
+  border-left:2px solid black;
+}
+
 .subtitle {
 	
     position:absolute;

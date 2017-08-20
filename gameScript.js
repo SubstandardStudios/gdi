@@ -493,7 +493,7 @@ function modifiersForPart(part, race, group, profession, mortalName, gender){
               break;
               
             case 'nimble':
-              var story = mortalName[0] + " once used " + pronouns[1] + " nimble appendages to steal a few magical tomes from the forbidden section of the library. Soon afterwards, " + pronouns[0] + " cast " + pronouns[1] + " first spell.";
+              var story = mortalName[0] + " once used " + pronouns[1] + " nimble appendages to steal a few magical tomes from the forbidden section of the library. What " + pronouns[0] + " read in that tome changed him forever.";
               var bonusToStats = {magic:5, sneaking:3, stealing:2};
               var secondaryClass = 'mage'
               break;
@@ -1105,7 +1105,6 @@ function character(){
             
             //The following code facilitates the examine function.
             $('#examine' + encapsulationDevice).click(function(){
-              console.log(item);
               $('#canvasCan').append('<div class = inGameWindow id = examineWindow' + encapsulationDevice + ' style = padding:0px;width:500px;height:200px;> </div>');
               
               $('#examineWindow' + encapsulationDevice).append('<div id = leftSideDiv' + encapsulationDevice + ' style = text-align:center;display:inline-block;margin:0px;height:100%;width:150px;></div>');
@@ -1115,16 +1114,50 @@ function character(){
               $('#leftSideDiv' + encapsulationDevice).append('<img src = ' + item.tile.image.src.replace(/tiles/i, 'examinationIcons') + '>');
               $('#leftSideDiv' + encapsulationDevice).append('<h4 style = margin-top:10px;>' + item.name + '</h4>');
               
-              $('#rightSideDiv' + encapsulationDevice).append('<div id = examineWindowExit' + encapsulationDevice + ' style = float:left;margin:5px;margin-top:10px;margin-bottom:0px;font-size:20px;> X </div>');
-              $('#examineWindowExit' + encapsulationDevice).click(function(){
-                $(this).parent().parent().fadeOut(500, function(){$(this).remove();});
-                playerCharacter.busy = false;
-              });
+              function flipDiv(whichSide, nextSide){
+                $('#rightSideDiv' + encapsulationDevice).empty();
+                $('#rightSideDiv' + encapsulationDevice).append('<div id = examineWindowExit' + encapsulationDevice + ' style = float:left;margin:5px;margin-top:10px;margin-bottom:0px;font-size:20px;> X </div>');
+                $('#examineWindowExit' + encapsulationDevice).click(function(){
+                  $(this).parent().parent().fadeOut(500, function(){$(this).remove();});
+                  playerCharacter.busy = false;
+                });
+
+                $('#rightSideDiv' + encapsulationDevice).append('<div class = genericButton id = nextSideButton' + encapsulationDevice + ' style = margin:5px;margin-right:10px;width:auto;float:right;padding:5px;padding-bottom:0px;padding-top:2px;>' + nextSide.capitalize() + ' -></div>');
+                $('#nextSideButton' + encapsulationDevice).click(function(){
+                  flipDiv(nextSide, whichSide);
+                });
+                $('#rightSideDiv' + encapsulationDevice).append('<h3 style = margin-top:10px;>' + whichSide.capitalize() + '</h3>');
+                $('#rightSideDiv' + encapsulationDevice).append('<div id = rightSideDiv' + encapsulationDevice + 'statsDiv style=overflow:auto;height:165px;width:340px;margin-top:5px;></div>');
+                $('#rightSideDiv' + encapsulationDevice + 'statsDiv').append('<hr id = thinHr style = margin-top:0px;margin-bottom:0px;width:95%;>');
+                
+                var toWrite = [];
+                for(var index in item.tile.crafting['as' + whichSide.capitalize()]){
+                  var element = item.tile.crafting['as' + whichSide.capitalize()][index];
+                  
+                  if(typeof element == 'object' && !(Array.isArray(element))){
+                    for(nestedIndex in element){
+                      var nestedElement = element[nestedIndex]
+                      toWrite.push([nestedIndex + ' ' + index, nestedElement]);
+                    }
+                  }
+                  else if(Array.isArray(element)){
+                    var nameList = "";
+                    element.forEach(function(nestedElement, nestedIndex){
+                      nameList = nameList + nestedElement;
+                      if(!(nestedIndex == element.length-1))nameList = nameList + ', ';
+                    });
+                    toWrite.push([index, nameList]);
+                  }
+                  else toWrite.push([index, element]);
+                }
+                toWrite.forEach(function(element){
+                  element[1] = (typeof element[1] == 'string') ? element[1].replace(/([A-Z])/g, ' $1').trim().capitalize() : element[1]+'%';
+                  $('#rightSideDiv' + encapsulationDevice + 'statsDiv').append('<div style=padding:5px;> <p style = display:inline-block;float:left;margin:5px;margin-right:20px;margin-top:0px;>' + element[0].replace(/([A-Z])/g, ' $1').trim().capitalize() + ':</p>  <p style = display:inline-block;float:right;margin:5px;margin-right:20px;margin-top:0px;>' + element[1] + '</p> </div>');
+                  $('#rightSideDiv' + encapsulationDevice + 'statsDiv').append('<hr id = thinHr style = margin-top:10px;margin-bottom:0px;width:95%;>');
+                });
+              }
               
-              $('#rightSideDiv' + encapsulationDevice).append('<div class = genericButton style = margin:5px;margin-right:10px;width:auto;float:right;padding:5px;padding-bottom:0px;padding-top:2px;>Tool-></div>');
-              $('#rightSideDiv' + encapsulationDevice).append('<h3 style = margin-top:10px;>Material</h3>');
-              $('#rightSideDiv' + encapsulationDevice).append('<hr id = thinHr style = margin-top:5px;>');
-              
+              flipDiv('material', 'tool');
               makeDraggable('#examineWindow' + encapsulationDevice, $('#settingsWindow' + encapsulationDevice).children());
               
               var width = $('#examineWindow' + encapsulationDevice).width();
@@ -1498,31 +1531,33 @@ function gameLoad(ctx, cnv){
                 
                 //These add the rocks and other enviromental elements
                 
-                worldMap.addElement([tileArray[2], tileArray[3]], 'clutter', 0.15, undefined, 32, undefined, undefined);
+                worldMap.addElement([tileArray[2], tileArray[3]], 'clutter', 0.15, bigRockClick, 32, undefined, undefined);
                 worldMap.addElement([tileArray[4]], 'clutter', .5, smallRockPickup, 10, {width:0, height:0}, undefined);
+                
+                function bigRockClick(){
+                  //console.log('You clicked a big rock!');
+                }
                 
                 //This function is called when the small rock is clicked ^
                 function smallRockPickup(){
-                  
                   if(!this.crafting){
-                    
                     this.crafting = {
                       asMaterial:{//A stone is a material
                         resemblance:{//Over 70, then a tool is usable. Higher the resemblance, the better the tool.
-                          axe:Math.floor(Math.random()*50),
-                          point:Math.floor(Math.random()*50)
                         },
-                        material:'mineral'//Only tools with 'mineral' listed in their asTools.materials will have an effect on this material
+                        durability:100,
+                        materialType:'mineral',//Only tools with 'mineral' listed in their asTools.materials will have an effect on this material
+                        rockiness:'quite rocky'
                       },
                       asTool:{//And a tool.
-                        durability:100,
                         precision:10,//precision is roughly how much resemblance is added each strike. The higher resemblance gets, the less resemblance is added.
                         bluntness:10,//coarse is roughly how much durability is lost each strike. The higher the resemblance, the more durability is harmed.
                         materials:['mineral', 'metal']//A stone is able to affect these materials.
                       }
                     }
-                    this.crafting.asMaterial.resemblance.blade = Math.floor(this.crafting.point/4 + Math.random()*12.5);
-                    
+                    this.crafting.asMaterial.resemblance.axe = 15+Math.floor(Math.random()*35);
+                    this.crafting.asMaterial.resemblance.point = 15+Math.floor(Math.random()*35);
+                    this.crafting.asMaterial.resemblance.blade = Math.floor(this.crafting.asMaterial.resemblance.point/4 + Math.random()*12.5);
                   }
                   
                   var upperBound = {

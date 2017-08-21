@@ -1564,12 +1564,12 @@ function gameLoad(ctx, cnv){
                   $('#largeRockGUI').append('<div id = largeRockGUIMainArea style = width:100%;height:100%;></div>');
                   $('#largeRockGUIMainArea').append('<div id = largeRockGUIUpperArea style = text-align:center;width:100%;height:285px;></div>');
                   
-                  this.inventory = {
+                  if(!this.inventory)this.inventory = {
                     tool:undefined,
                     toolEncapsulationDevice:undefined,
                     material:undefined,
                     materialEncapsulationDevice:undefined
-                  }
+                  };
                   
                   this.updateInventory = function(){
                     console.log(this.inventory);

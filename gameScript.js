@@ -12,6 +12,7 @@ function roundToMaxOrMin(value, max, min){
 }
 
 function makeDraggable(id, exceptions){
+  if(!exceptions)exceptions = [];
   $(id).mousedown(function(event){
     $(id).on('mousemove', function(event){
       for(var index = 0; index < exceptions.length; index++){
@@ -1048,7 +1049,7 @@ function character(){
         this.inventory[encapsulationDevice]['holding'].forEach(function(item){
           
           $('#' + encapsulationDevice).append('<p style = margin-top:5px;margin-bottom:0px;font-size:12px> ' + item.name + ' </p>');
-          $('#' + encapsulationDevice).append('<img margin-top:0px; src = ' + item.imgSrc + '>');
+          $('#' + encapsulationDevice).append('<img margin-top:0px; src = ' + item.image.src.replace(/tiles/i, 'inventoryIcons') + '>');
           $('#' + encapsulationDevice).append('<p style = margin-top:0px;margin-bottom:0px;font-size:9px> ' + encapsulationDevice.replace(/([A-Z])/g, ' $1').trim().capitalize() + ' </p>');
           
           $('#' + encapsulationDevice).click(function(){
@@ -1105,20 +1106,23 @@ function character(){
             
             //The following code facilitates the examine function.
             $('#examine' + encapsulationDevice).click(function(){
+              playerCharacter.busy = false;
+              if(item.beingExamined == true)return;
+              item.beingExamined = true;
               $('#canvasCan').append('<div class = inGameWindow id = examineWindow' + encapsulationDevice + ' style = padding:0px;width:500px;height:200px;> </div>');
               
               $('#examineWindow' + encapsulationDevice).append('<div id = leftSideDiv' + encapsulationDevice + ' style = text-align:center;display:inline-block;margin:0px;height:100%;width:150px;></div>');
               $('#examineWindow' + encapsulationDevice).append('<div id = rightSideDiv' + encapsulationDevice + ' style = text-align:center;display:inline-block;margin:0px;height:100%;width:347px;float:right; class = rightSideDiv></div>');
               
               $('#leftSideDiv' + encapsulationDevice).append('<h4 style = margin-bottom:0px;margin-top:12px;text-align:center;>' + encapsulationDevice.replace(/([A-Z])/g, ' $1').trim().capitalize() + '</h4>');
-              $('#leftSideDiv' + encapsulationDevice).append('<img src = ' + item.tile.image.src.replace(/tiles/i, 'examinationIcons') + '>');
+              $('#leftSideDiv' + encapsulationDevice).append('<img src = ' + item.image.src.replace(/tiles/i, 'examinationIcons') + '>');
               $('#leftSideDiv' + encapsulationDevice).append('<h4 style = margin-top:10px;>' + item.name + '</h4>');
               
               function flipDiv(whichSide, nextSide){
                 $('#rightSideDiv' + encapsulationDevice).empty();
                 $('#rightSideDiv' + encapsulationDevice).append('<div id = examineWindowExit' + encapsulationDevice + ' style = float:left;margin:5px;margin-top:10px;margin-bottom:0px;font-size:20px;> X </div>');
                 $('#examineWindowExit' + encapsulationDevice).click(function(){
-                  $(this).parent().parent().fadeOut(500, function(){$(this).remove();});
+                  $(this).parent().parent().fadeOut(500, function(){$(this).remove();item.beingExamined = false;});
                   playerCharacter.busy = false;
                 });
 
@@ -1131,8 +1135,8 @@ function character(){
                 $('#rightSideDiv' + encapsulationDevice + 'statsDiv').append('<hr id = thinHr style = margin-top:0px;margin-bottom:0px;width:95%;>');
                 
                 var toWrite = [];
-                for(var index in item.tile.crafting['as' + whichSide.capitalize()]){
-                  var element = item.tile.crafting['as' + whichSide.capitalize()][index];
+                for(var index in item.crafting['as' + whichSide.capitalize()]){
+                  var element = item.crafting['as' + whichSide.capitalize()][index];
                   
                   if(typeof element == 'object' && !(Array.isArray(element))){
                     for(nestedIndex in element){
@@ -1191,21 +1195,23 @@ function character(){
                   if(isInside(mousePos, {x:element.x, y:element.y, width:element.image.width, height:element.image.height})){
 
                     //The following code sticks the rock into the map system
-                    item.tile.cartesianY = parseInt(element.cartesianY);
-                    item.tile.cartesianX = parseInt(element.cartesianX);
+                    item.cartesianY = parseInt(element.cartesianY);
+                    item.cartesianX = parseInt(element.cartesianX);
 
-                    item.tile.x = Math.round(mousePos.x - item.tile.image.width/2);
-                    item.tile.y = Math.round(mousePos.y - item.tile.image.height/2)-10;
+                    item.x = Math.round(mousePos.x - item.image.width/2);
+                    item.y = Math.round(mousePos.y - item.image.height/2)-10;
 
-                    item.tile.clickRect.x = item.tile.x;
-                    item.tile.clickRect.y = item.tile.y;
+                    item.clickRect.x = item.x;
+                    item.clickRect.y = item.y;
 
-                    worldMap.mapIndex['clutter'][0].push(item.tile);
+                    worldMap.mapIndex['clutter'][0].push(item);
                     //Done with rock-sticking code.
 
                     //These cleanup stuff setup to see if the character was click and to prevent him from picking up a rock while trying to put one down.
                     $('#canvasCan').off('click', dropOffAtClick);
                     playerCharacter.busy = false;
+                    
+                    if(item.beingExamined)$('#examineWindow' + encapsulationDevice).fadeOut(500, function(){$(this).remove();item.beingExamined = false;});
                     //Done with cleanup
 
                     //These two remove the rock from the inventory and display it to be so
@@ -1535,7 +1541,117 @@ function gameLoad(ctx, cnv){
                 worldMap.addElement([tileArray[4]], 'clutter', .5, smallRockPickup, 10, {width:0, height:0}, undefined);
                 
                 function bigRockClick(){
-                  //console.log('You clicked a big rock!');
+                  if(playerCharacter.busy)return;
+                  playerCharacter.busy = true;
+                  
+                  function makeInventoryBox(id, encapsulationDevice, item){
+                    if(!item){
+                      return '<div class = inventorySquare id = ' + id + '></div>';
+                    }
+                    else {
+                      return '<div class = inventorySquare id = ' + id + '><p style = margin-top:5px;margin-bottom:0px;font-size:12px> ' + item.name + ' </p><img margin-top:0px; src = ' + item.image.src.replace(/tiles/i, 'inventoryIcons') + '><p style = margin-top:0px;margin-bottom:0px;font-size:9px> ' + encapsulationDevice.replace(/([A-Z])/g, ' $1').trim().capitalize() + ' </p></div>';
+                    }
+                  }
+                  
+                  $('#canvasCan').append('<div class = inGameWindow id = largeRockGUI style = width:350px;height:415px;padding:0px;> <h3 style = margin-left:100px;margin-right:100px;margin-top:10px;> Anvil </h3> <h4 style = position:absolute;top:0px;right:0px;margin:20px;margin-top:7px;margin-bottom:0px;font-size:12px; > Drag Me! </h4> <hr id = thinHr> </div>');
+                  
+                  
+                  $('#largeRockGUI').prepend('<div id = largeRockGUIExit style = float:left;margin:10px;margin-top:7px;margin-bottom:0px;font-size:20px;> X </div>');
+                  $('#largeRockGUIExit').click(function(){
+                    $(this).parent().fadeOut(500, function(){$(this).remove();playerCharacter.busy = false;});
+                  });
+                  
+                  $('#largeRockGUI').append('<div id = largeRockGUIMainArea style = width:100%;height:100%;></div>');
+                  $('#largeRockGUIMainArea').append('<div id = largeRockGUIUpperArea style = text-align:center;width:100%;height:285px;></div>');
+                  
+                  this.inventory = {
+                    tool:undefined,
+                    toolEncapsulationDevice:undefined,
+                    material:undefined,
+                    materialEncapsulationDevice:undefined
+                  }
+                  
+                  this.updateInventory = function(){
+                    console.log(this.inventory);
+                    $('#largeRockGUIUpperArea').empty();
+                    
+                    $('#largeRockGUIUpperArea').append('<h3 style = margin-left:100px;margin-right:100px;margin-top:10px;font-size:10px; id = toolSlotTitle> Tool Slot </h3>');
+                    $('#largeRockGUIUpperArea').append(makeInventoryBox('toolSlot', this.inventory.toolEncapsulationDevice, this.inventory.tool));
+                  
+                  
+                    $('#largeRockGUIUpperArea').append('<h3 style = margin-left:100px;margin-right:100px;margin-top:15px;font-size:10px; id = materialSlotTitle> Material Slot </h3>');
+                    $('#largeRockGUIUpperArea').append(makeInventoryBox('materialSlot', this.inventory.materialEncapsulationDevice, this.inventory.material));
+                    
+                    $('#largeRockGUIUpperArea').append('<div class = genericButton id = whackButton style = margin:auto;width:60px;padding:5px;padding-bottom:0px;padding-top:2px;> Whack </div>')
+                    $('#whackButton').click(function(){
+                      $('#toolSlot').css('position', 'absolute');
+                      $('#toolSlot').css('left', 135+'px');
+                      $('#toolSlotTitle').css('margin-bottom', 89+'px');
+
+                      var animationLevel = 0;
+                      var upOrDown = 7;
+
+                      function whackAnimation(){
+                        $('#toolSlot').css('top', 55+animationLevel+'px');
+                        if(animationLevel > 20)upOrDown = upOrDown*-1;
+                        if(animationLevel < upOrDown*-1){
+                          $('#toolSlot').css('position', 'static');
+                          $('#toolSlotTitle').css('margin-bottom', '0px');
+                          return;
+                        }
+                        else setTimeout(whackAnimation, 17);
+
+                        animationLevel=animationLevel+upOrDown;
+                      }
+                      whackAnimation();
+                    });
+                  }
+                  
+
+                  
+                  $('#largeRockGUIMainArea').append('<hr id = thinHr style = width:100%;>');
+                  $('#largeRockGUIMainArea').append('<div id = inventoryAreaLargeRockGUI style = text-align:center;width:100%;height:75px;overflow-x:auto;></div>');
+                  
+                  this.updateInventoryBar = function(){
+                    $('#inventoryAreaLargeRockGUI').empty();
+                    for(encapsulationDevice in playerCharacter.inventory){
+                      playerCharacter.inventory[encapsulationDevice]['holding'].forEach(function(item){
+                        $('#inventoryAreaLargeRockGUI').append(makeInventoryBox('largeRockInventoryItem' + encapsulationDevice + $('#inventoryAreaLargeRockGUI').children().length, encapsulationDevice, item));
+                        var myItem = item;
+                        var myItemEncapsulationDevice = encapsulationDevice;
+                        function itemSwap(){
+                          console.log(myItem);
+                          console.log(myItemEncapsulationDevice);
+                          for(var slot in this.inventory){
+                            if(!(this.inventory[slot])){
+                              
+                              console.log(myItemEncapsulationDevice);
+                              
+                              this.inventory[slot] = myItem;
+                              this.inventory[slot+'EncapsulationDevice'] = myItemEncapsulationDevice;
+                              
+                              playerCharacter.inventory[myItemEncapsulationDevice]['holding'].splice(0, 1);
+                              playerCharacter.inventoryUpdate();
+                              
+                              this.updateInventory();
+                              this.updateInventoryBar();
+                              break;
+                            }
+                          }
+                        }
+                        
+                        $('#inventoryAreaLargeRockGUI').children().last().click(itemSwap.bind(this));
+                      }.bind(this));
+                    }
+                  }
+                  
+                  this.updateInventory();
+                  this.updateInventoryBar();
+                  
+                  $('#largeRockGUI').css('left', cnv.width/2 - $('#largeRockGUI').width()/2 + 'px');
+                  $('#largeRockGUI').css('top', cnv.height/2 - $('#largeRockGUI').height()/2 + 'px');
+                  
+                  makeDraggable('#largeRockGUI', ['#largeRockGUIMainArea']);
                 }
                 
                 //This function is called when the small rock is clicked ^
@@ -1560,6 +1676,8 @@ function gameLoad(ctx, cnv){
                     this.crafting.asMaterial.resemblance.blade = Math.floor(this.crafting.asMaterial.resemblance.point/4 + Math.random()*12.5);
                   }
                   
+                  if(!this.name)this.name = 'Rock';
+                  
                   var upperBound = {
                     x:playerCharacter.overTiles[0].cartesianX + 2,
                     y:playerCharacter.overTiles[0].cartesianY + 2,
@@ -1573,7 +1691,7 @@ function gameLoad(ctx, cnv){
                       var encapsulationDevice = playerCharacter.inventory[encapsulationDeviceIndex];
                       if(encapsulationDevice.type == 'hand'){
                         if(encapsulationDevice.size > encapsulationDevice.holding.length){
-                          encapsulationDevice.holding.push({name:'Rock', imgSrc:this.image.src.replace(/tiles/i, 'inventoryIcons'), tile:this});
+                          encapsulationDevice.holding.push(this);
                           playerCharacter.inventoryUpdate();
                           worldMap.mapIndex['clutter'][0].splice(worldMap.mapIndex['clutter'][0].indexOf(this), 1);
                           break;
@@ -1581,7 +1699,7 @@ function gameLoad(ctx, cnv){
                       }
                     }
                   }
-                }
+                }//.image.src.replace(/tiles/i, 'inventoryIcons')
                 
                 //This adds a few tiles to said starting map
                 worldMap.makeTiles();

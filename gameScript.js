@@ -1564,7 +1564,7 @@ function gameLoad(ctx, cnv){
                   $('#largeRockGUI').append('<div id = largeRockGUIMainArea style = width:100%;height:100%;></div>');
                   $('#largeRockGUIMainArea').append('<div id = largeRockGUIUpperArea style = text-align:center;width:100%;height:285px;></div>');
                   
-                  if(!this.inventory)this.inventory = {
+                  if(!(this.inventory))this.inventory = {
                     tool:undefined,
                     toolEncapsulationDevice:undefined,
                     material:undefined,
@@ -1572,16 +1572,32 @@ function gameLoad(ctx, cnv){
                   };
                   
                   this.updateInventory = function(){
-                    console.log(this.inventory);
                     $('#largeRockGUIUpperArea').empty();
                     
                     $('#largeRockGUIUpperArea').append('<h3 style = margin-left:100px;margin-right:100px;margin-top:10px;font-size:10px; id = toolSlotTitle> Tool Slot </h3>');
                     $('#largeRockGUIUpperArea').append(makeInventoryBox('toolSlot', this.inventory.toolEncapsulationDevice, this.inventory.tool));
-                  
+               			$('#toolSlot').click(function(){
+											playerCharacter.inventory[this.inventory.toolEncapsulationDevice]['holding'].push(this.inventory.tool);
+											this.inventory.tool = undefined;
+											this.inventory.toolEncapsulationDevice = undefined;
+											
+											this.updateInventory();
+											this.updateInventoryBar();
+											this.updatePlayerInventory
+										});
                   
                     $('#largeRockGUIUpperArea').append('<h3 style = margin-left:100px;margin-right:100px;margin-top:15px;font-size:10px; id = materialSlotTitle> Material Slot </h3>');
                     $('#largeRockGUIUpperArea').append(makeInventoryBox('materialSlot', this.inventory.materialEncapsulationDevice, this.inventory.material));
-                    
+                    $('#toolSlot').click(function(){
+											playerCharacter.inventory[this.inventory.toolEncapsulationDevice]['holding'].push(this.inventory.material);
+											this.inventory.material = undefined;
+											this.inventory.materialEncapsulationDevice = undefined;
+											
+											this.updateInventory();
+											this.updateInventoryBar();
+											this.updatePlayerInventory
+										});
+										
                     $('#largeRockGUIUpperArea').append('<div class = genericButton id = whackButton style = margin:auto;width:60px;padding:5px;padding-bottom:0px;padding-top:2px;> Whack </div>')
                     $('#whackButton').click(function(){
                       $('#toolSlot').css('position', 'absolute');

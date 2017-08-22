@@ -1549,7 +1549,7 @@ function gameLoad(ctx, cnv){
                       return '<div class = inventorySquare id = ' + id + '></div>';
                     }
                     else {
-                      return '<div class = inventorySquare id = ' + id + '><p style = margin-top:5px;margin-bottom:0px;font-size:12px> ' + item.name + ' </p><img margin-top:0px; src = ' + item.image.src.replace(/tiles/i, 'inventoryIcons') + '><p style = margin-top:0px;margin-bottom:0px;font-size:9px> ' + encapsulationDevice.replace(/([A-Z])/g, ' $1').trim().capitalize() + ' </p></div>';
+                      return '<div class = inventorySquare id = ' + id + ' style = margin-bottom:5px;><p style = margin-top:5px;margin-bottom:0px;font-size:12px> ' + item.name + ' </p><img margin-top:0px; src = ' + item.image.src.replace(/tiles/i, 'inventoryIcons') + '><p style = margin-top:0px;margin-bottom:0px;font-size:9px> ' + encapsulationDevice.replace(/([A-Z])/g, ' $1').trim().capitalize() + ' </p></div>';
                     }
                   }
                   
@@ -1568,7 +1568,8 @@ function gameLoad(ctx, cnv){
                     tool:undefined,
                     toolEncapsulationDevice:undefined,
                     material:undefined,
-                    materialEncapsulationDevice:undefined
+                    materialEncapsulationDevice:undefined,
+                    currentCraftingGoal:'point'
                   };
                   
                   this.updateInventory = function(){
@@ -1576,43 +1577,61 @@ function gameLoad(ctx, cnv){
                     
                     $('#largeRockGUIUpperArea').append('<h3 style = margin-left:100px;margin-right:100px;margin-top:10px;font-size:10px; id = toolSlotTitle> Tool Slot </h3>');
                     $('#largeRockGUIUpperArea').append(makeInventoryBox('toolSlot', this.inventory.toolEncapsulationDevice, this.inventory.tool));
-               			$('#toolSlot').click(function(){
-											playerCharacter.inventory[this.inventory.toolEncapsulationDevice]['holding'].push(this.inventory.tool);
-											this.inventory.tool = undefined;
-											this.inventory.toolEncapsulationDevice = undefined;
-											
-											this.updateInventory();
-											this.updateInventoryBar();
-											this.updatePlayerInventory
-										});
+               	    $('#toolSlot').click(function(){
+                      playerCharacter.inventory[this.inventory.toolEncapsulationDevice]['holding'].push(this.inventory.tool);
+                      this.inventory.tool = undefined;
+                      this.inventory.toolEncapsulationDevice = undefined;
+
+                      this.updateInventory();
+                      this.updateInventoryBar();
+                      playerCharacter.inventoryUpdate();
+                    }.bind(this));
                   
                     $('#largeRockGUIUpperArea').append('<h3 style = margin-left:100px;margin-right:100px;margin-top:15px;font-size:10px; id = materialSlotTitle> Material Slot </h3>');
                     $('#largeRockGUIUpperArea').append(makeInventoryBox('materialSlot', this.inventory.materialEncapsulationDevice, this.inventory.material));
-                    $('#toolSlot').click(function(){
-											playerCharacter.inventory[this.inventory.toolEncapsulationDevice]['holding'].push(this.inventory.material);
-											this.inventory.material = undefined;
-											this.inventory.materialEncapsulationDevice = undefined;
-											
-											this.updateInventory();
-											this.updateInventoryBar();
-											this.updatePlayerInventory
-										});
-										
+                    $('#materialSlot').click(function(){
+                      playerCharacter.inventory[this.inventory.materialEncapsulationDevice]['holding'].push(this.inventory.material);
+                      this.inventory.material = undefined;
+                      this.inventory.materialEncapsulationDevice = undefined;
+
+                      this.updateInventory();
+                      this.updateInventoryBar();
+                      playerCharacter.inventoryUpdate();
+                    }.bind(this));
+                    
+                    if(this.inventory && this.inventory.material){
+                      $('#largeRockGUIUpperArea').append('<p style = position:absolute;top:20px;left:20px;font-size:30px;>' + this.inventory.material.crafting.asMaterial.durability + '%</p>');
+                      $('#largeRockGUIUpperArea').append('<p style = position:absolute;top:70px;left:10px;font-size:10px;>Material Durability</p>');
+                      
+                      $('#largeRockGUIUpperArea').append('<p style = position:absolute;top:20px;right:20px;font-size:30px;>' + this.inventory.material.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal] + '%</p>');
+                      $('#largeRockGUIUpperArea').append('<p style = position:absolute;top:70px;right:10px;font-size:10px;>' + this.inventory.currentCraftingGoal.capitalize() + ' Resemblance' + '</p>');
+                      
+                    }
                     $('#largeRockGUIUpperArea').append('<div class = genericButton id = whackButton style = margin:auto;width:60px;padding:5px;padding-bottom:0px;padding-top:2px;> Whack </div>')
                     $('#whackButton').click(function(){
                       $('#toolSlot').css('position', 'absolute');
                       $('#toolSlot').css('left', 135+'px');
                       $('#toolSlotTitle').css('margin-bottom', 89+'px');
+                      
+                      function changeStats(){
+                        console.log(this);
+                        if(!this.inventory && (!this.inventory.material || !this.inventory.tool))return;
+                        this.inventory.material.crafting.asMaterial.durability = this.inventory.material.crafting.asMaterial.durability - (this.inventory.tool.crafting.asTool.bluntness + 0.25*this.inventory.material.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal]);
+                        this.inventory.material.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal] = this.inventory.material.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal] + (this.inventory.tool.crafting.asTool.precision - 0.25*this.inventory.material.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal])
+                        if(this.inventory.material.crafting.asMaterial.durability < 0)this.inventory.material = undefined;
+                        this.updateInventory();
+                      }
 
                       var animationLevel = 0;
                       var upOrDown = 7;
 
                       function whackAnimation(){
                         $('#toolSlot').css('top', 55+animationLevel+'px');
-                        if(animationLevel > 20)upOrDown = upOrDown*-1;
+                        if(animationLevel > 25)upOrDown = upOrDown*-1;
                         if(animationLevel < upOrDown*-1){
                           $('#toolSlot').css('position', 'static');
                           $('#toolSlotTitle').css('margin-bottom', '0px');
+                          changeStats();
                           return;
                         }
                         else setTimeout(whackAnimation, 17);
@@ -1620,7 +1639,7 @@ function gameLoad(ctx, cnv){
                         animationLevel=animationLevel+upOrDown;
                       }
                       whackAnimation();
-                    });
+                    }.bind(this));
                   }
                   
 

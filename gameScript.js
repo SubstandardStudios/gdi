@@ -1612,15 +1612,6 @@ function gameLoad(ctx, cnv){
                       $('#toolSlot').css('position', 'absolute');
                       $('#toolSlot').css('left', 135+'px');
                       $('#toolSlotTitle').css('margin-bottom', 89+'px');
-                      
-                      function changeStats(){
-                        console.log(this);
-                        if(!this.inventory && (!this.inventory.material || !this.inventory.tool))return;
-                        this.inventory.material.crafting.asMaterial.durability = this.inventory.material.crafting.asMaterial.durability - (this.inventory.tool.crafting.asTool.bluntness + 0.25*this.inventory.material.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal]);
-                        this.inventory.material.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal] = this.inventory.material.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal] + (this.inventory.tool.crafting.asTool.precision - 0.25*this.inventory.material.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal])
-                        if(this.inventory.material.crafting.asMaterial.durability < 0)this.inventory.material = undefined;
-                        this.updateInventory();
-                      }
 
                       var animationLevel = 0;
                       var upOrDown = 7;
@@ -1631,7 +1622,12 @@ function gameLoad(ctx, cnv){
                         if(animationLevel < upOrDown*-1){
                           $('#toolSlot').css('position', 'static');
                           $('#toolSlotTitle').css('margin-bottom', '0px');
-                          changeStats();
+                         	alert(this);
+                        	if((!this.inventory.material || !this.inventory.tool))return;
+                        	this.inventory.material.crafting.asMaterial.durability = this.inventory.material.crafting.asMaterial.durability - (this.inventory.tool.crafting.asTool.bluntness + 0.25*this.inventory.material.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal]);
+                        	this.inventory.material.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal] = this.inventory.material.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal] + (this.inventory.tool.crafting.asTool.precision - 0.25*this.inventory.material.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal])
+                        	if(this.inventory.material.crafting.asMaterial.durability < 0)this.inventory.material = undefined;
+                        	this.updateInventory();
                           return;
                         }
                         else setTimeout(whackAnimation, 17);
@@ -1655,12 +1651,8 @@ function gameLoad(ctx, cnv){
                         var myItem = item;
                         var myItemEncapsulationDevice = encapsulationDevice;
                         function itemSwap(){
-                          console.log(myItem);
-                          console.log(myItemEncapsulationDevice);
                           for(var slot in this.inventory){
                             if(!(this.inventory[slot])){
-                              
-                              console.log(myItemEncapsulationDevice);
                               
                               this.inventory[slot] = myItem;
                               this.inventory[slot+'EncapsulationDevice'] = myItemEncapsulationDevice;

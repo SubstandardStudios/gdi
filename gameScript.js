@@ -1609,32 +1609,46 @@ function gameLoad(ctx, cnv){
                     }
                     $('#largeRockGUIUpperArea').append('<div class = genericButton id = whackButton style = margin:auto;width:60px;padding:5px;padding-bottom:0px;padding-top:2px;> Whack </div>')
                     $('#whackButton').click(function(){
+                      
+                      if(this.inventory.material && this.inventory.tool){
+                        var accuracy = Math.round(Math.random()*(this.inventory.tool.crafting.asTool.accuracy*2))-this.inventory.tool.crafting.asTool.accuracy;
+                        
+                        var newDurability = Math.ceil((this.inventory.tool.crafting.asTool.bluntness/20)*this.inventory.material.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal]);
+                        console.log(accuracy,  newDurability, ((newDurability+accuracy < 0) ? newDurability : newDurability+accuracy));
+                        this.inventory.material.crafting.asMaterial.durability = this.inventory.material.crafting.asMaterial.durability - ((newDurability+accuracy > 0) ? newDurability : newDurability+accuracy);
+                        
+                        var newResemblance = Math.ceil(((this.inventory.tool.crafting.asTool.precision/5)*(100-this.inventory.material.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal])));
+                        newResemblance = newResemblance + accuracy;
+                        console.log(accuracy,  newResemblance);
+                        this.inventory.material.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal] = this.inventory.material.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal] + newResemblance;
+                        
+                        $('#largeRockGUIUpperArea').append('<p style = position:absolute;top:100px;right:10px;font-size:15px;>Results:</p>');
+                        //$('#largeRockGUIUpperArea').append('<p style = position:absolute;top:115px;right:10px;font-size:10px;>Accuracy:' + this.inventory.tool.crafting.asTool.accuracy+accuracy + '/' + this.inventory.tool.crafting.asTool.accuracy*2 + '</p>');
+                        
+                        if(this.inventory.material.crafting.asMaterial.durability < 0)this.inventory.material = undefined;
+                        this.updateInventory();
+                      }
+                      
                       $('#toolSlot').css('position', 'absolute');
                       $('#toolSlot').css('left', 135+'px');
                       $('#toolSlotTitle').css('margin-bottom', 89+'px');
-
+                      
                       var animationLevel = 0;
                       var upOrDown = 7;
 
                       function whackAnimation(){
                         $('#toolSlot').css('top', 55+animationLevel+'px');
                         if(animationLevel > 25)upOrDown = upOrDown*-1;
+                        
                         if(animationLevel < upOrDown*-1){
                           $('#toolSlot').css('position', 'static');
                           $('#toolSlotTitle').css('margin-bottom', '0px');
-                         	alert(this);
-                        	if((!this.inventory.material || !this.inventory.tool))return;
-                        	this.inventory.material.crafting.asMaterial.durability = this.inventory.material.crafting.asMaterial.durability - (this.inventory.tool.crafting.asTool.bluntness + 0.25*this.inventory.material.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal]);
-                        	this.inventory.material.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal] = this.inventory.material.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal] + (this.inventory.tool.crafting.asTool.precision - 0.25*this.inventory.material.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal])
-                        	if(this.inventory.material.crafting.asMaterial.durability < 0)this.inventory.material = undefined;
-                        	this.updateInventory();
-                          return;
                         }
                         else setTimeout(whackAnimation, 17);
-
+                        
                         animationLevel=animationLevel+upOrDown;
                       }
-                      whackAnimation();
+                      whackAnimation()
                     }.bind(this));
                   }
                   
@@ -1693,8 +1707,9 @@ function gameLoad(ctx, cnv){
                         rockiness:'quite rocky'
                       },
                       asTool:{//And a tool.
-                        precision:10,//precision is roughly how much resemblance is added each strike. The higher resemblance gets, the less resemblance is added.
+                        precision:1,//precision is roughly how much resemblance is added each strike. The higher resemblance gets, the less resemblance is added.
                         bluntness:10,//coarse is roughly how much durability is lost each strike. The higher the resemblance, the more durability is harmed.
+                        accuracy:5,//Accuracy helps generate a random number, which is in between accuracy and negative accuracy, which is added to the durability and the precision each time the rock is struck.
                         materials:['mineral', 'metal']//A stone is able to affect these materials.
                       }
                     }

@@ -1654,7 +1654,7 @@ function gameLoad(ctx, cnv){
                       whackAnimation()
                     }.bind(this));
 			  						
-										$('#largeRockGUIUpperArea').append('<div class = borderedBoxThin style = width:95%;height:75px;>Test</div>');
+										$('#largeRockGUIUpperArea').append('<div class = borderedBoxThin>Test</div>');
 			  
                   }
                   

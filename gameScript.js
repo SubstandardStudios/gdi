@@ -1611,20 +1611,23 @@ function gameLoad(ctx, cnv){
                     $('#whackButton').click(function(){
                       
                       if(this.inventory.material && this.inventory.tool){
+                        //Accuracy math here
                         var accuracy = Math.round(Math.random()*(this.inventory.tool.crafting.asTool.accuracy*2))-this.inventory.tool.crafting.asTool.accuracy;
                         
+                        //Durability math here
                         var newDurability = Math.ceil((this.inventory.tool.crafting.asTool.bluntness/20)*this.inventory.material.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal]);
-                        console.log(accuracy,  newDurability, ((newDurability+accuracy < 0) ? newDurability : newDurability+accuracy));
                         this.inventory.material.crafting.asMaterial.durability = this.inventory.material.crafting.asMaterial.durability - ((newDurability+accuracy > 0) ? newDurability : newDurability+accuracy);
                         
+                        //Resemblance math here
                         var newResemblance = Math.ceil(((this.inventory.tool.crafting.asTool.precision/5)*(100-this.inventory.material.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal])));
                         newResemblance = newResemblance + accuracy;
-                        console.log(accuracy,  newResemblance);
                         this.inventory.material.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal] = this.inventory.material.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal] + newResemblance;
                         
+                        //Failed explanation system here
                         $('#largeRockGUIUpperArea').append('<p style = position:absolute;top:100px;right:10px;font-size:15px;>Results:</p>');
                         //$('#largeRockGUIUpperArea').append('<p style = position:absolute;top:115px;right:10px;font-size:10px;>Accuracy:' + this.inventory.tool.crafting.asTool.accuracy+accuracy + '/' + this.inventory.tool.crafting.asTool.accuracy*2 + '</p>');
                         
+                        //Rock destruction here
                         if(this.inventory.material.crafting.asMaterial.durability < 0)this.inventory.material = undefined;
                         this.updateInventory();
                       }

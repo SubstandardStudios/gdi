@@ -1653,8 +1653,12 @@ function gameLoad(ctx, cnv){
                       }
                       whackAnimation()
                     }.bind(this));
-			  						
-										$('#largeRockGUIUpperArea').append('<div style = border-width:3px;border-style:solid;border-color:black;>Test</div>');
+			  	    
+                    $('#largeRockGUIUpperArea').append('<hr id = thinHr style = margin-bottom:2px;margin-top:45px;>');
+                    
+				    $('#largeRockGUIUpperArea').append('<div id = whichToCraftArea style = margin-top:0px;height:25px;></div>');
+                    $('#whichToCraftArea').append(makeInventoryBox('testytest'));
+                    $('#whichToCraftArea').children().css('height', 22+'px');
 			  
                   }
                   

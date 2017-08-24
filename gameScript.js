@@ -1655,17 +1655,32 @@ function gameLoad(ctx, cnv){
                     }.bind(this));
 			  	    
                     $('#largeRockGUIUpperArea').append('<hr id = thinHr style = margin-bottom:2px;margin-top:45px;>');
+
+                    $('#largeRockGUIUpperArea').append('<div id = whichToCraftArea style = margin-top:0px;height:25px;></div>');
                     
-				    				$('#largeRockGUIUpperArea').append('<div id = whichToCraftArea style = margin-top:0px;height:25px;></div>');
-											
-											for(var craftableItemIndex in this.inventory.material.crafting.asMaterial.resemblance){
-												var craftableItem = this.inventory.material.crafting.asMaterial.resemblance[craftableItemIndex];
-												
-                    		$('#whichToCraftArea').append(makeInventoryBox(craftableItemIndex))
-												$('#' + craftableItemIndex).append(craftableItemIndex);
-											}
-											$('#whichToCraftArea').children().css('height', 22+'px');
-                  	}
+                    if(this.inventory.material){
+                      for(var craftableItemIndex in this.inventory.material.crafting.asMaterial.resemblance){
+                        var craftableItem = this.inventory.material.crafting.asMaterial.resemblance[craftableItemIndex];
+
+                        $('#whichToCraftArea').append(makeInventoryBox(craftableItemIndex));
+                        
+                        $('#' + craftableItemIndex).append('<p style = margin-top:3px;>' + craftableItemIndex.capitalize() + '</p>');
+                        $('#' + craftableItemIndex).data('itemIndex', craftableItemIndex);
+                        
+                        if(craftableItemIndex == this.inventory.currentCraftingGoal){
+                          console.log('One was!');
+                          $('#' + craftableItemIndex).css('border-style', 'dashed');
+                        }
+                        $('#' + craftableItemIndex).click(function(event){
+                          this.inventory.currentCraftingGoal = $(event.target).parent().data('itemIndex');
+                          this.updateInventory();
+                        }.bind(this));
+                      }
+                      
+                      $('#whichToCraftArea').children().css('height', 22+'px');
+                    }
+                    
+                  }
                   
 
                   

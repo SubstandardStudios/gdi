@@ -1656,11 +1656,16 @@ function gameLoad(ctx, cnv){
 			  	    
                     $('#largeRockGUIUpperArea').append('<hr id = thinHr style = margin-bottom:2px;margin-top:45px;>');
                     
-				    $('#largeRockGUIUpperArea').append('<div id = whichToCraftArea style = margin-top:0px;height:25px;></div>');
-                    $('#whichToCraftArea').append(makeInventoryBox('testytest'));
-                    $('#whichToCraftArea').children().css('height', 22+'px');
-			  
-                  }
+				    				$('#largeRockGUIUpperArea').append('<div id = whichToCraftArea style = margin-top:0px;height:25px;></div>');
+											
+											for(var craftableItemIndex in this.inventory.material.crafting.asMaterial.resemblance){
+												var craftableItem = this.inventory.material.crafting.asMaterial.resemblance[craftableItemIndex];
+												
+                    		$('#whichToCraftArea').append(makeInventoryBox(craftableItemIndex))
+												$('#' + craftableItemIndex).append(craftableItemIndex);
+											}
+											$('#whichToCraftArea').children().css('height', 22+'px');
+                  	}
                   
 
                   

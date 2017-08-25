@@ -1549,7 +1549,7 @@ function gameLoad(ctx, cnv){
                       return '<div class = inventorySquare id = ' + id + '></div>';
                     }
                     else {
-                      return '<div class = inventorySquare id = ' + id + ' style = margin-bottom:5px;><p style = margin-top:5px;margin-bottom:0px;font-size:12px> ' + item.name + ' </p><img margin-top:0px; src = ' + item.image.src.replace(/tiles/i, 'inventoryIcons') + '><p style = margin-top:0px;margin-bottom:0px;font-size:9px> ' + encapsulationDevice.replace(/([A-Z])/g, ' $1').trim().capitalize() + ' </p></div>';
+                      return '<div class = inventorySquare id = ' + id + ' style = margin-bottom:5px;><p style = margin-top:5px;margin-bottom:0px;font-size:12px> ' + item.name + ' </p><img margin-top:0px; src = ' + item.image.src.replace(/tiles/i, 'inventoryIcons') + '><p style = float:left;margin-top:0px;margin-bottom:0px;font-size:9px> D: ' + this.inventory.material.asMaterial.durability + '% </p><p style = float:right;margin-top:0px;margin-bottom:0px;font-size:9px> R: ' + this.inventory.material.asMaterial.resemblance[this.currentCraftingGoal] + '% </p></div>';
                     }
                   }
                   
@@ -1629,6 +1629,9 @@ function gameLoad(ctx, cnv){
                         
                         //Rock destruction here
                         if(this.inventory.material.crafting.asMaterial.durability < 0)this.inventory.material = undefined;
+												else if(this.inventory.material.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal] < 70){
+													this.inventory.material.name = this.inventory.material.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal].capitalize();
+												}
                         this.updateInventory();
                       }
                       

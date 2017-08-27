@@ -1139,6 +1139,7 @@ function character(){
                   var element = item.crafting['as' + whichSide.capitalize()][index];
                   
                   if(typeof element == 'object' && !(Array.isArray(element))){
+                    if(index == 'craftableInto')continue;
                     for(nestedIndex in element){
                       var nestedElement = element[nestedIndex]
                       toWrite.push([nestedIndex + ' ' + index, nestedElement]);
@@ -1544,12 +1545,20 @@ function gameLoad(ctx, cnv){
                   if(playerCharacter.busy)return;
                   playerCharacter.busy = true;
                   
-                  this.makeInventoryBox = function(id, encapsulationDevice, item){
+                  this.makeInventoryBox = function(id, item){
                     if(!item){
                       return '<div class = inventorySquare id = ' + id + '></div>';
                     }
                     else {
-                      return '<div class = inventorySquare id = ' + id + ' style = margin-bottom:5px;><p style = margin-top:5px;margin-bottom:0px;font-size:12px> ' + item.name + ' </p><img margin-top:0px; src = ' + item.image.src.replace(/tiles/i, 'inventoryIcons') + '><p style = margin-top:0px;margin-bottom:0px;font-size:10px> ' + this.inventory.currentCraftingGoal.capitalize() + ': ' + item.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal] + '% </p></div>';
+                      var bottomPart = "";
+                      if(item.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal])bottomPart = '<p style = margin-top:0px;margin-bottom:0px;font-size:10px> ' + this.inventory.currentCraftingGoal.capitalize() + ': ' + item.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal] + '% </p>';
+                      else if(item.crafting.asMaterial.resemblance){
+                        for(var statIndex in item.crafting.asMaterial.resemblance){
+                          var stat = item.crafting.asMaterial.resemblance[statIndex];
+                          bottomPart = '<p style = margin-top:0px;margin-bottom:0px;font-size:10px> ' + statIndex.capitalize() + ': ' + stat + '% </p>';
+                        }
+                      }
+                      return '<div class = inventorySquare id = ' + id + ' style = margin-bottom:5px;><p style = margin-top:5px;margin-bottom:0px;font-size:12px> ' + item.name + ' </p><img margin-top:0px; src = ' + item.image.src.replace(/tiles/i, 'inventoryIcons') + '>' + bottomPart + '</div>';
                     }
                   }
                   
@@ -1576,11 +1585,24 @@ function gameLoad(ctx, cnv){
                     $('#largeRockGUIUpperArea').empty();
                     
                     $('#largeRockGUIUpperArea').append('<h3 style = margin-left:100px;margin-right:100px;margin-top:10px;font-size:10px; id = toolSlotTitle> Tool Slot </h3>');
-                    $('#largeRockGUIUpperArea').append(this.makeInventoryBox('toolSlot', this.inventory.toolEncapsulationDevice, this.inventory.tool));
+                    $('#largeRockGUIUpperArea').append(this.makeInventoryBox('toolSlot', this.inventory.tool));
                	    $('#toolSlot').click(function(){
-                      playerCharacter.inventory[this.inventory.toolEncapsulationDevice]['holding'].push(this.inventory.tool);
+                      
+                      if(!(this.inventory.tool))return;
+                      
+                      var wasRoom = false;
+                      
+                      for(var encapsulationDeviceIndex in playerCharacter.inventory){
+                        var encapsulationDevice = playerCharacter.inventory[encapsulationDeviceIndex]
+                        if(encapsulationDevice['holding'].length < encapsulationDevice.size){
+                          wasRoom = true;
+                          encapsulationDevice['holding'].push(this.inventory.tool);
+                          break;
+                        }
+                      };
+                      if(!wasRoom)return;
+                      
                       this.inventory.tool = undefined;
-                      this.inventory.toolEncapsulationDevice = undefined;
 
                       this.updateInventory();
                       this.updateInventoryBar();
@@ -1588,11 +1610,24 @@ function gameLoad(ctx, cnv){
                     }.bind(this));
                   
                     $('#largeRockGUIUpperArea').append('<h3 style = margin-left:100px;margin-right:100px;margin-top:15px;font-size:10px; id = materialSlotTitle> Material Slot </h3>');
-                    $('#largeRockGUIUpperArea').append(this.makeInventoryBox('materialSlot', this.inventory.materialEncapsulationDevice, this.inventory.material));
+                    $('#largeRockGUIUpperArea').append(this.makeInventoryBox('materialSlot', this.inventory.material));
                     $('#materialSlot').click(function(){
-                      playerCharacter.inventory[this.inventory.materialEncapsulationDevice]['holding'].push(this.inventory.material);
+                      
+                      if(!(this.inventory.material))return;
+                      
+                      var wasRoom = false;
+                      
+                      for(var encapsulationDeviceIndex in playerCharacter.inventory){
+                        var encapsulationDevice = playerCharacter.inventory[encapsulationDeviceIndex]
+                        if(encapsulationDevice['holding'].length < encapsulationDevice.size){
+                          wasRoom = true;
+                          encapsulationDevice['holding'].push(this.inventory.material);
+                          break;
+                        }
+                      };
+                      if(!wasRoom)return;
+                      
                       this.inventory.material = undefined;
-                      this.inventory.materialEncapsulationDevice = undefined;
 
                       this.updateInventory();
                       this.updateInventoryBar();
@@ -1603,7 +1638,7 @@ function gameLoad(ctx, cnv){
                       $('#largeRockGUIUpperArea').append('<p style = position:absolute;top:20px;left:20px;font-size:30px;>' + this.inventory.material.crafting.asMaterial.durability + '%</p>');
                       $('#largeRockGUIUpperArea').append('<p style = position:absolute;top:70px;left:10px;font-size:10px;>Material Durability</p>');
                       
-                      $('#largeRockGUIUpperArea').append('<p style = position:absolute;top:20px;right:20px;font-size:30px;>' + this.inventory.material.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal] + '%</p>');
+                      $('#largeRockGUIUpperArea').append('<p style = position:absolute;top:20px;right:20px;font-size:30px;>' + ((this.inventory.material.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal]) ? this.inventory.material.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal] : '0') + '%</p>');
                       $('#largeRockGUIUpperArea').append('<p style = position:absolute;top:70px;right:10px;font-size:10px;>' + this.inventory.currentCraftingGoal.capitalize() + ' Resemblance' + '</p>');
                       
                     }
@@ -1611,15 +1646,18 @@ function gameLoad(ctx, cnv){
                     $('#whackButton').click(function(){
                       
                       if(this.inventory.material && this.inventory.tool){
+                        
+                        if(this.inventory.tool.crafting.asTool.materials.indexOf(this.inventory.material.crafting.asMaterial.materialType) == -1)return;
+                        
                         //Accuracy math here
                         var accuracy = Math.round(Math.random()*(this.inventory.tool.crafting.asTool.accuracy*2))-this.inventory.tool.crafting.asTool.accuracy;
                         
                         //Durability math here
-                        var newDurability = Math.ceil((this.inventory.tool.crafting.asTool.bluntness/20)*this.inventory.material.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal]);
+                        var newDurability = Math.ceil((this.inventory.tool.crafting.asTool.bluntness*((10-this.inventory.material.crafting.asMaterial.ductility)/100))*this.inventory.material.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal]);
                         this.inventory.material.crafting.asMaterial.durability = this.inventory.material.crafting.asMaterial.durability - ((newDurability+accuracy > 0) ? newDurability : newDurability+accuracy);
                         
                         //Resemblance math here
-                        var newResemblance = Math.ceil(((this.inventory.tool.crafting.asTool.precision/5)*(100-this.inventory.material.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal])));
+                        var newResemblance = Math.ceil(((this.inventory.tool.crafting.asTool.precision*(this.inventory.material.crafting.asMaterial.malleability/100))*(100-this.inventory.material.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal])));
                         newResemblance = newResemblance + accuracy;
                         this.inventory.material.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal] = this.inventory.material.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal] + newResemblance;
                         
@@ -1628,13 +1666,21 @@ function gameLoad(ctx, cnv){
                         //$('#largeRockGUIUpperArea').append('<p style = position:absolute;top:115px;right:10px;font-size:10px;>Accuracy:' + this.inventory.tool.crafting.asTool.accuracy+accuracy + '/' + this.inventory.tool.crafting.asTool.accuracy*2 + '</p>');
                         
                         //Item destruction here
-                        if(this.inventory.material.crafting.asMaterial.durability < 0)this.inventory.material = undefined;
+                        if(this.inventory.material.crafting.asMaterial.durability < 1)this.inventory.material = undefined;
                         //Crafting happens here
                         else if(this.inventory.material.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal] > 69){
                           
+                          var overAmount = this.inventory.material.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal] - 70;
+                          
                           this.inventory.material.name = this.inventory.currentCraftingGoal.capitalize();
                           
-                          this.inventory.material.crafting.asTool = this.inventory.material.crafting.asMaterial.craftableInto[this.inventory.currentCraftingGoal].asTool;
+                          this.inventory.material.crafting.asTool = $.extend(true, {}, this.inventory.material.crafting.asMaterial.craftableInto[this.inventory.currentCraftingGoal].asTool);
+                          
+                          this.inventory.material.crafting.asTool.precision = this.inventory.material.crafting.asTool.precision + this.inventory.material.crafting.asTool.precision*(overAmount/15)*(this.inventory.material.crafting.asMaterial.malleability/100);
+                          this.inventory.material.crafting.asTool.bluntness = this.inventory.material.crafting.asTool.bluntness - this.inventory.material.crafting.asTool.bluntness*(overAmount/15)*((this.inventory.material.crafting.asMaterial.ductility)/100);
+                          
+                          this.inventory.material.crafting.asTool.precision = parseFloat((this.inventory.material.crafting.asTool.precision + "").substring(0, (this.inventory.material.crafting.asTool.precision+"").indexOf('.')+3));
+                          this.inventory.material.crafting.asTool.bluntness = parseFloat((this.inventory.material.crafting.asTool.bluntness + "").substring(0, (this.inventory.material.crafting.asTool.bluntness+"").indexOf('.')+3));
                           
                           var cachedResemblance = this.inventory.material.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal];
                           this.inventory.material.crafting.asMaterial.resemblance = {};
@@ -1684,6 +1730,7 @@ function gameLoad(ctx, cnv){
                           $('#' + craftableItemIndex).css('border-style', 'dashed');
                         }
                         $('#' + craftableItemIndex).click(function(event){
+                          if(!($(event.target).parent().data('itemIndex')))return;
                           this.inventory.currentCraftingGoal = $(event.target).parent().data('itemIndex');
                           this.updateInventory();
                         }.bind(this));
@@ -1703,7 +1750,7 @@ function gameLoad(ctx, cnv){
                     $('#inventoryAreaLargeRockGUI').empty();
                     for(encapsulationDevice in playerCharacter.inventory){
                       playerCharacter.inventory[encapsulationDevice]['holding'].forEach(function(item){
-                        $('#inventoryAreaLargeRockGUI').append(this.makeInventoryBox('largeRockInventoryItem' + encapsulationDevice + $('#inventoryAreaLargeRockGUI').children().length, encapsulationDevice, item));
+                        $('#inventoryAreaLargeRockGUI').append(this.makeInventoryBox('largeRockInventoryItem' + encapsulationDevice + $('#inventoryAreaLargeRockGUI').children().length, item));
                         var myItem = item;
                         var myItemEncapsulationDevice = encapsulationDevice;
                         function itemSwap(){
@@ -1745,6 +1792,8 @@ function gameLoad(ctx, cnv){
                         resemblance:{//Over 70, then a tool is usable. Higher the resemblance, the better the tool.
                         },
                         durability:100,
+                        malleability:15,
+                        ductility:6,
                         materialType:'mineral',//Only tools with 'mineral' listed in their asTools.materials will have an effect on this material
                         rockiness:'quite rocky',
                         craftableInto:{
@@ -1758,7 +1807,7 @@ function gameLoad(ctx, cnv){
                           },
                           point:{
                             asTool:{
-                              precision:0.2,
+                              precision:0.1,
                               bluntness:1,
                               accuracy:0,
                               materials:['mineral']
@@ -1777,7 +1826,7 @@ function gameLoad(ctx, cnv){
                       asTool:{//And a tool.
                         precision:1,//precision is roughly how much resemblance is added each strike. The higher resemblance gets, the less resemblance is added.
                         bluntness:10,//coarse is roughly how much durability is lost each strike. The higher the resemblance, the more durability is harmed.
-                        accuracy:5,//Accuracy helps generate a random number, which is in between accuracy and negative accuracy, which is added to the durability and the precision each time the rock is struck.
+                        accuracy:3,//Accuracy helps generate a random number, which is in between accuracy and negative accuracy, which is added to the durability and the precision each time the rock is struck.
                         materials:['mineral', 'metal']//A stone is able to affect these materials.
                       }
                     }

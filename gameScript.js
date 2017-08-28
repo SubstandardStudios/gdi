@@ -1564,12 +1564,6 @@ function gameLoad(ctx, cnv){
                   
                   $('#canvasCan').append('<div class = inGameWindow id = largeRockGUI style = width:350px;height:415px;padding:0px;> <h3 style = margin-left:100px;margin-right:100px;margin-top:10px;> Anvil </h3> <h4 style = position:absolute;top:0px;right:0px;margin:20px;margin-top:7px;margin-bottom:0px;font-size:12px; > Drag Me! </h4> <hr id = thinHr> </div>');
                   
-                  
-                  $('#largeRockGUI').prepend('<div id = largeRockGUIExit style = float:left;margin:10px;margin-top:7px;margin-bottom:0px;font-size:20px;> X </div>');
-                  $('#largeRockGUIExit').click(function(){
-                    $(this).parent().fadeOut(500, function(){$(this).remove();playerCharacter.busy = false;});
-                  });
-                  
                   $('#largeRockGUI').append('<div id = largeRockGUIMainArea style = width:100%;height:100%;></div>');
                   $('#largeRockGUIMainArea').append('<div id = largeRockGUIUpperArea style = text-align:center;width:100%;height:285px;></div>');
                   
@@ -1583,6 +1577,11 @@ function gameLoad(ctx, cnv){
                   
                   this.updateInventory = function(){
                     $('#largeRockGUIUpperArea').empty();
+                    
+                    $('#largeRockGUIUpperArea').prepend('<div id = largeRockGUIExit style = position:absolute;top:7px;margin-left:10px;font-size:20px;> X </div>');
+                    $('#largeRockGUIExit').click(function(){
+                      $(this).parent().parent().parent().fadeOut(500, function(){$(this).remove();playerCharacter.busy = false;});
+                    });
                     
                     $('#largeRockGUIUpperArea').append('<h3 style = margin-left:100px;margin-right:100px;margin-top:10px;font-size:10px; id = toolSlotTitle> Tool Slot </h3>');
                     $('#largeRockGUIUpperArea').append(this.makeInventoryBox('toolSlot', this.inventory.tool));
@@ -1661,12 +1660,8 @@ function gameLoad(ctx, cnv){
                         newResemblance = newResemblance + randomness;
                         this.inventory.material.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal] = this.inventory.material.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal] + newResemblance;
                         
-                        //Failed explanation system here
-                        //$('#largeRockGUIUpperArea').append('<p style = position:absolute;top:100px;right:10px;font-size:15px;>Results:</p>');
-                        //$('#largeRockGUIUpperArea').append('<p style = position:absolute;top:115px;right:10px;font-size:10px;>randomness:' + this.inventory.tool.crafting.asTool.randomness+randomness + '/' + this.inventory.tool.crafting.asTool.randomness*2 + '</p>');
-                        
                         //Item destruction here
-                        if(this.inventory.material.crafting.asMaterial.durability < 1)this.inventory.material = undefined;
+                        if(this.inventory.material.crafting.asMaterial.durability < 1 || !(typeof this.inventory.material.crafting.asMaterial.durability == 'number'))this.inventory.material = undefined;
                         //Crafting happens here
                         else if(this.inventory.material.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal] > 69){
                           
@@ -1674,7 +1669,6 @@ function gameLoad(ctx, cnv){
                           
                           this.inventory.material.name = this.inventory.currentCraftingGoal.capitalize();
                           this.inventory.material.image = this.inventory.material.crafting.asMaterial.craftableInto[this.inventory.currentCraftingGoal].image;
-                          console.log(this.inventory.material.crafting.asMaterial.craftableInto[this.inventory.currentCraftingGoal].image);
                           
                           this.inventory.material.crafting.asTool = $.extend(true, {}, this.inventory.material.crafting.asMaterial.craftableInto[this.inventory.currentCraftingGoal].asTool);
                           
@@ -1789,7 +1783,6 @@ function gameLoad(ctx, cnv){
                 //This function is called when the small rock is clicked ^
                 function smallRockPickup(){
                   if(!this.crafting){
-                    console.log(tileArray[6]);
                     this.crafting = {
                       asMaterial:{//A stone is a material
                         resemblance:{//Over 70, then a tool is usable. Higher the resemblance, the better the tool.

@@ -1551,14 +1551,14 @@ function gameLoad(ctx, cnv){
                     }
                     else {
                       var bottomPart = "";
-                      if(item.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal])bottomPart = '<p style = margin-top:0px;margin-bottom:0px;font-size:10px> ' + this.inventory.currentCraftingGoal.capitalize() + ': ' + item.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal] + '% </p>';
+                      if(item.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal])bottomPart = '<p style = margin-top:0px;margin-bottom:0px;font-size:10px> ' + ((/\s/.test(this.inventory.currentCraftingGoal.replace(/([A-Z])/g, ' $1').trim())) ? this.inventory.currentCraftingGoal.substring(0, this.inventory.currentCraftingGoal.replace(/([A-Z])/g, ' $1').indexOf(' ')).capitalize() : this.inventory.currentCraftingGoal.capitalize()) + ': ' + item.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal] + '% </p>';
                       else if(item.crafting.asMaterial.resemblance){
                         for(var statIndex in item.crafting.asMaterial.resemblance){
                           var stat = item.crafting.asMaterial.resemblance[statIndex];
-                          bottomPart = '<p style = margin-top:0px;margin-bottom:0px;font-size:10px> ' + statIndex.capitalize() + ': ' + stat + '% </p>';
+                          bottomPart = '<p style = margin-top:0px;margin-bottom:0px;font-size:10px> ' + ((/\s/.test(statIndex.replace(/([A-Z])/g, ' $1').trim())) ? statIndex.substring(0, statIndex.replace(/([A-Z])/g, ' $1').indexOf(' ')).capitalize() : statIndex.capitalize()) + ': ' + stat + '% </p>';
                         }
                       }
-                      return '<div class = inventorySquare id = ' + id + ' style = margin-bottom:5px;><p style = margin-top:5px;margin-bottom:0px;font-size:12px> ' + item.name + ' </p><img margin-top:0px; src = ' + item.image.src.replace(/tiles/i, 'inventoryIcons') + '>' + bottomPart + '</div>';
+                      return '<div class = inventorySquare id = ' + id + ' style = margin-bottom:5px;><p style = margin-top:5px;margin-bottom:0px;font-size:' + ((item.name.length > 7) ? 10 : 12) + 'px> ' + item.name + ' </p><img margin-top:0px; src = ' + item.image.src.replace(/tiles/i, 'inventoryIcons') + '>' + bottomPart + '</div>';
                     }
                   }
                   
@@ -1638,7 +1638,7 @@ function gameLoad(ctx, cnv){
                       $('#largeRockGUIUpperArea').append('<p style = position:absolute;top:70px;left:10px;font-size:10px;>Material Durability</p>');
                       
                       $('#largeRockGUIUpperArea').append('<p style = position:absolute;top:20px;right:20px;font-size:30px;>' + ((this.inventory.material.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal]) ? this.inventory.material.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal] : '0') + '%</p>');
-                      $('#largeRockGUIUpperArea').append('<p style = position:absolute;top:70px;right:10px;font-size:10px;>' + this.inventory.currentCraftingGoal.capitalize() + ' Resemblance' + '</p>');
+                      $('#largeRockGUIUpperArea').append('<p style = position:absolute;top:70px;right:10px;font-size:10px;>' + this.inventory.currentCraftingGoal.replace(/([A-Z])/g, ' $1').trim().capitalize() + ' Resemblance' + '</p>');
                       
                     }
                     $('#largeRockGUIUpperArea').append('<div class = genericButton id = whackButton style = margin:auto;width:60px;padding:5px;padding-bottom:0px;padding-top:2px;> Whack </div>')
@@ -1667,7 +1667,7 @@ function gameLoad(ctx, cnv){
                           
                           var overAmount = this.inventory.material.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal] - 70;
                           
-                          this.inventory.material.name = this.inventory.currentCraftingGoal.capitalize();
+                          this.inventory.material.name = this.inventory.currentCraftingGoal.replace(/([A-Z])/g, ' $1').trim().capitalize();
                           this.inventory.material.image = this.inventory.material.crafting.asMaterial.craftableInto[this.inventory.currentCraftingGoal].image;
                           
                           this.inventory.material.crafting.asTool = $.extend(true, {}, this.inventory.material.crafting.asMaterial.craftableInto[this.inventory.currentCraftingGoal].asTool);
@@ -1719,7 +1719,7 @@ function gameLoad(ctx, cnv){
 
                         $('#whichToCraftArea').append(this.makeInventoryBox(craftableItemIndex));
                         
-                        $('#' + craftableItemIndex).append('<p style = margin-top:3px;>' + craftableItemIndex.capitalize() + '</p>');
+                        $('#' + craftableItemIndex).append('<p style = margin-top:3px;>' + craftableItemIndex.replace(/([A-Z])/g, ' $1').trim().capitalize() + '</p>');
                         $('#' + craftableItemIndex).data('itemIndex', craftableItemIndex);
                         
                         if(craftableItemIndex == this.inventory.currentCraftingGoal){
@@ -1733,6 +1733,7 @@ function gameLoad(ctx, cnv){
                       }
                       
                       $('#whichToCraftArea').children().css('height', 22+'px');
+                      $('#whichToCraftArea').children().css('width', 100+'px');
                     }
                     
                   }
@@ -1793,7 +1794,7 @@ function gameLoad(ctx, cnv){
                         materialType:'mineral',//Only tools with 'mineral' listed in their asTools.materials will have an effect on this material
                         rockiness:'quite rocky',
                         craftableInto:{
-                          axe:{
+                          axeHead:{
                             asTool:{
                               pointiness:1,
                               smashiness:3,
@@ -1829,7 +1830,7 @@ function gameLoad(ctx, cnv){
                         materials:['mineral', 'metal']//A stone is able to affect these materials.
                       }
                     }
-                    this.crafting.asMaterial.resemblance.axe = 15+Math.floor(Math.random()*35);
+                    this.crafting.asMaterial.resemblance.axeHead = 15+Math.floor(Math.random()*35);
                     this.crafting.asMaterial.resemblance.point = 15+Math.floor(Math.random()*35);
                     this.crafting.asMaterial.resemblance.blade = Math.floor(this.crafting.asMaterial.resemblance.point/4 + Math.random()*12.5);
                   }

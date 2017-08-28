@@ -1434,7 +1434,7 @@ function gameLoad(ctx, cnv){
         if(playerModelCounter === 112){
           
           //Tile loading now!
-          var numberOfTileImages = 5;
+          var numberOfTileImages = 8;
           for(var i = 0; i < numberOfTileImages; i++){
             tileArray.push(new Image());
             
@@ -1649,21 +1649,21 @@ function gameLoad(ctx, cnv){
                         
                         if(this.inventory.tool.crafting.asTool.materials.indexOf(this.inventory.material.crafting.asMaterial.materialType) == -1)return;
                         
-                        //Accuracy math here
-                        var accuracy = Math.round(Math.random()*(this.inventory.tool.crafting.asTool.accuracy*2))-this.inventory.tool.crafting.asTool.accuracy;
+                        //randomness math here
+                        var randomness = Math.round(Math.random()*(this.inventory.tool.crafting.asTool.randomness*2))-this.inventory.tool.crafting.asTool.randomness;
                         
                         //Durability math here
-                        var newDurability = Math.ceil((this.inventory.tool.crafting.asTool.bluntness*((10-this.inventory.material.crafting.asMaterial.ductility)/100))*this.inventory.material.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal]);
-                        this.inventory.material.crafting.asMaterial.durability = this.inventory.material.crafting.asMaterial.durability - ((newDurability+accuracy > 0) ? newDurability : newDurability+accuracy);
+                        var newDurability = Math.ceil((this.inventory.tool.crafting.asTool.smashiness*((10-this.inventory.material.crafting.asMaterial.ductility)/100))*this.inventory.material.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal]);
+                        this.inventory.material.crafting.asMaterial.durability = this.inventory.material.crafting.asMaterial.durability - ((newDurability+randomness > 0) ? newDurability : newDurability+randomness);
                         
                         //Resemblance math here
-                        var newResemblance = Math.ceil(((this.inventory.tool.crafting.asTool.precision*(this.inventory.material.crafting.asMaterial.malleability/100))*(100-this.inventory.material.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal])));
-                        newResemblance = newResemblance + accuracy;
+                        var newResemblance = Math.ceil(((this.inventory.tool.crafting.asTool.pointiness*(this.inventory.material.crafting.asMaterial.malleability/100))*(100-this.inventory.material.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal])));
+                        newResemblance = newResemblance + randomness;
                         this.inventory.material.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal] = this.inventory.material.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal] + newResemblance;
                         
                         //Failed explanation system here
                         //$('#largeRockGUIUpperArea').append('<p style = position:absolute;top:100px;right:10px;font-size:15px;>Results:</p>');
-                        //$('#largeRockGUIUpperArea').append('<p style = position:absolute;top:115px;right:10px;font-size:10px;>Accuracy:' + this.inventory.tool.crafting.asTool.accuracy+accuracy + '/' + this.inventory.tool.crafting.asTool.accuracy*2 + '</p>');
+                        //$('#largeRockGUIUpperArea').append('<p style = position:absolute;top:115px;right:10px;font-size:10px;>randomness:' + this.inventory.tool.crafting.asTool.randomness+randomness + '/' + this.inventory.tool.crafting.asTool.randomness*2 + '</p>');
                         
                         //Item destruction here
                         if(this.inventory.material.crafting.asMaterial.durability < 1)this.inventory.material = undefined;
@@ -1673,14 +1673,16 @@ function gameLoad(ctx, cnv){
                           var overAmount = this.inventory.material.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal] - 70;
                           
                           this.inventory.material.name = this.inventory.currentCraftingGoal.capitalize();
+                          this.inventory.material.image = this.inventory.material.crafting.asMaterial.craftableInto[this.inventory.currentCraftingGoal].image;
+                          console.log(this.inventory.material.crafting.asMaterial.craftableInto[this.inventory.currentCraftingGoal].image);
                           
                           this.inventory.material.crafting.asTool = $.extend(true, {}, this.inventory.material.crafting.asMaterial.craftableInto[this.inventory.currentCraftingGoal].asTool);
                           
-                          this.inventory.material.crafting.asTool.precision = this.inventory.material.crafting.asTool.precision + this.inventory.material.crafting.asTool.precision*(overAmount/15)*(this.inventory.material.crafting.asMaterial.malleability/100);
-                          this.inventory.material.crafting.asTool.bluntness = this.inventory.material.crafting.asTool.bluntness - this.inventory.material.crafting.asTool.bluntness*(overAmount/15)*((this.inventory.material.crafting.asMaterial.ductility)/100);
+                          this.inventory.material.crafting.asTool.pointiness = this.inventory.material.crafting.asTool.pointiness + this.inventory.material.crafting.asTool.pointiness*(overAmount/15)*(this.inventory.material.crafting.asMaterial.malleability/100);
+                          this.inventory.material.crafting.asTool.smashiness = this.inventory.material.crafting.asTool.smashiness - this.inventory.material.crafting.asTool.smashiness*(overAmount/15)*((this.inventory.material.crafting.asMaterial.ductility)/100);
                           
-                          this.inventory.material.crafting.asTool.precision = parseFloat((this.inventory.material.crafting.asTool.precision + "").substring(0, (this.inventory.material.crafting.asTool.precision+"").indexOf('.')+3));
-                          this.inventory.material.crafting.asTool.bluntness = parseFloat((this.inventory.material.crafting.asTool.bluntness + "").substring(0, (this.inventory.material.crafting.asTool.bluntness+"").indexOf('.')+3));
+                          this.inventory.material.crafting.asTool.pointiness = parseFloat((this.inventory.material.crafting.asTool.pointiness + "").substring(0, (this.inventory.material.crafting.asTool.pointiness+"").indexOf('.')+3));
+                          this.inventory.material.crafting.asTool.smashiness = parseFloat((this.inventory.material.crafting.asTool.smashiness + "").substring(0, (this.inventory.material.crafting.asTool.smashiness+"").indexOf('.')+3));
                           
                           var cachedResemblance = this.inventory.material.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal];
                           this.inventory.material.crafting.asMaterial.resemblance = {};
@@ -1787,6 +1789,7 @@ function gameLoad(ctx, cnv){
                 //This function is called when the small rock is clicked ^
                 function smallRockPickup(){
                   if(!this.crafting){
+                    console.log(tileArray[6]);
                     this.crafting = {
                       asMaterial:{//A stone is a material
                         resemblance:{//Over 70, then a tool is usable. Higher the resemblance, the better the tool.
@@ -1799,34 +1802,37 @@ function gameLoad(ctx, cnv){
                         craftableInto:{
                           axe:{
                             asTool:{
-                              precision:1,
-                              bluntness:3,
-                              accuracy:2,
+                              pointiness:1,
+                              smashiness:3,
+                              randomness:2,
                               materials:['fibrous', 'fleshy']
-                            }
+                            },
+                            image:tileArray[7]
                           },
                           point:{
                             asTool:{
-                              precision:0.1,
-                              bluntness:1,
-                              accuracy:0,
+                              pointiness:0.1,
+                              smashiness:1,
+                              randomness:0,
                               materials:['mineral']
-                            }
+                            },
+                            image:tileArray[5]
                           },
                           blade:{
                               asTool:{
-                              precision:3,
-                              bluntness:0.1,
-                              accuracy:1,
+                              pointiness:3,
+                              smashiness:0.1,
+                              randomness:1,
                               materials:['fleshy']
-                            }
-                          },
+                            },
+                            image:tileArray[6]
+                          }
                         }
                       },
                       asTool:{//And a tool.
-                        precision:1,//precision is roughly how much resemblance is added each strike. The higher resemblance gets, the less resemblance is added.
-                        bluntness:10,//coarse is roughly how much durability is lost each strike. The higher the resemblance, the more durability is harmed.
-                        accuracy:3,//Accuracy helps generate a random number, which is in between accuracy and negative accuracy, which is added to the durability and the precision each time the rock is struck.
+                        pointiness:1,//pointiness is roughly how much resemblance is added each strike. The higher resemblance gets, the less resemblance is added.
+                        smashiness:10,//coarse is roughly how much durability is lost each strike. The higher the resemblance, the more durability is harmed.
+                        randomness:3,//randomness helps generate a random number, which is in between randomness and negative randomness, which is added to the durability and the pointiness each time the rock is struck.
                         materials:['mineral', 'metal']//A stone is able to affect these materials.
                       }
                     }

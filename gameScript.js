@@ -1833,7 +1833,12 @@ function gameLoad(ctx, cnv){
                           this.inventory.material.name = newItem.name;
                           this.inventory.material.image = newItem.image;
                           this.inventory.currentCraftingGoal = newItem.name.toLowerCase();
-
+													
+													var parts = {
+														firstPart = this.inventory.tool;
+														secondPart = this.inventory.material;
+													}
+													
                           this.inventory.material.crafting = newItem.crafting;
                           this.inventory.material.crafting.asMaterial = {
                             durability:100,
@@ -1841,7 +1846,8 @@ function gameLoad(ctx, cnv){
                             ductility:6,
                             materialType:'tool',
                             resemblance:{
-                            }
+                            },
+														parts:parts
                           }
                           this.inventory.material.harvesting = newItem.harvesting;
                           

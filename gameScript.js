@@ -1647,7 +1647,7 @@ function gameLoad(ctx, cnv){
                 
                 function onTreeSpawn(){
                   this.scatterAround('smallStick' , [0, 0, 0, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3, 3, 4], 160, 128, 64, 65, 30, -20);
-                  this.scatterAround('mediumStick', [0,0,0,0,1,1,1,1,1,1,2], 160, -96, 75, 7, 30, 10);
+                  //this.scatterAround('mediumStick', [0,0,0,0,1,1,1,1,1,1,2], 160, -96, 75, 7, 30, 10);
                   //this.scatterAround('largeStick' , [0,0,0,0,0,1], 250, -200, 120, 0, 50, -24);
                 }
                 

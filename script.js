@@ -124,7 +124,7 @@ function startScreen() {
     var gameCanvas = document.getElementById("gameCanvas");
     
     gameCanvas.width = $(window).width();
-    gameCanvas.height = $(window).height()-16;
+    gameCanvas.height = $(window).height();
     
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     cameraX = 0;
@@ -429,14 +429,14 @@ function displayAcrossScreen(imagesArray, maxRows, startX, edgeFitOverlap) {
           
           else if(this.rows === this.maxRows)this.map.push([
             this.plankEnd,
-            $(window).width() - (this.plankEnd.width+16),
+            $(window).width() - (this.plankEnd.width),
             this.plankEnd.height * this.columns + this.addTo
           ]);
           
           
           else if(this.rows === this.maxRows-1)this.map.push([
             this.plankMiddle,
-            $(window).width()-(this.plankEnd.width+16+this.plankMiddle.width),
+            $(window).width()-(this.plankEnd.width+this.plankMiddle.width),
             this.plankMiddle.height * this.columns + this.addTo
           ]);
           

@@ -770,42 +770,27 @@ function tile(image, x, y, zHeight, shouldAddElements, size){
   this.x = x;
   this.y = y;
   
-  this.elementsOnScreen = [];
-  
   //if(typeof shouldAddElements == typeof undefined)shouldAddElements = true;
   
   if(shouldAddElements){
     worldMap.elementTypes.forEach(function(element){
       if(Math.random()*100 < element.frequency){
-        var newElement = new tile(chooseFrom(element.image), this.x, this.y, element.zHeight, false, element.size);
-        
-        newElement.cartesianX = (this.x / 32 + this.y / 16) /2;
-        newElement.cartesianY = (this.y / 16 -(this.x / 32)) /2;
-        
-        if(!element.clickRect){
-          newElement.clickRect = {};
-          newElement.clickRect.x = newElement.x;
-          newElement.clickRect.y = newElement.y;
-          newElement.clickRect.width = newElement.image.width;
-          newElement.clickRect.height = newElement.image.height;
-        }
-        
-        else newElement.clickRect = element.clickRect;
-        
-        newElement.onClick = element.onClick;
-        
-        worldMap.mapIndex[element.zIndex][0].push(newElement);
+        worldMap.addOneElement(element, this.x, this.y);
       }
     }.bind(this));
   }
   
   if(size && ((size.width || size.width == 0) && (size.height || size.height == 0))){
     this.size = size;
+    if(!this.size.xAdjust)this.size.xAdjust = 0;
+    if(!this.size.yAdjust)this.size.yAdjust = 0;
   }
     
   else this.size = {
     width:this.image.width,
-    height:this.image.height
+    height:this.image.height,
+    xAdjust:0,
+    yAdjust:0
   }
   
   this.updateRect = function(){
@@ -814,6 +799,11 @@ function tile(image, x, y, zHeight, shouldAddElements, size){
       coords1:[(this.x) + this.size.width, (this.y) + this.size.height/4 + this.size.height/2],
       coords2:[(this.x) + this.size.width/2, (this.y) + this.size.height/2 + this.size.height/2],
       coords3:[(this.x), (this.y) + this.size.height/4 + this.size.height/2]
+    }
+    //Now we'll quickly loop through update rect and add in the x and y adjustments for the rect, so it ends up in the right place and not in the top-left.
+    for(var coordinateSet in this.rect){
+      this.rect[coordinateSet][0] = this.rect[coordinateSet][0] + this.size.xAdjust;
+      this.rect[coordinateSet][1] = this.rect[coordinateSet][1] + this.size.yAdjust;
     }
   }
   this.updateRect();
@@ -836,7 +826,33 @@ function tile(image, x, y, zHeight, shouldAddElements, size){
     ctx.closePath();
     ctx.stroke();
   }
+  
+  this.scatterAround = function(nameOfElementToScatter, amountToScatterArray, xWidthToScatter, yWidthToScatter, startOfSideRange, startOfBottomRange, boxVariance, xAdjust){
+      worldMap.elementTypes.forEach(function(element){
+      if(element.name === nameOfElementToScatter){
+        var amountToAdd = chooseFrom(amountToScatterArray);
+        for(var i = 0; i < amountToAdd; i++){
+          var whichPositionType = Math.ceil(Math.random()*2);
+
+          switch(whichPositionType){
+            case 1://Bottom side
+              var x = this.rect.coords3[0] + xAdjust + (Math.ceil(Math.random()*xWidthToScatter)-xWidthToScatter/2);
+              var y = this.rect.coords3[1] + (Math.ceil(Math.random()*boxVariance) - startOfBottomRange);
+              break;
+
+            case 2://Left and right sides
+              var x = this.rect.coords3[0] + xAdjust + (Math.ceil(Math.random()*boxVariance)+startOfSideRange)*(chooseFrom([1, -1]));
+              var y = this.rect.coords3[1] + (Math.ceil(Math.random()*yWidthToScatter) - startOfBottomRange*2);
+              break;
+          }
+          worldMap.addOneElement(element, x, y);
+        }
+      }
+    }.bind(this));
+  }
 }
+
+
 
 function gameMap(tileImage1, tileImage2, size){
   this.tileImage1 = tileImage1;
@@ -945,8 +961,45 @@ function gameMap(tileImage1, tileImage2, size){
     });
   }
   
+  this.addOneElement = function(element, x, y){
+    var newElement = new tile(chooseFrom(element.image), x, y, element.zHeight, false, element.size);
+    
+    if(element.cartesianAdjust){
+      newElement.cartesianX = ((x + element.cartesianAdjust.x) / 32 + (y + element.cartesianAdjust.y) / 16) /2;
+      newElement.cartesianY = ((y + element.cartesianAdjust.y) / 16 - ((x + element.cartesianAdjust.x) / 32)) /2;
+    }
+    
+    else {
+      newElement.cartesianX = (x / 32 + y / 16) /2;
+      newElement.cartesianY = (y / 16 - (x / 32)) /2;
+    }
+
+    if(!element.clickRect){
+      newElement.clickRect = {};
+      newElement.clickRect.x = newElement.x;
+      newElement.clickRect.y = newElement.y;
+      newElement.clickRect.width = newElement.image.width;
+      newElement.clickRect.height = newElement.image.height;
+    }
+
+    else{
+      newElement.clickRect = element.clickRect;
+      newElement.clickRect.x = newElement.clickRect.x + newElement.x;
+      newElement.clickRect.y = newElement.clickRect.y + newElement.y;
+    }
+    
+    newElement.onClick = element.onClick;
+
+    if(element.onSpawn){
+      newElement.onSpawn = element.onSpawn;
+      newElement.onSpawn();
+    }
+
+    worldMap.mapIndex[element.zIndex][0].push(newElement);
+  }
+  
   //Image and zIndex are self explanatory. Frequency is the percentage chance the element has of spawning when a new tile is created.
-  this.addElement = function(image, zIndex, frequency, onClick, zHeight, size, clickRect){
+  this.addElement = function(name, image, zIndex, frequency, functions, zHeight, size, clickRect, cartesianAdjust){
     if(!this.mapIndex[zIndex]){
       this.mapIndex[zIndex] = [];
       this.mapIndex[zIndex][0] = [];
@@ -954,13 +1007,17 @@ function gameMap(tileImage1, tileImage2, size){
     
     this.elementTypes.push(
       {
+        name:name,
         image:image,
         zIndex:zIndex,
         zHeight:zHeight,
         frequency:frequency,
-        onClick:onClick,
+        onClick:functions[2],
+        onUpdate:functions[1],
+        onSpawn:functions[0],
         size:size,
-        clickRect:clickRect
+        clickRect:clickRect,
+        cartesianAdjust:cartesianAdjust
       }
     );
   }
@@ -1018,7 +1075,7 @@ function character(){
   }
   
   this.stats = {
-    speed:2,
+    speed:3,
     maxSight:25,
     sight:25
   };
@@ -1033,6 +1090,19 @@ function character(){
       type:'hand',
       size:1,
       holding:[]
+    },
+    shove:function(whatToShove){//A function that attempts to stick something into one of the player's hands. If the player's hands are full, it returns false.
+      for(var encapsulationDeviceIndex in playerCharacter.inventory){
+        var encapsulationDevice = playerCharacter.inventory[encapsulationDeviceIndex];
+        if(encapsulationDevice.type == 'hand'){
+          if(encapsulationDevice.size > encapsulationDevice.holding.length){
+            encapsulationDevice.holding.push(whatToShove);
+            playerCharacter.inventoryUpdate();
+            return true;
+          }
+        }
+      }
+      return false;
     }
   }
   
@@ -1044,11 +1114,11 @@ function character(){
     for(var encapsulationDevice in this.inventory){
       if(this.inventory[encapsulationDevice].type === 'hand'){
         
-        $('#canvasCan').append('<div class = handInventorySlot id = ' + encapsulationDevice + ' style = left:' + (75*spaceOut) + 'px;> </div>');
+        $('#canvasCan').append('<div class = handInventorySlot id = ' + encapsulationDevice + ' style = left:' + (parseInt(75*spaceOut)+parseInt(6)) + 'px;> </div>');
         
         this.inventory[encapsulationDevice]['holding'].forEach(function(item){
           
-          $('#' + encapsulationDevice).append('<p style = margin-top:5px;margin-bottom:0px;font-size:12px> ' + item.name + ' </p>');
+          $('#' + encapsulationDevice).append('<p style = margin-top:5px;margin-bottom:0px;font-size:' + ((item.name.length > 7) ? 10 : 12) + 'px> ' + item.name + ' </p>');
           $('#' + encapsulationDevice).append('<img margin-top:0px; src = ' + item.image.src.replace(/tiles/i, 'inventoryIcons') + '>');
           $('#' + encapsulationDevice).append('<p style = margin-top:0px;margin-bottom:0px;font-size:9px> ' + encapsulationDevice.replace(/([A-Z])/g, ' $1').trim().capitalize() + ' </p>');
           
@@ -1114,7 +1184,7 @@ function character(){
               $('#examineWindow' + encapsulationDevice).append('<div id = leftSideDiv' + encapsulationDevice + ' style = text-align:center;display:inline-block;margin:0px;height:100%;width:150px;></div>');
               $('#examineWindow' + encapsulationDevice).append('<div id = rightSideDiv' + encapsulationDevice + ' style = text-align:center;display:inline-block;margin:0px;height:100%;width:347px;float:right; class = rightSideDiv></div>');
               
-              $('#leftSideDiv' + encapsulationDevice).append('<h4 style = margin-bottom:0px;margin-top:12px;text-align:center;>' + encapsulationDevice.replace(/([A-Z])/g, ' $1').trim().capitalize() + '</h4>');
+              $('#leftSideDiv' + encapsulationDevice).append('<h4 style = margin-bottom:0px;margin-top:10px;text-align:center;>' + encapsulationDevice.replace(/([A-Z])/g, ' $1').trim().capitalize() + '</h4>');
               $('#leftSideDiv' + encapsulationDevice).append('<img src = ' + item.image.src.replace(/tiles/i, 'examinationIcons') + '>');
               $('#leftSideDiv' + encapsulationDevice).append('<h4 style = margin-top:10px;>' + item.name + '</h4>');
               
@@ -1204,6 +1274,8 @@ function character(){
 
                     item.clickRect.x = item.x;
                     item.clickRect.y = item.y;
+                    
+                    item.updateRect();
 
                     worldMap.mapIndex['clutter'][0].push(item);
                     //Done with rock-sticking code.
@@ -1282,10 +1354,6 @@ function character(){
       }.bind(this), 500);
     }
     
-    if(this.focusOn){
-      this.cameraFocus();
-    }
-    
     for(var element in this.movementSettings){
       if(keyMap[this.movementSettings[element][0]] || keyMap[this.movementSettings[element][0][0]] && keyMap[this.movementSettings[element][0][1]]){;
         this.move(this.movementSettings[element][1]);
@@ -1305,6 +1373,14 @@ function character(){
   
   
   this.move = function(direction, speed){
+    
+    $('.inGameWindow').each(function(){
+      if($(this).data('shouldCloseOnMove')){
+        $(this).remove();
+        playerCharacter.busy = false;
+      }
+    });
+    
     var xBefore = this.x;
     var yBefore = this.y;
     
@@ -1337,10 +1413,15 @@ function character(){
             if(this.rect['coords' + i][1] < element.rect.coords2[1] && this.rect['coords' + i][1] > element.rect.coords0[1]){
               this.x = xBefore;
               this.y = yBefore;
+              return;
             }
           }
         }
       }
+    }
+    
+    if(this.focusOn){
+      this.cameraFocus();
     }
   }
   
@@ -1434,7 +1515,7 @@ function gameLoad(ctx, cnv){
         if(playerModelCounter === 112){
           
           //Tile loading now!
-          var numberOfTileImages = 8;
+          var numberOfTileImages = 38;
           for(var i = 0; i < numberOfTileImages; i++){
             tileArray.push(new Image());
             
@@ -1461,11 +1542,21 @@ function gameLoad(ctx, cnv){
                   mousePos.x = mousePos.x + cameraX;
                   mousePos.y = mousePos.y + cameraY;
                   
-                  for(var index = 0; index < worldMap.elementsOnScreen.length; index++){
+                  if(!playerCharacter.busy)for(var index = 0; index < worldMap.elementsOnScreen.length; index++){
                     var element = worldMap.elementsOnScreen[index];
                     if(isInside(mousePos, element.clickRect)){
-                      if(!playerCharacter.busy)element.onClick();
-                      break;
+                      var upperBound = {
+                        x:playerCharacter.overTiles[0].cartesianX + 2,
+                        y:playerCharacter.overTiles[0].cartesianY + 2,
+                      }
+                      var lowerBound = {
+                        x:playerCharacter.overTiles[0].cartesianX - 2,
+                        y:playerCharacter.overTiles[0].cartesianY - 2,
+                      }
+                      if((element.cartesianX > lowerBound.x && element.cartesianX < upperBound.x) && (element.cartesianY > lowerBound.y && element.cartesianY < upperBound.y)){
+                        element.onClick();
+                        break;
+                      }
                     }
                   }
                   
@@ -1533,13 +1624,36 @@ function gameLoad(ctx, cnv){
                 $(document).on('keydown', onkeydown)
                 $(document).on('keyup', onkeyup)
                 
+                
+                
+                
+                
                 //This makes the starting map
                 worldMap = new gameMap(tileArray[0], tileArray[1], 50);
                 
                 //These add the rocks and other enviromental elements
                 
-                worldMap.addElement([tileArray[2], tileArray[3]], 'clutter', 0.15, bigRockClick, 32, undefined, undefined);
-                worldMap.addElement([tileArray[4]], 'clutter', .5, smallRockPickup, 10, {width:0, height:0}, undefined);
+                worldMap.addElement('bigRock', [tileArray[2], tileArray[3]], 'clutter', 0.15, [onBigRockSpawn, undefined, bigRockClick], 32, undefined, undefined, undefined);
+                worldMap.addElement('smallRock', [tileArray[4]], 'clutter', .05, [, undefined, smallRockPickup], 10, {width:0, height:0, xAdjust:32, yAdjust:32}, undefined, undefined);
+                worldMap.addElement('tree', [tileArray[8]], 'clutter', .1, [onTreeSpawn, undefined, function(){console.log('Tree clicked!');}], 32, {width:85, height:90, xAdjust:95, yAdjust:166}, undefined, {x:130, y:175});
+                //The sticks are defined here.
+                worldMap.addElement('smallStick' , [tileArray[22]], 'clutter', 0, [undefined, undefined, smallStickPickup] , 10, {width:0, height:0, xAdjust:32, yAdjust:32}, undefined, undefined);
+                worldMap.addElement('mediumStick', [tileArray[23]], 'clutter', 0, [undefined, undefined, mediumStickPickup], 10, {width:0, height:0, xAdjust:32, yAdjust:32}, undefined, undefined);
+                worldMap.addElement('largeStick' , [tileArray[24]], 'clutter', 0, [undefined, undefined, largeStickPickup] , 10, {width:0, height:0, xAdjust:32, yAdjust:64}, undefined, undefined);
+                //End of stick definition.
+                
+                
+                
+                
+                function onTreeSpawn(){
+                  this.scatterAround('smallStick' , [0, 0, 0, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3, 3, 4], 160, 128, 64, 65, 30, -20);
+                  this.scatterAround('mediumStick', [0,0,0,0,1,1,1,1,1,1,2], 160, -96, 75, 7, 30, 10);
+                  //this.scatterAround('largeStick' , [0,0,0,0,0,1], 250, -200, 120, 0, 50, -24);
+                }
+                
+                function onBigRockSpawn(){
+                  this.scatterAround('smallRock', [1, 1, 2, 2, 2, 3, 3, 3, 3, 3, 3, 4], 80, 32, 32, 32, 4, 0);
+                }
                 
                 function bigRockClick(){
                   if(playerCharacter.busy)return;
@@ -1551,21 +1665,23 @@ function gameLoad(ctx, cnv){
                     }
                     else {
                       var bottomPart = "";
-                      if(item.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal])bottomPart = '<p style = margin-top:0px;margin-bottom:0px;font-size:10px> ' + ((/\s/.test(this.inventory.currentCraftingGoal.replace(/([A-Z])/g, ' $1').trim())) ? this.inventory.currentCraftingGoal.substring(0, this.inventory.currentCraftingGoal.replace(/([A-Z])/g, ' $1').indexOf(' ')).capitalize() : this.inventory.currentCraftingGoal.capitalize()) + ': ' + item.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal] + '% </p>';
+                      if(item.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal])bottomPart = '<p style = margin-top:0px;margin-bottom:0px;font-size:8px> ' + ((/\s/.test(this.inventory.currentCraftingGoal.replace(/([A-Z])/g, ' $1').trim())) ? this.inventory.currentCraftingGoal.substring(0, this.inventory.currentCraftingGoal.replace(/([A-Z])/g, ' $1').indexOf(' ')).capitalize() : this.inventory.currentCraftingGoal.capitalize()) + ': ' + item.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal] + '% </p>';
                       else if(item.crafting.asMaterial.resemblance){
                         for(var statIndex in item.crafting.asMaterial.resemblance){
                           var stat = item.crafting.asMaterial.resemblance[statIndex];
-                          bottomPart = '<p style = margin-top:0px;margin-bottom:0px;font-size:10px> ' + ((/\s/.test(statIndex.replace(/([A-Z])/g, ' $1').trim())) ? statIndex.substring(0, statIndex.replace(/([A-Z])/g, ' $1').indexOf(' ')).capitalize() : statIndex.capitalize()) + ': ' + stat + '% </p>';
+                          bottomPart = '<p style = margin-top:0px;margin-bottom:0px;font-size:8px> ' + ((/\s/.test(statIndex.replace(/([A-Z])/g, ' $1').trim())) ? statIndex.substring(0, statIndex.replace(/([A-Z])/g, ' $1').indexOf(' ')).capitalize() : statIndex.capitalize()) + ': ' + stat + '% </p>';
                         }
                       }
-                      return '<div class = inventorySquare id = ' + id + ' style = margin-bottom:5px;><p style = margin-top:5px;margin-bottom:0px;font-size:' + ((item.name.length > 7) ? 10 : 12) + 'px> ' + item.name + ' </p><img margin-top:0px; src = ' + item.image.src.replace(/tiles/i, 'inventoryIcons') + '>' + bottomPart + '</div>';
+                      return '<div class = inventorySquare id = ' + id + ' style = margin-bottom:5px;><p style = margin-top:5px;margin-bottom:0px;font-size:12px> ' + ((/\s/.test(item.name.replace(/([A-Z])/g, ' $1').trim())) ? item.name.substring(0, item.name.capitalize().replace(/([A-Z])/g, ' $1').trim().indexOf(' ')).capitalize() : item.name.capitalize()) + ' </p><img margin-top:0px; src = ' + item.image.src.replace(/tiles/i, 'inventoryIcons') + '>' + bottomPart + '</div>';
                     }
                   }
                   
-                  $('#canvasCan').append('<div class = inGameWindow id = largeRockGUI style = width:350px;height:415px;padding:0px;> <h3 style = margin-left:100px;margin-right:100px;margin-top:10px;> Anvil </h3> <h4 style = position:absolute;top:0px;right:0px;margin:20px;margin-top:7px;margin-bottom:0px;font-size:12px; > Drag Me! </h4> <hr id = thinHr> </div>');
+                  $('#canvasCan').append('<div class = inGameWindow id = largeRockGUI style = width:350px;height:430px;padding:0px;> <h3 style = margin-left:100px;margin-right:100px;margin-top:10px;> Anvil </h3> <h4 style = position:absolute;top:0px;right:0px;margin:20px;margin-top:7px;margin-bottom:0px;font-size:12px; > Drag Me! </h4> <hr id = thinHr> </div>');
+                  
+                  $('#largeRockGUI').data('shouldCloseOnMove', true);
                   
                   $('#largeRockGUI').append('<div id = largeRockGUIMainArea style = width:100%;height:100%;></div>');
-                  $('#largeRockGUIMainArea').append('<div id = largeRockGUIUpperArea style = text-align:center;width:100%;height:285px;></div>');
+                  $('#largeRockGUIMainArea').append('<div id = largeRockGUIUpperArea style = position:relative;text-align:center;width:100%;height:300px;></div>');
                   
                   if(!(this.inventory))this.inventory = {
                     tool:undefined,
@@ -1578,7 +1694,7 @@ function gameLoad(ctx, cnv){
                   this.updateInventory = function(){
                     $('#largeRockGUIUpperArea').empty();
                     
-                    $('#largeRockGUIUpperArea').prepend('<div id = largeRockGUIExit style = position:absolute;top:7px;margin-left:10px;font-size:20px;> X </div>');
+                    $('#largeRockGUIUpperArea').prepend('<div id = largeRockGUIExit style = position:absolute;top:-35px;margin-left:10px;font-size:20px;> X </div>');
                     $('#largeRockGUIExit').click(function(){
                       $(this).parent().parent().parent().fadeOut(500, function(){$(this).remove();playerCharacter.busy = false;});
                     });
@@ -1589,23 +1705,11 @@ function gameLoad(ctx, cnv){
                       
                       if(!(this.inventory.tool))return;
                       
-                      var wasRoom = false;
-                      
-                      for(var encapsulationDeviceIndex in playerCharacter.inventory){
-                        var encapsulationDevice = playerCharacter.inventory[encapsulationDeviceIndex]
-                        if(encapsulationDevice['holding'].length < encapsulationDevice.size){
-                          wasRoom = true;
-                          encapsulationDevice['holding'].push(this.inventory.tool);
-                          break;
-                        }
-                      };
-                      if(!wasRoom)return;
-                      
-                      this.inventory.tool = undefined;
+                      if(playerCharacter.inventory.shove(this.inventory.tool)){
+                        this.inventory.tool = undefined;
 
-                      this.updateInventory();
-                      this.updateInventoryBar();
-                      playerCharacter.inventoryUpdate();
+                        this.updateInventory();
+                      }
                     }.bind(this));
                   
                     $('#largeRockGUIUpperArea').append('<h3 style = margin-left:100px;margin-right:100px;margin-top:15px;font-size:10px; id = materialSlotTitle> Material Slot </h3>');
@@ -1614,41 +1718,35 @@ function gameLoad(ctx, cnv){
                       
                       if(!(this.inventory.material))return;
                       
-                      var wasRoom = false;
-                      
-                      for(var encapsulationDeviceIndex in playerCharacter.inventory){
-                        var encapsulationDevice = playerCharacter.inventory[encapsulationDeviceIndex]
-                        if(encapsulationDevice['holding'].length < encapsulationDevice.size){
-                          wasRoom = true;
-                          encapsulationDevice['holding'].push(this.inventory.material);
-                          break;
-                        }
-                      };
-                      if(!wasRoom)return;
-                      
-                      this.inventory.material = undefined;
+                      if(playerCharacter.inventory.shove(this.inventory.material)){
+                        this.inventory.material = undefined;
 
-                      this.updateInventory();
-                      this.updateInventoryBar();
-                      playerCharacter.inventoryUpdate();
+                        this.updateInventory();
+                      }
                     }.bind(this));
                     
                     if(this.inventory && this.inventory.material){
-                      $('#largeRockGUIUpperArea').append('<p style = position:absolute;top:20px;left:20px;font-size:30px;>' + this.inventory.material.crafting.asMaterial.durability + '%</p>');
-                      $('#largeRockGUIUpperArea').append('<p style = position:absolute;top:70px;left:10px;font-size:10px;>Material Durability</p>');
+                      if(!(this.inventory.material.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal])){
+                        for(var i in this.inventory.material.crafting.asMaterial.resemblance){
+                          this.inventory.currentCraftingGoal = i;
+                          break;
+                        }
+                      }
                       
-                      $('#largeRockGUIUpperArea').append('<p style = position:absolute;top:20px;right:20px;font-size:30px;>' + ((this.inventory.material.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal]) ? this.inventory.material.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal] : '0') + '%</p>');
-                      $('#largeRockGUIUpperArea').append('<p style = position:absolute;top:70px;right:10px;font-size:10px;>' + this.inventory.currentCraftingGoal.replace(/([A-Z])/g, ' $1').trim().capitalize() + ' Resemblance' + '</p>');
+                      $('#largeRockGUIUpperArea').append('<p style = position:absolute;top:-35px;left:20px;font-size:30px;>' + this.inventory.material.crafting.asMaterial.durability + '%</p>');
+                      $('#largeRockGUIUpperArea').append('<p style = position:absolute;top:15px;left:10px;font-size:10px;>Material Durability</p>');
+                      
+                      $('#largeRockGUIUpperArea').append('<p style = position:absolute;top:-35px;right:20px;font-size:30px;>' + ((this.inventory.material.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal]) ? this.inventory.material.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal] : '0') + '%</p>');
+                      $('#largeRockGUIUpperArea').append('<p style = position:absolute;top:15px;right:10px;font-size:10px;>' + this.inventory.currentCraftingGoal.replace(/([A-Z])/g, ' $1').trim().capitalize() + ' Resemblance' + '</p>');
                       
                     }
-                    $('#largeRockGUIUpperArea').append('<div class = genericButton id = whackButton style = margin:auto;width:60px;padding:5px;padding-bottom:0px;padding-top:2px;> Whack </div>')
+                    $('#largeRockGUIUpperArea').append('<div class = genericButton id = whackButton style = margin:auto;width:80px;padding:5px;padding-bottom:0px;padding-top:2px;> Whack </div>');
                     $('#whackButton').click(function(){
-                      
                       if(this.inventory.material && this.inventory.tool){
-                        
-                        if(this.inventory.tool.crafting.asTool.materials.indexOf(this.inventory.material.crafting.asMaterial.materialType) == -1)return;
+                        if(this.inventory.tool.crafting.asTool && this.inventory.tool.crafting.asTool.materials && this.inventory.tool.crafting.asTool.materials.indexOf(this.inventory.material.crafting.asMaterial.materialType) == -1)return;
                         
                         //randomness math here
+                        //Oh almighty RNG God, blessed be thine name, gift ye servants all with good luck, and illustrious fame.
                         var randomness = Math.round(Math.random()*(this.inventory.tool.crafting.asTool.randomness*2))-this.inventory.tool.crafting.asTool.randomness;
                         
                         //Durability math here
@@ -1672,11 +1770,15 @@ function gameLoad(ctx, cnv){
                           
                           this.inventory.material.crafting.asTool = $.extend(true, {}, this.inventory.material.crafting.asMaterial.craftableInto[this.inventory.currentCraftingGoal].asTool);
                           
-                          this.inventory.material.crafting.asTool.pointiness = this.inventory.material.crafting.asTool.pointiness + this.inventory.material.crafting.asTool.pointiness*(overAmount/15)*(this.inventory.material.crafting.asMaterial.malleability/100);
-                          this.inventory.material.crafting.asTool.smashiness = this.inventory.material.crafting.asTool.smashiness - this.inventory.material.crafting.asTool.smashiness*(overAmount/15)*((this.inventory.material.crafting.asMaterial.ductility)/100);
-                          
-                          this.inventory.material.crafting.asTool.pointiness = parseFloat((this.inventory.material.crafting.asTool.pointiness + "").substring(0, (this.inventory.material.crafting.asTool.pointiness+"").indexOf('.')+3));
-                          this.inventory.material.crafting.asTool.smashiness = parseFloat((this.inventory.material.crafting.asTool.smashiness + "").substring(0, (this.inventory.material.crafting.asTool.smashiness+"").indexOf('.')+3));
+                          for(var stat in this.inventory.material.crafting.asMaterial.craftableInto[this.inventory.currentCraftingGoal].asTool.statsIncreasedWithHigherQuality){
+                            var shouldIncrease = this.inventory.material.crafting.asMaterial.craftableInto[this.inventory.currentCraftingGoal].asTool.statsIncreasedWithHigherQuality[stat];
+                            
+                            if(shouldIncrease)this.inventory.material.crafting.asTool[stat] = this.inventory.material.crafting.asTool[stat] + this.inventory.material.crafting.asTool[stat]*(overAmount/15)*(this.inventory.material.crafting.asMaterial.malleability/100);
+                            else if(!shouldIncrease)this.inventory.material.crafting.asTool[stat] = this.inventory.material.crafting.asTool[stat] - this.inventory.material.crafting.asTool[stat]*(overAmount/15)*((this.inventory.material.crafting.asMaterial.ductility)/100);
+
+                            this.inventory.material.crafting.asTool[stat] = this.inventory.material.crafting.asTool[stat].toFixed(2);
+                          }
+                          if(this.inventory.material.crafting.asMaterial.craftableInto[this.inventory.currentCraftingGoal].asMaterial && this.inventory.material.crafting.asMaterial.craftableInto[this.inventory.currentCraftingGoal].asMaterial.combineableWith)this.inventory.material.crafting.asMaterial.combineableWith = this.inventory.material.crafting.asMaterial.craftableInto[this.inventory.currentCraftingGoal].asMaterial.combineableWith;
                           
                           var cachedResemblance = this.inventory.material.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal];
                           this.inventory.material.crafting.asMaterial.resemblance = {};
@@ -1691,27 +1793,79 @@ function gameLoad(ctx, cnv){
                       $('#toolSlot').css('left', 135+'px');
                       $('#toolSlotTitle').css('margin-bottom', 89+'px');
                       
+                      var startTime;
                       var animationLevel = 0;
-                      var upOrDown = 7;
+                      var isGoingUp = true;
 
-                      function whackAnimation(){
-                        $('#toolSlot').css('top', 55+animationLevel+'px');
-                        if(animationLevel > 25)upOrDown = upOrDown*-1;
+                      function whackAnimation(timestamp){
+                        var runTime = timestamp - startTime;
+                        var progress = runTime/250;
+                        animationLevel = (progress * (isGoingUp ? 55 : -55)).toFixed(2);
                         
-                        if(animationLevel < upOrDown*-1){
+                        $('#toolSlot').css('top', parseInt(55)+parseInt(animationLevel)+'px');
+                        if(animationLevel > 15){
+                          isGoingUp = false;
+                          startTime = timestamp;
+                        }
+                        
+                        if(animationLevel < -25){
                           $('#toolSlot').css('position', 'static');
                           $('#toolSlotTitle').css('margin-bottom', '0px');
                         }
-                        else setTimeout(whackAnimation, 17);
-                        
-                        animationLevel=animationLevel+upOrDown;
+                        else requestAnimationFrame(whackAnimation, 30);
                       }
-                      whackAnimation()
+                      requestAnimationFrame(function(timestamp){
+                        startTime = timestamp;
+                        whackAnimation(timestamp);
+                      });
                     }.bind(this));
-			  	    
-                    $('#largeRockGUIUpperArea').append('<hr id = thinHr style = margin-bottom:2px;margin-top:45px;>');
+                    
+                    //Combining code here
+                    if(this.inventory.tool && this.inventory.material){
+                      if((this.inventory.tool.crafting.asMaterial && this.inventory.tool.crafting.asMaterial.combineableWith && this.inventory.tool.crafting.asMaterial.combineableWith[this.inventory.material.name[0].toLowerCase() + this.inventory.material.name.replace(/\s/g, '').substring(1,this.inventory.material.name.replace(/\s/g, '').length)]) || (this.inventory.material.crafting.asMaterial.combineableWith && this.inventory.material.crafting.asMaterial.combineableWith[this.inventory.tool.name[0].toLowerCase() + this.inventory.tool.name.replace(/\s/g, '').substring(1,this.inventory.tool.name.replace(/\s/g, '').length)])){
+                        $('#largeRockGUIUpperArea').append('<div class = genericButton id = combineButton style = margin:auto;margin-top:5px;width:80px;padding:5px;padding-bottom:0px;padding-top:2px;> Combine </div>');
 
-                    $('#largeRockGUIUpperArea').append('<div id = whichToCraftArea style = margin-top:0px;height:25px;></div>');
+                        $('#combineButton').click(function(){
+                          var materialSlotResemblance = this.inventory.material.crafting.asMaterial.resemblance[this.inventory.material.name.toLowerCase()];
+                          if(this.inventory.tool.crafting.asMaterial && this.inventory.tool.crafting.asMaterial.combineableWith && this.inventory.tool.crafting.asMaterial.combineableWith[this.inventory.material.name[0].toLowerCase() + this.inventory.material.name.replace(/\s/g, '').substring(1,this.inventory.material.name.replace(/\s/g, '').length)])var newItem = this.inventory.tool.crafting.asMaterial.combineableWith[this.inventory.material.name[0].toLowerCase() + this.inventory.material.name.replace(/\s/g, '').substring(1,this.inventory.material.name.replace(/\s/g, '').length)];
+                          else var newItem = this.inventory.material.crafting.asMaterial.combineableWith[this.inventory.tool.name[0].toLowerCase() + this.inventory.tool.name.replace(/\s/g, '').substring(1,this.inventory.tool.name.replace(/\s/g, '').length)];
+
+                          this.inventory.material.name = newItem.name;
+                          this.inventory.material.image = newItem.image;
+                          this.inventory.currentCraftingGoal = newItem.name.toLowerCase();
+
+                          this.inventory.material.crafting = newItem.crafting;
+                          this.inventory.material.crafting.asMaterial = {
+                            durability:100,
+                            malleability:15,
+                            ductility:6,
+                            materialType:'tool',
+                            resemblance:{
+                            }
+                          }
+                          this.inventory.material.harvesting = newItem.harvesting;
+                          
+                          this.inventory.material.crafting.asMaterial.resemblance[newItem.name.toLowerCase()] = Math.floor((materialSlotResemblance + this.inventory.tool.crafting.asMaterial.resemblance[this.inventory.tool.name[0].toLowerCase() + this.inventory.tool.name.replace(/\s/g, '').substring(1,this.inventory.tool.name.replace(/\s/g, '').length)])/2);
+                          var overAmount = this.inventory.material.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal] - 70;
+                          
+                          for(var stat in this.inventory.material.crafting.asTool.statsIncreasedWithHigherQuality){
+                            var shouldIncrease = this.inventory.material.crafting.asTool.statsIncreasedWithHigherQuality[stat];
+                            
+                            if(shouldIncrease)this.inventory.material.crafting.asTool[stat] = this.inventory.material.crafting.asTool[stat] + this.inventory.material.crafting.asTool[stat]*(overAmount/15)*(this.inventory.material.crafting.asMaterial.malleability/100);
+                            else if(!shouldIncrease)this.inventory.material.crafting.asTool[stat] = this.inventory.material.crafting.asTool[stat] - this.inventory.material.crafting.asTool[stat]*(overAmount/15)*((this.inventory.material.crafting.asMaterial.ductility)/100);
+
+                            this.inventory.material.crafting.asTool[stat] = this.inventory.material.crafting.asTool[stat].toFixed(2);
+                          }
+                          this.inventory.tool = undefined;
+                          
+                          this.updateInventory();
+                        }.bind(this));
+                      }
+                    }
+			  	    
+                    $('#largeRockGUIUpperArea').append('<hr id = thinHr style = margin:0px;position:absolute;width:100%;bottom:45px;>');
+
+                    $('#largeRockGUIUpperArea').append('<div id = whichToCraftArea style = width:100%;position:absolute;bottom:0px;height:41px;></div>');
                     
                     if(this.inventory.material){
                       for(var craftableItemIndex in this.inventory.material.crafting.asMaterial.resemblance){
@@ -1736,6 +1890,7 @@ function gameLoad(ctx, cnv){
                       $('#whichToCraftArea').children().css('width', 100+'px');
                     }
                     
+                    this.updateInventoryBar();
                   }
                   
 
@@ -1746,6 +1901,7 @@ function gameLoad(ctx, cnv){
                   this.updateInventoryBar = function(){
                     $('#inventoryAreaLargeRockGUI').empty();
                     for(encapsulationDevice in playerCharacter.inventory){
+                      if(!playerCharacter.inventory[encapsulationDevice].type)continue;
                       playerCharacter.inventory[encapsulationDevice]['holding'].forEach(function(item){
                         $('#inventoryAreaLargeRockGUI').append(this.makeInventoryBox('largeRockInventoryItem' + encapsulationDevice + $('#inventoryAreaLargeRockGUI').children().length, item));
                         var myItem = item;
@@ -1761,7 +1917,6 @@ function gameLoad(ctx, cnv){
                               playerCharacter.inventoryUpdate();
                               
                               this.updateInventory();
-                              this.updateInventoryBar();
                               break;
                             }
                           }
@@ -1773,7 +1928,6 @@ function gameLoad(ctx, cnv){
                   }
                   
                   this.updateInventory();
-                  this.updateInventoryBar();
                   
                   $('#largeRockGUI').css('left', cnv.width/2 - $('#largeRockGUI').width()/2 + 'px');
                   $('#largeRockGUI').css('top', cnv.height/2 - $('#largeRockGUI').height()/2 + 'px');
@@ -1796,28 +1950,40 @@ function gameLoad(ctx, cnv){
                         craftableInto:{
                           axeHead:{
                             asTool:{
-                              pointiness:1,
+                              pointiness:.5,
                               smashiness:3,
-                              randomness:2,
-                              materials:['fibrous', 'fleshy']
+                              randomness:3,
+                              materials:['fibrous', 'fleshy'],
+                              statsIncreasedWithHigherQuality:{
+                                pointiness:true,
+                                smashiness:false
+                              }
                             },
                             image:tileArray[7]
                           },
                           point:{
                             asTool:{
-                              pointiness:0.1,
-                              smashiness:1,
-                              randomness:0,
-                              materials:['mineral']
+                              pointiness:.3,
+                              smashiness:3,
+                              randomness:3,
+                              materials:['mineral'],
+                              statsIncreasedWithHigherQuality:{
+                                pointiness:true,
+                                smashiness:false
+                              }
                             },
                             image:tileArray[5]
                           },
                           blade:{
-                              asTool:{
+                            asTool:{
                               pointiness:3,
-                              smashiness:0.1,
+                              smashiness:1,
                               randomness:1,
-                              materials:['fleshy']
+                              materials:['fleshy'],
+                              statsIncreasedWithHigherQuality:{
+                                pointiness:true,
+                                smashiness:false
+                              }
                             },
                             image:tileArray[6]
                           }
@@ -1826,7 +1992,7 @@ function gameLoad(ctx, cnv){
                       asTool:{//And a tool.
                         pointiness:1,//pointiness is roughly how much resemblance is added each strike. The higher resemblance gets, the less resemblance is added.
                         smashiness:10,//coarse is roughly how much durability is lost each strike. The higher the resemblance, the more durability is harmed.
-                        randomness:3,//randomness helps generate a random number, which is in between randomness and negative randomness, which is added to the durability and the pointiness each time the rock is struck.
+                        randomness:5,//randomness helps generate a random number, which is in between randomness and negative randomness, which is added to the durability and the pointiness each time the rock is struck.
                         materials:['mineral', 'metal']//A stone is able to affect these materials.
                       }
                     }
@@ -1837,28 +2003,170 @@ function gameLoad(ctx, cnv){
                   
                   if(!this.name)this.name = 'Rock';
                   
-                  var upperBound = {
-                    x:playerCharacter.overTiles[0].cartesianX + 2,
-                    y:playerCharacter.overTiles[0].cartesianY + 2,
+                  if(playerCharacter.inventory.shove(this)){
+                    worldMap.mapIndex['clutter'][0].splice(worldMap.mapIndex['clutter'][0].indexOf(this), 1);
                   }
-                  var lowerBound = {
-                    x:playerCharacter.overTiles[0].cartesianX - 2,
-                    y:playerCharacter.overTiles[0].cartesianY - 2,
-                  }
-                  if((this.cartesianX > lowerBound.x && this.cartesianX < upperBound.x) && (this.cartesianY > lowerBound.y && this.cartesianY < upperBound.y)){
-                    for(var encapsulationDeviceIndex in playerCharacter.inventory){
-                      var encapsulationDevice = playerCharacter.inventory[encapsulationDeviceIndex];
-                      if(encapsulationDevice.type == 'hand'){
-                        if(encapsulationDevice.size > encapsulationDevice.holding.length){
-                          encapsulationDevice.holding.push(this);
-                          playerCharacter.inventoryUpdate();
-                          worldMap.mapIndex['clutter'][0].splice(worldMap.mapIndex['clutter'][0].indexOf(this), 1);
-                          break;
+                }//.image.src.replace(/tiles/i, 'inventoryIcons')
+                
+                
+                
+                function smallStickPickup() {
+                  if(!this.name)this.name = 'Stick';
+                  
+                  if(!this.crafting){
+                    this.crafting = {
+                      asMaterial:{
+                        resemblance:{
+                        },
+                        durability:100,
+                        malleability:25,
+                        ductility:2,
+                        materialType:'fibrous',
+                        length:'short',
+                        craftableInto:{
+                          grip:{
+                            asMaterial:{
+                              length:'short',
+                              combineableWith:{
+                                axeHead:{
+                                  name:'Hatchet',
+                                  image:tileArray[29],
+                                  crafting:{
+                                    asTool:{
+                                      pointiness:1.5,
+                                      smashiness:2,
+                                      randomness:2,
+                                      easeOfUse:.5,
+                                      arcanis:.9,
+                                      materials:['fibrous', 'fleshy'],
+                                      statsIncreasedWithHigherQuality:{
+                                        easeOfUse:true,
+                                        arcanis:true,
+                                        pointiness:true,
+                                        smashiness:false
+                                      }
+                                    }
+                                  },
+                                  harvesting:{
+                                    
+                                  }
+                                },
+                                blade:{
+                                  name:'Dagger',
+                                  image:tileArray[30],
+                                  crafting:{
+                                    asTool:{
+                                      pointiness:5,
+                                      smashiness:.5,
+                                      randomness:1,
+                                      easeOfUse:.5,
+                                      arcanis:.9,
+                                      materials:['fleshy'],
+                                      statsIncreasedWithHigherQuality:{
+                                        easeOfUse:true,
+                                        arcanis:true,
+                                        pointiness:true,
+                                        smashiness:false
+                                      }
+                                    }
+                                  },
+                                  harvesting:{
+                                    
+                                  }
+                                },
+                                point:{
+                                  name:'Chisel',
+                                  image:tileArray[31],
+                                  crafting:{
+                                    asTool:{
+                                      pointiness:1.25,
+                                      smashiness:2,
+                                      randomness:1,
+                                      easeOfUse:.5,
+                                      arcanis:.9,
+                                      materials:['mineral'],
+                                      statsIncreasedWithHigherQuality:{
+                                        easeOfUse:true,
+                                        arcanis:true,
+                                        pointiness:true,
+                                        smashiness:false
+                                      }
+                                    }
+                                  },
+                                  harvesting:{
+                                    
+                                  }
+                                }
+                              }
+                            },
+                            asTool:{
+                              easeOfUse:.5,
+                              arcanis:.9,
+                              statsIncreasedWithHigherQuality:{
+                                easeOfUse:true,
+                                arcanis:true
+                              }
+                            },
+                            image:tileArray[26]
+                          }
                         }
                       }
                     }
+                    this.crafting.asMaterial.resemblance.grip = 15+Math.floor(Math.random()*35);
                   }
-                }//.image.src.replace(/tiles/i, 'inventoryIcons')
+                  
+                  if(playerCharacter.inventory.shove(this)){
+                    worldMap.mapIndex['clutter'][0].splice(worldMap.mapIndex['clutter'][0].indexOf(this), 1);
+                  }
+                }
+                
+                
+                function mediumStickPickup(){
+                  if(!this.name)this.name = 'Stick';
+                  
+                  if(!this.crafting){
+                    this.crafting = {
+                      asMaterial:{
+                        resemblance:{
+                        },
+                        durability:100,
+                        malleability:15,
+                        ductility:20,
+                        materialType:'fibrous',
+                        length:'short',
+                      }
+                    }
+                    this.crafting.asMaterial.resemblance.grip = 15+Math.floor(Math.random()*35);
+                  }
+                  
+                  if(playerCharacter.inventory.shove(this)){
+                    worldMap.mapIndex['clutter'][0].splice(worldMap.mapIndex['clutter'][0].indexOf(this), 1);
+                  }
+                }
+                
+                
+                function largeStickPickup() {
+                  if(!this.name)this.name = 'Stick';
+                  
+                  if(!this.crafting){
+                    this.crafting = {
+                      asMaterial:{
+                        resemblance:{
+                        },
+                        durability:100,
+                        malleability:20,
+                        ductility:20,
+                        materialType:'fibrous',
+                        length:'short',
+                      }
+                    }
+                    this.crafting.asMaterial.resemblance.grip = 15+Math.floor(Math.random()*35);
+                  }
+                  
+                  if(playerCharacter.inventory.shove(this)){
+                    worldMap.mapIndex['clutter'][0].splice(worldMap.mapIndex['clutter'][0].indexOf(this), 1);
+                  }
+                }
                 
                 //This adds a few tiles to said starting map
                 worldMap.makeTiles();
@@ -1923,6 +2231,9 @@ function gameUpdate(ctx, cnv){
   for(var element in worldMap.mapIndex){
     
     if(element === 'clutter'){
+      worldMap.mapIndex["clutter"][0].sort(function(elementOne, elementTwo){
+        return elementOne.rect.coords3[1] - elementTwo.rect.coords3[1] || elementTwo.rect.coords3[0] - elementTwo.rect.coords3[0];
+      });
       
       var drawAfter = [];
       worldMap.elementsOnScreen = [];
@@ -1946,8 +2257,9 @@ function gameUpdate(ctx, cnv){
           
           if(environmentalElement.onClick)worldMap.elementsOnScreen.push(environmentalElement);
           
-          if (environmentalElement.y-environmentalElement.image.height < playerCharacter.y){
+          if(environmentalElement.rect.coords2[1] < playerCharacter.y+128){
             environmentalElement.draw();
+            environmentalElement.drawRect();
           }
 
           else drawAfter.push(environmentalElement);
@@ -1956,6 +2268,10 @@ function gameUpdate(ctx, cnv){
       
       
       playerCharacter.draw();
+      
+      drawAfter.sort(function(elementOne, elementTwo){
+        return elementOne.rect.coords3[1] - elementTwo.rect.coords3[1] || elementOne.rect.coords3[0] - elementTwo.rect.coords3[0];
+      });
       
       drawAfter.forEach(
         function(element){
@@ -2032,7 +2348,7 @@ function gameUpdate(ctx, cnv){
   }
   //End of world render
   
-  setTimeout(function(){gameUpdate(ctx, cnv);}, 17);
+  requestAnimationFrame(function(){gameUpdate(ctx, cnv);});
 }
 
 //END OF GAME ENGINE CODE!-------------------------------------------------------------------------------------------------

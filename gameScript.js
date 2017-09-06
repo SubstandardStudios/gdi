@@ -989,6 +989,7 @@ function gameMap(tileImage1, tileImage2, size){
     }
     
     newElement.onClick = element.onClick;
+    newElement.onUpdate = element.onUpdate;
 
     if(element.onSpawn){
       newElement.onSpawn = element.onSpawn;
@@ -1635,7 +1636,7 @@ function gameLoad(ctx, cnv){
                 
                 worldMap.addElement('bigRock', [tileArray[2], tileArray[3]], 'clutter', 0.15, [onBigRockSpawn, undefined, bigRockClick], 32, undefined, undefined, undefined);
                 worldMap.addElement('smallRock', [tileArray[4]], 'clutter', .05, [, undefined, smallRockPickup], 10, {width:0, height:0, xAdjust:32, yAdjust:32}, undefined, undefined);
-                worldMap.addElement('tree', [tileArray[8]], 'clutter', .1, [onTreeSpawn, undefined, function(){console.log('Tree clicked!');}], 32, {width:85, height:90, xAdjust:95, yAdjust:166}, undefined, {x:130, y:175});
+                worldMap.addElement('tree', [tileArray[8]], 'clutter', .1, [onTreeSpawn, onTreeUpdate, function(){console.log('Tree clicked!');}], 32, {width:85, height:90, xAdjust:95, yAdjust:166}, undefined, {x:130, y:175});
                 //The sticks are defined here.
                 worldMap.addElement('smallStick' , [tileArray[22]], 'clutter', 0, [undefined, undefined, smallStickPickup] , 10, {width:0, height:0, xAdjust:32, yAdjust:32}, undefined, undefined);
                 worldMap.addElement('mediumStick', [tileArray[23]], 'clutter', 0, [undefined, undefined, mediumStickPickup], 10, {width:0, height:0, xAdjust:32, yAdjust:32}, undefined, undefined);
@@ -1649,6 +1650,35 @@ function gameLoad(ctx, cnv){
                   this.scatterAround('smallStick' , [0, 0, 0, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3, 3, 4], 160, 128, 64, 65, 30, -20);
                   //this.scatterAround('mediumStick', [0,0,0,0,1,1,1,1,1,1,2], 160, -96, 75, 7, 30, 10);
                   //this.scatterAround('largeStick' , [0,0,0,0,0,1], 250, -200, 120, 0, 50, -24);
+                  this.leaves = [];
+                  this.leavesNumber = 7+Math.round(Math.random()*3);
+                  for(var i = 0; i < this.leavesNumber; i++){
+                    this.leaves.push(new effect('magical orb'));
+                    var magicalOrb = this.leaves[i];
+                    
+                    magicalOrb.frequencyOfColorChange = 0;
+                    magicalOrb.speed = 2;
+                    magicalOrb.maxSize = 7;
+                    magicalOrb.minSize = 3;
+                    magicalOrb.size = 1;
+                    magicalOrb.x = this.x + Math.round(Math.random()*this.image.width);
+                    magicalOrb.y = this.y + Math.round(Math.random()*(this.image.height/2));
+                    magicalOrb.shouldColorChange = false;
+                    magicalOrb.activeColor = 'rgb(152,251,152)';
+                    magicalOrb.colors = ['rgb(152,251,152)'];
+                  }
+                }
+                
+                function onTreeUpdate(){
+                  this.leaves.forEach(function(element){
+                    element.draw();
+                    if(!(element.isGliding)){
+                      element.glideX = this.x + Math.round(Math.random()*this.image.width);
+                      element.glideY = this.y + Math.round(Math.random()*(this.image.height/2));
+                      element.isGliding = true;
+                    }
+                  }.bind(this));
+                  ctx.globalAlpha = 1;
                 }
                 
                 function onBigRockSpawn(){
@@ -1835,8 +1865,8 @@ function gameLoad(ctx, cnv){
                           this.inventory.currentCraftingGoal = newItem.name.toLowerCase();
 						  
                           var parts = {
-                              firstPart:this.inventory.tool,
-                              secondPart:this.inventory.material
+                            firstPart:this.inventory.tool,
+                            secondPart:this.inventory.material
                           }
                           
                           this.inventory.material.crafting = newItem.crafting;
@@ -1847,7 +1877,7 @@ function gameLoad(ctx, cnv){
                             materialType:'tool',
                             resemblance:{
                             },
-                              parts:parts
+                            parts:parts
                           }
                           this.inventory.material.harvesting = newItem.harvesting;
                           
@@ -2265,7 +2295,7 @@ function gameUpdate(ctx, cnv){
           
           if(environmentalElement.rect.coords2[1] < playerCharacter.y+128){
             environmentalElement.draw();
-            environmentalElement.drawRect();
+            if(environmentalElement.onUpdate)environmentalElement.onUpdate();
           }
 
           else drawAfter.push(environmentalElement);
@@ -2282,6 +2312,7 @@ function gameUpdate(ctx, cnv){
       drawAfter.forEach(
         function(element){
           element.draw();
+          if(element.onUpdate)element.onUpdate();
         }
       );
       

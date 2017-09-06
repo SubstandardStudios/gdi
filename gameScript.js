@@ -1981,7 +1981,9 @@ function gameLoad(ctx, cnv){
                         durability:100,
                         malleability:15,
                         ductility:6,
-                        materialType:'mineral',//Only tools with 'mineral' listed in their asTools.materials will have an effect on this material
+                        materialType:'
+			      
+			      ',//Only tools with 'mineral' listed in their asTools.materials will have an effect on this material
                         rockiness:'quite rocky',
                         craftableInto:{
                           axeHead:{
@@ -2180,12 +2182,12 @@ function gameLoad(ctx, cnv){
                                   image:tileArray[32],
                                   crafting:{
                                     asTool:{
-                                      pointiness:1.5,
-                                      smashiness:2,
-                                      randomness:2,
+                                      pointiness:3,
+                                      smashiness:4,
+                                      randomness:5,
                                       easeOfUse:2,
                                       arcanis:.5,
-                                      materials:[],
+                                      materials:['fibrous'],
                                       statsIncreasedWithHigherQuality:{
                                         easeOfUse:true,
                                         arcanis:true,
@@ -2226,12 +2228,12 @@ function gameLoad(ctx, cnv){
                                   image:tileArray[34],
                                   crafting:{
                                     asTool:{
-                                      pointiness:1.25,
-                                      smashiness:2,
-                                      randomness:1,
+                                      pointiness:2.5,
+                                      smashiness:4,
+                                      randomness:5,
                                       easeOfUse:2,
                                       arcanis:.5,
-                                      materials:[],
+                                      materials:['minerals'],
                                       statsIncreasedWithHigherQuality:{
                                         easeOfUse:true,
                                         arcanis:true,

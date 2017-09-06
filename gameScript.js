@@ -1651,7 +1651,7 @@ function gameLoad(ctx, cnv){
                   this.scatterAround('mediumStick', [0,0,0,0,1,1,1,1,1,1,2], 160, -96, 75, 7, 30, 10);
                   //this.scatterAround('largeStick' , [0,0,0,0,0,1], 250, -200, 120, 0, 50, -24);
                   this.leaves = [];
-                  this.leavesNumber = 10+Math.round(Math.random()*3);
+                  this.leavesNumber = 7+Math.round(Math.random()*3);
                   for(var i = 0; i < this.leavesNumber; i++){
                     this.leaves.push(new effect('magical orb'));
                     var magicalOrb = this.leaves[i];

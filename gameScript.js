@@ -1657,7 +1657,7 @@ function gameLoad(ctx, cnv){
                     var magicalOrb = this.leaves[i];
                     
                     magicalOrb.frequencyOfColorChange = 0;
-                    magicalOrb.speed = 2;
+                    magicalOrb.speed = 1+Math.floor(Math.random()*2);
                     magicalOrb.maxSize = 7;
                     magicalOrb.minSize = 3;
                     magicalOrb.size = 1;

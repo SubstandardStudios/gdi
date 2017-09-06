@@ -2230,12 +2230,12 @@ function gameLoad(ctx, cnv){
                                   image:tileArray[34],
                                   crafting:{
                                     asTool:{
-                                      pointiness:1.5,
+                                      pointiness:1,
                                       smashiness:4,
                                       randomness:5,
                                       easeOfUse:2,
                                       arcanis:.5,
-                                      materials:['minerals'],
+                                      materials:['mineral'],
                                       statsIncreasedWithHigherQuality:{
                                         easeOfUse:true,
                                         arcanis:true,

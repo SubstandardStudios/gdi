@@ -1651,18 +1651,22 @@ function gameLoad(ctx, cnv){
                   this.scatterAround('mediumStick', [0,0,0,0,1,1,1,1,1,1,2], 160, -96, 75, 7, 30, 10);
                   //this.scatterAround('largeStick' , [0,0,0,0,0,1], 250, -200, 120, 0, 50, -24);
                   this.leaves = [];
-                  this.leavesNumber = 7+Math.round(Math.random()*3);
+                  this.leavesNumber = 10+Math.round(Math.random()*3);
                   for(var i = 0; i < this.leavesNumber; i++){
                     this.leaves.push(new effect('magical orb'));
                     var magicalOrb = this.leaves[i];
                     
                     magicalOrb.frequencyOfColorChange = 0;
                     magicalOrb.speed = 1+Math.floor(Math.random()*2);
-                    magicalOrb.maxSize = 7;
-                    magicalOrb.minSize = 3;
+                    
+                    magicalOrb.maxSize = 15;
+                    magicalOrb.minSize = 10;
                     magicalOrb.size = 1;
+                    magicalOrb.growthBufferMax = Math.floor(Math.random()*10)+5;
+                    
                     magicalOrb.x = this.x + Math.round(Math.random()*this.image.width);
                     magicalOrb.y = this.y + Math.round(Math.random()*(this.image.height/2));
+                    
                     magicalOrb.shouldColorChange = false;
                     magicalOrb.activeColor = 'rgb(152,251,152)';
                     magicalOrb.colors = ['rgb(152,251,152)'];
@@ -2180,7 +2184,7 @@ function gameLoad(ctx, cnv){
                                   image:tileArray[32],
                                   crafting:{
                                     asTool:{
-                                      pointiness:3,
+                                      pointiness:1.75,
                                       smashiness:4,
                                       randomness:5,
                                       easeOfUse:2,
@@ -2203,7 +2207,7 @@ function gameLoad(ctx, cnv){
                                   image:tileArray[33],
                                   crafting:{
                                     asTool:{
-                                      pointiness:5,
+                                      pointiness:.5,
                                       smashiness:.5,
                                       randomness:1,
                                       easeOfUse:2,
@@ -2226,7 +2230,7 @@ function gameLoad(ctx, cnv){
                                   image:tileArray[34],
                                   crafting:{
                                     asTool:{
-                                      pointiness:2.5,
+                                      pointiness:1.5,
                                       smashiness:4,
                                       randomness:5,
                                       easeOfUse:2,

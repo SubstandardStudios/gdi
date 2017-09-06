@@ -2160,16 +2160,103 @@ function gameLoad(ctx, cnv){
                 function mediumStickPickup(){
                   if(!this.name)this.name = 'Stick';
                   
-                  if(!this.crafting){
+									if(!this.crafting){
                     this.crafting = {
                       asMaterial:{
                         resemblance:{
                         },
                         durability:100,
-                        malleability:15,
-                        ductility:20,
+                        malleability:25,
+                        ductility:2,
                         materialType:'fibrous',
                         length:'short',
+                        craftableInto:{
+                          grip:{
+                            asMaterial:{
+                              length:'medium',
+                              combineableWith:{
+                                axeHead:{
+                                  name:'Axe',
+                                  image:tileArray[32],
+                                  crafting:{
+                                    asTool:{
+                                      pointiness:1.5,
+                                      smashiness:2,
+                                      randomness:2,
+                                      easeOfUse:2,
+                                      arcanis:.5,
+                                      materials:[],
+                                      statsIncreasedWithHigherQuality:{
+                                        easeOfUse:true,
+                                        arcanis:true,
+                                        pointiness:true,
+                                        smashiness:false
+                                      }
+                                    }
+                                  },
+                                  harvesting:{
+                                    
+                                  }
+                                },
+                                blade:{
+                                  name:'Scythe',
+                                  image:tileArray[33],
+                                  crafting:{
+                                    asTool:{
+                                      pointiness:5,
+                                      smashiness:.5,
+                                      randomness:1,
+                                      easeOfUse:2,
+                                      arcanis:.5,
+                                      materials:[],
+                                      statsIncreasedWithHigherQuality:{
+                                        easeOfUse:true,
+                                        arcanis:true,
+                                        pointiness:true,
+                                        smashiness:false
+                                      }
+                                    }
+                                  },
+                                  harvesting:{
+                                    
+                                  }
+                                },
+                                point:{
+                                  name:'Pick',
+                                  image:tileArray[34],
+                                  crafting:{
+                                    asTool:{
+                                      pointiness:1.25,
+                                      smashiness:2,
+                                      randomness:1,
+                                      easeOfUse:2,
+                                      arcanis:.5,
+                                      materials:[],
+                                      statsIncreasedWithHigherQuality:{
+                                        easeOfUse:true,
+                                        arcanis:true,
+                                        pointiness:true,
+                                        smashiness:false
+                                      }
+                                    }
+                                  },
+                                  harvesting:{
+                                    
+                                  }
+                                }
+                              }
+                            },
+                            asTool:{
+                              easeOfUse:2,
+                              arcanis:.5,
+                              statsIncreasedWithHigherQuality:{
+                                easeOfUse:true,
+                                arcanis:true
+                              }
+                            },
+                            image:tileArray[27]
+                          }
+                        }
                       }
                     }
                     this.crafting.asMaterial.resemblance.grip = 15+Math.floor(Math.random()*35);

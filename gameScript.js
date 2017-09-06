@@ -1981,9 +1981,7 @@ function gameLoad(ctx, cnv){
                         durability:100,
                         malleability:15,
                         ductility:6,
-                        materialType:'
-			      
-			      ',//Only tools with 'mineral' listed in their asTools.materials will have an effect on this material
+                        materialType:'mineral',//Only tools with 'mineral' listed in their asTools.materials will have an effect on this material
                         rockiness:'quite rocky',
                         craftableInto:{
                           axeHead:{

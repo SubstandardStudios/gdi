@@ -1547,12 +1547,12 @@ function gameLoad(ctx, cnv){
                     var element = worldMap.elementsOnScreen[index];
                     if(isInside(mousePos, element.clickRect)){
                       var upperBound = {
-                        x:playerCharacter.overTiles[0].cartesianX + 2,
-                        y:playerCharacter.overTiles[0].cartesianY + 2,
+                        x:playerCharacter.overTiles[0].cartesianX + 4,
+                        y:playerCharacter.overTiles[0].cartesianY + 4,
                       }
                       var lowerBound = {
-                        x:playerCharacter.overTiles[0].cartesianX - 2,
-                        y:playerCharacter.overTiles[0].cartesianY - 2,
+                        x:playerCharacter.overTiles[0].cartesianX - 4,
+                        y:playerCharacter.overTiles[0].cartesianY - 4,
                       }
                       if((element.cartesianX > lowerBound.x && element.cartesianX < upperBound.x) && (element.cartesianY > lowerBound.y && element.cartesianY < upperBound.y)){
                         element.onClick();

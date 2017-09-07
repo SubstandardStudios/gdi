@@ -1636,7 +1636,7 @@ function gameLoad(ctx, cnv){
                 
                 worldMap.addElement('bigRock', [tileArray[2], tileArray[3]], 'clutter', 0.15, [onBigRockSpawn, undefined, bigRockClick], 32, undefined, undefined, undefined);
                 worldMap.addElement('smallRock', [tileArray[4]], 'clutter', .05, [, undefined, smallRockPickup], 10, {width:0, height:0, xAdjust:32, yAdjust:32}, undefined, undefined);
-                worldMap.addElement('tree', [tileArray[8]], 'clutter', .1, [onTreeSpawn, onTreeUpdate, function(){console.log('Tree clicked!');}], 32, {width:85, height:90, xAdjust:95, yAdjust:166}, undefined, {x:130, y:175});
+                worldMap.addElement('tree', [tileArray[8]], 'clutter', .1, [onTreeSpawn, onTreeUpdate, onTreeClick], 32, {width:85, height:90, xAdjust:95, yAdjust:166}, undefined, {x:130, y:175});
                 //The sticks are defined here.
                 worldMap.addElement('smallStick' , [tileArray[22]], 'clutter', 0, [undefined, undefined, smallStickPickup] , 10, {width:0, height:0, xAdjust:32, yAdjust:32}, undefined, undefined);
                 worldMap.addElement('mediumStick', [tileArray[23]], 'clutter', 0, [undefined, undefined, mediumStickPickup], 10, {width:0, height:0, xAdjust:32, yAdjust:32}, undefined, undefined);
@@ -2019,6 +2019,7 @@ function gameLoad(ctx, cnv){
                               pointiness:3,
                               smashiness:1,
                               randomness:1,
+                              
                               materials:['fleshy'],
                               statsIncreasedWithHigherQuality:{
                                 pointiness:true,
@@ -2076,6 +2077,7 @@ function gameLoad(ctx, cnv){
                                       pointiness:1.5,
                                       smashiness:2,
                                       randomness:2,
+                                      harvestingEffectiveness:3,
                                       easeOfUse:.5,
                                       arcanis:.9,
                                       materials:['fibrous', 'fleshy'],
@@ -2099,6 +2101,7 @@ function gameLoad(ctx, cnv){
                                       pointiness:5,
                                       smashiness:.5,
                                       randomness:1,
+                                      harvestingEffectiveness:2,
                                       easeOfUse:.5,
                                       arcanis:.9,
                                       materials:['fleshy'],
@@ -2122,6 +2125,7 @@ function gameLoad(ctx, cnv){
                                       pointiness:1.25,
                                       smashiness:2,
                                       randomness:1,
+                                      harvestingEffectiveness:.5,
                                       easeOfUse:.5,
                                       arcanis:.9,
                                       materials:['mineral'],
@@ -2187,6 +2191,7 @@ function gameLoad(ctx, cnv){
                                       pointiness:1.75,
                                       smashiness:4,
                                       randomness:5,
+                                      harvestingEffectiveness:5,
                                       easeOfUse:2,
                                       arcanis:.5,
                                       materials:['fibrous'],
@@ -2210,6 +2215,7 @@ function gameLoad(ctx, cnv){
                                       pointiness:.5,
                                       smashiness:.5,
                                       randomness:1,
+                                      harvestingEffectiveness:5,
                                       easeOfUse:2,
                                       arcanis:.5,
                                       materials:[],
@@ -2233,6 +2239,7 @@ function gameLoad(ctx, cnv){
                                       pointiness:1,
                                       smashiness:4,
                                       randomness:5,
+                                      harvestingEffectiveness:5,
                                       easeOfUse:2,
                                       arcanis:.5,
                                       materials:['mineral'],

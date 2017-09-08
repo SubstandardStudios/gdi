@@ -1289,6 +1289,7 @@ function character(){
                     //Done with cleanup
 
                     //These two remove the rock from the inventory and display it to be so
+                    //Holding, of course, contains all of the items in this encapsulationDevice.
                     playerCharacter.inventory[encapsulationDevice].holding = [];
                     playerCharacter.inventoryUpdate();
                     //Done with inventory stuff, now we'll end the loop and the window
@@ -1638,9 +1639,9 @@ function gameLoad(ctx, cnv){
                 worldMap.addElement('smallRock', [tileArray[4]], 'clutter', .05, [, undefined, smallRockPickup], 10, {width:0, height:0, xAdjust:32, yAdjust:32}, undefined, undefined);
                 worldMap.addElement('tree', [tileArray[8]], 'clutter', .1, [onTreeSpawn, onTreeUpdate, onTreeClick], 32, {width:85, height:90, xAdjust:95, yAdjust:166}, undefined, {x:130, y:175});
                 //The sticks are defined here.
-                worldMap.addElement('smallStick' , [tileArray[22]], 'clutter', 0, [undefined, undefined, smallStickPickup] , 10, {width:0, height:0, xAdjust:32, yAdjust:32}, undefined, undefined);
-                worldMap.addElement('mediumStick', [tileArray[23]], 'clutter', 0, [undefined, undefined, mediumStickPickup], 10, {width:0, height:0, xAdjust:32, yAdjust:32}, undefined, undefined);
-                worldMap.addElement('largeStick' , [tileArray[24]], 'clutter', 0, [undefined, undefined, largeStickPickup] , 10, {width:0, height:0, xAdjust:32, yAdjust:64}, undefined, undefined);
+                worldMap.addElement('smallStick' , [tileArray[25]], 'clutter', 0, [undefined, undefined, smallStickPickup] , 10, {width:0, height:0, xAdjust:32, yAdjust:32}, undefined, undefined);
+                worldMap.addElement('mediumStick', [tileArray[26]], 'clutter', 0, [undefined, undefined, mediumStickPickup], 10, {width:0, height:0, xAdjust:32, yAdjust:32}, undefined, undefined);
+                worldMap.addElement('largeStick' , [tileArray[27]], 'clutter', 0, [undefined, undefined, largeStickPickup] , 10, {width:0, height:0, xAdjust:32, yAdjust:64}, undefined, undefined);
                 //End of stick definition.
                 
                 
@@ -1671,6 +1672,10 @@ function gameLoad(ctx, cnv){
                     magicalOrb.activeColor = 'rgb(152,251,152)';
                     magicalOrb.colors = ['rgb(152,251,152)'];
                   }
+                  
+                  this.strength = Math.round(Math.random()*200)+300;
+                  console.log(this.strength);
+                  this.fullStrength = this.strength;
                 }
                 
                 function onTreeUpdate(){
@@ -1683,6 +1688,42 @@ function gameLoad(ctx, cnv){
                     }
                   }.bind(this));
                   ctx.globalAlpha = 1;
+                }
+                
+                function onTreeClick(){
+                  for(var encapsulationDevice in playerCharacter.inventory){
+                    for(var itemIndex in playerCharacter.inventory[encapsulationDevice].holding){
+                      var item = playerCharacter.inventory[encapsulationDevice].holding[itemIndex];
+                      if(item && item.crafting && item.crafting.asTool && item.crafting.asTool.harvestingEffectiveness){
+                        this.strength = this.strength - item.crafting.asTool.harvestingEffectiveness;
+                        console.log(this.strength);
+                      }
+                    }
+                  }
+                  if(this.strength < this.fullStrength){
+                    this.image = tileArray[9];
+                  }
+                  if(this.strength < (this.fullStrength*0.8)){
+                    this.image = tileArray[10];
+                  }
+                  if(this.strength < (this.fullStrength*0.6)){
+                    this.image = tileArray[11];
+                    this.animationCounter = 0;
+                    //TODO: Cache clickRect instead of entire function.
+                    this.cachedOnClick = this.onClick;
+                    
+                    this.onClick = function(){};
+                    this.onUpdate = function(){
+                      this.animationCounter = this.animationCounter + 1;
+                      this.image = tileArray[11 + Math.floor(this.animationCounter/2)];
+                      
+                      if(this.animationCounter > 14){
+                        this.image = tileArray[18];
+                        this.onUpdate = function(){};
+                        this.onClick = this.cachedOnClick;
+                      }
+                    }
+                  }
                 }
                 
                 function onBigRockSpawn(){
@@ -2071,7 +2112,7 @@ function gameLoad(ctx, cnv){
                               combineableWith:{
                                 axeHead:{
                                   name:'Hatchet',
-                                  image:tileArray[29],
+                                  image:tileArray[32],
                                   crafting:{
                                     asTool:{
                                       pointiness:1.5,
@@ -2095,7 +2136,7 @@ function gameLoad(ctx, cnv){
                                 },
                                 blade:{
                                   name:'Dagger',
-                                  image:tileArray[30],
+                                  image:tileArray[33],
                                   crafting:{
                                     asTool:{
                                       pointiness:5,
@@ -2119,7 +2160,7 @@ function gameLoad(ctx, cnv){
                                 },
                                 point:{
                                   name:'Chisel',
-                                  image:tileArray[31],
+                                  image:tileArray[34],
                                   crafting:{
                                     asTool:{
                                       pointiness:1.25,
@@ -2151,7 +2192,7 @@ function gameLoad(ctx, cnv){
                                 arcanis:true
                               }
                             },
-                            image:tileArray[26]
+                            image:tileArray[29]
                           }
                         }
                       }
@@ -2168,7 +2209,7 @@ function gameLoad(ctx, cnv){
                 function mediumStickPickup(){
                   if(!this.name)this.name = 'Stick';
                   
-									if(!this.crafting){
+				  if(!this.crafting){
                     this.crafting = {
                       asMaterial:{
                         resemblance:{
@@ -2185,7 +2226,7 @@ function gameLoad(ctx, cnv){
                               combineableWith:{
                                 axeHead:{
                                   name:'Axe',
-                                  image:tileArray[32],
+                                  image:tileArray[35],
                                   crafting:{
                                     asTool:{
                                       pointiness:1.75,
@@ -2209,7 +2250,7 @@ function gameLoad(ctx, cnv){
                                 },
                                 blade:{
                                   name:'Scythe',
-                                  image:tileArray[33],
+                                  image:tileArray[36],
                                   crafting:{
                                     asTool:{
                                       pointiness:.5,
@@ -2233,7 +2274,7 @@ function gameLoad(ctx, cnv){
                                 },
                                 point:{
                                   name:'Pick',
-                                  image:tileArray[34],
+                                  image:tileArray[37],
                                   crafting:{
                                     asTool:{
                                       pointiness:1,
@@ -2265,7 +2306,7 @@ function gameLoad(ctx, cnv){
                                 arcanis:true
                               }
                             },
-                            image:tileArray[27]
+                            image:tileArray[30]
                           }
                         }
                       }

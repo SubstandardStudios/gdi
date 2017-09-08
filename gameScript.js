@@ -1673,9 +1673,72 @@ function gameLoad(ctx, cnv){
                     magicalOrb.colors = ['rgb(152,251,152)'];
                   }
                   
-                  this.strength = Math.round(Math.random()*200)+300;
+                  this.strength = Math.round(Math.random()*200)+100;
                   console.log(this.strength);
                   this.fullStrength = this.strength;
+                  
+                  this.stages = [
+                    {
+                      strengthUnder:this.fullStrength,
+                      image:tileArray[9]
+                    },
+                    {
+                      strengthUnder:this.fullStrength*0.8,
+                      image:tileArray[10]
+                    },
+                    {
+                      strengthUnder:this.fullStrength*0.6,
+                      extraCode:function(){
+                        if(this.hasBeenAnimated)return;
+                        this.hasBeenAnimated = true;
+                        
+                        this.animationCounter = 0;
+                        
+                        this.onUpdate = function(){
+                          this.animationCounter = this.animationCounter + 1;
+                          this.image = tileArray[11 + Math.floor(this.animationCounter/2)];
+
+                          if(this.animationCounter > 14){
+                            this.strength = this.strength - 1;
+                            this.image = tileArray[18];
+                            this.onUpdate = function(){};
+                          }
+                        }
+                      }.bind(this)
+                    },
+                    {
+                      strengthUnder:this.fullStrength*0.5,
+                      image:tileArray[19]
+                    },
+                    {
+                      strengthUnder:this.fullStrength*0.45,
+                      image:tileArray[20]
+                    },
+                    {
+                      strengthUnder:this.fullStrength*0.4,
+                      image:tileArray[21]
+                    },
+                    {
+                      strengthUnder:this.fullStrength*0.35,
+                      image:tileArray[22]
+                    },
+                    {
+                      strengthUnder:this.fullStrength*0.2,
+                      image:tileArray[23]
+                    },
+                    {
+                      strengthUnder:this.fullStrength*0.05,
+                      image:tileArray[24]
+                    },
+                    {
+                      strengthUnder:this.fullStrength*-1,
+                      image:tileArray[24],
+                      extraCode:function(){
+                        console.log(this);
+                        worldMap.mapIndex["clutter"][0].splice(worldMap.mapIndex["clutter"][0].indexOf(this), 1);
+                      }.bind(this)
+                    }
+                  ]
                 }
                 
                 function onTreeUpdate(){
@@ -1695,32 +1758,19 @@ function gameLoad(ctx, cnv){
                     for(var itemIndex in playerCharacter.inventory[encapsulationDevice].holding){
                       var item = playerCharacter.inventory[encapsulationDevice].holding[itemIndex];
                       if(item && item.crafting && item.crafting.asTool && item.crafting.asTool.harvestingEffectiveness){
+                        
                         this.strength = this.strength - item.crafting.asTool.harvestingEffectiveness;
-                        console.log(this.strength);
-                      }
-                    }
-                  }
-                  if(this.strength < this.fullStrength){
-                    this.image = tileArray[9];
-                  }
-                  if(this.strength < (this.fullStrength*0.8)){
-                    this.image = tileArray[10];
-                  }
-                  if(this.strength < (this.fullStrength*0.6)){
-                    this.image = tileArray[11];
-                    this.animationCounter = 0;
-                    //TODO: Cache clickRect instead of entire function.
-                    this.cachedOnClick = this.onClick;
-                    
-                    this.onClick = function(){};
-                    this.onUpdate = function(){
-                      this.animationCounter = this.animationCounter + 1;
-                      this.image = tileArray[11 + Math.floor(this.animationCounter/2)];
-                      
-                      if(this.animationCounter > 14){
-                        this.image = tileArray[18];
-                        this.onUpdate = function(){};
-                        this.onClick = this.cachedOnClick;
+                        
+                        this.lastUnder = this.stages[0];
+                        
+                        this.stages.forEach(function(element){
+                          if(this.strength < element.strengthUnder && element.strengthUnder < this.lastUnder.strengthUnder){
+                            this.lastUnder = element;
+                          }
+                        }.bind(this))
+                        console.log(this);
+                        if(this.lastUnder.image)this.image = this.lastUnder.image;
+                        if(this.lastUnder.extraCode)this.lastUnder.extraCode();
                       }
                     }
                   }

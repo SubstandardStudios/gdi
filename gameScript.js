@@ -878,7 +878,7 @@ function gameMap(tileImage1, tileImage2, size){
     for(var rows = 0; rows < this.size; rows++){
       this.mapIndex[0].push([]);
       for(var columns = 0; columns < this.size; columns++){
-        var newTile = new tile(chooseFrom([this.tileImage1, this.tileImage2, this.tileImage2]), (rows-columns)*32-32, ((columns+rows)/2)*32, 32, true);
+        var newTile = new tile(chooseFrom([this.tileImage1, this.tileImage2, this.tileImage2]), (rows-columns)*128-128, ((columns+rows)/2)*128, 32, true);
         newTile.cartesianX = rows;
         newTile.cartesianY = columns;
         this.mapIndex[0][rows].push(newTile);
@@ -897,8 +897,8 @@ function gameMap(tileImage1, tileImage2, size){
       tileStats.cartesianX = (length*whichSide) - ((whichSide) ? 0 : length+1);
       tileStats.cartesianY = i - this.moreSizeStats.widthAddedNeg;
       
-      tileStats.x = (tileStats.cartesianX-tileStats.cartesianY)*32-32;
-      tileStats.y = ((tileStats.cartesianY+tileStats.cartesianX)/2)*32;
+      tileStats.x = (tileStats.cartesianX-tileStats.cartesianY)*128-128;
+      tileStats.y = ((tileStats.cartesianY+tileStats.cartesianX)/2)*128;
       
       var newTile = new tile(chooseFrom([this.tileImage1, this.tileImage2, this.tileImage2]), tileStats.x, tileStats.y, 32, true);
       
@@ -929,8 +929,8 @@ function gameMap(tileImage1, tileImage2, size){
       tileStats.cartesianY = parseInt(tileStats.cartesianY);
       tileStats.cartesianX = parseInt(tileStats.cartesianX);
       
-      tileStats.x = (tileStats.cartesianX-tileStats.cartesianY)*32-32;
-      tileStats.y = ((tileStats.cartesianY+tileStats.cartesianX)/2)*32;
+      tileStats.x = (tileStats.cartesianX-tileStats.cartesianY)*128-128;
+      tileStats.y = ((tileStats.cartesianY+tileStats.cartesianX)/2)*128;
       
       var newTile = new tile(chooseFrom([this.tileImage1, this.tileImage2, this.tileImage2]), tileStats.x, tileStats.y, 32, true);
       
@@ -965,13 +965,13 @@ function gameMap(tileImage1, tileImage2, size){
     var newElement = new tile(chooseFrom(element.image), x, y, element.zHeight, false, element.size);
     
     if(element.cartesianAdjust){
-      newElement.cartesianX = ((x + element.cartesianAdjust.x) / 32 + (y + element.cartesianAdjust.y) / 16) /2;
-      newElement.cartesianY = ((y + element.cartesianAdjust.y) / 16 - ((x + element.cartesianAdjust.x) / 32)) /2;
+      newElement.cartesianX = ((x + element.cartesianAdjust.x) / 128 + (y + element.cartesianAdjust.y) / 64) /2;
+      newElement.cartesianY = ((y + element.cartesianAdjust.y) / 64 - ((x + element.cartesianAdjust.x) / 128)) /2;
     }
     
     else {
-      newElement.cartesianX = (x / 32 + y / 16) /2;
-      newElement.cartesianY = (y / 16 - (x / 32)) /2;
+      newElement.cartesianX = (x / 128 + y / 64) /2;
+      newElement.cartesianY = (y / 64 - (x / 128)) /2;
     }
 
     if(!element.clickRect){
@@ -1631,13 +1631,13 @@ function gameLoad(ctx, cnv){
                 
                 
                 //This makes the starting map
-                worldMap = new gameMap(tileArray[0], tileArray[1], 50);
+                worldMap = new gameMap(tileArray[0], tileArray[0], 50);
                 
                 //These add the rocks and other enviromental elements
                 
-                worldMap.addElement('bigRock', [tileArray[2], tileArray[3]], 'clutter', 0.15, [onBigRockSpawn, undefined, bigRockClick], 32, undefined, undefined, undefined);
-                worldMap.addElement('smallRock', [tileArray[4]], 'clutter', .05, [, undefined, smallRockPickup], 10, {width:0, height:0, xAdjust:32, yAdjust:32}, undefined, undefined);
-                worldMap.addElement('tree', [tileArray[8]], 'clutter', .1, [onTreeSpawn, onTreeUpdate, onTreeClick], 32, {width:85, height:90, xAdjust:95, yAdjust:166}, undefined, {x:130, y:175});
+                worldMap.addElement('bigRock', [tileArray[2], tileArray[3]], 'clutter', 1.5, [onBigRockSpawn, undefined, bigRockClick], 32, undefined, undefined, undefined);
+                worldMap.addElement('smallRock', [tileArray[4]], 'clutter', .5, [, undefined, smallRockPickup], 10, {width:0, height:0, xAdjust:32, yAdjust:32}, undefined, undefined);
+                worldMap.addElement('tree', [tileArray[8]], 'clutter', 1, [onTreeSpawn, onTreeUpdate, onTreeClick], 32, {width:85, height:90, xAdjust:95, yAdjust:166}, undefined, {x:130, y:175});
                 //The sticks are defined here.
                 worldMap.addElement('smallStick' , [tileArray[25]], 'clutter', 0, [undefined, undefined, smallStickPickup] , 10, {width:0, height:0, xAdjust:32, yAdjust:32}, undefined, undefined);
                 worldMap.addElement('mediumStick', [tileArray[26]], 'clutter', 0, [undefined, undefined, mediumStickPickup], 10, {width:0, height:0, xAdjust:32, yAdjust:32}, undefined, undefined);
@@ -1674,7 +1674,6 @@ function gameLoad(ctx, cnv){
                   }
                   
                   this.strength = Math.round(Math.random()*200)+100;
-                  console.log(this.strength);
                   this.fullStrength = this.strength;
                   
                   this.stages = [
@@ -1709,38 +1708,38 @@ function gameLoad(ctx, cnv){
                     {
                       strengthUnder:this.fullStrength*0.5,
                       image:tileArray[19],
-											extraCode:function(){
-												this.scatterAround('smallStick' , [0, 0, 0, 0, 1, 1, 2, 2,], 160, 128, 64, 65, 30, -20);
-                  			this.scatterAround('mediumStick', [0,0,0,0,0,0,1,2], 160, -96, 75, 7, 30, 10);
-                  			this.scatterAround('largeStick' , [0,0,0,0,0,1], 250, -200, 120, 0, 50, -24);
-											}.bind(this)
+                      extraCode:function(){
+                        this.scatterAround('smallStick' , [0, 0, 0, 0, 1, 1, 2, 2,], 160, 128, 64, 65, 30, -20);
+                        this.scatterAround('mediumStick', [0,0,0,0,0,0,1,2], 160, -96, 75, 7, 30, 10);
+                        this.scatterAround('largeStick' , [0,0,0,0,0,1], 250, -200, 120, 0, 50, -24);
+                      }.bind(this)
                     },
                     {
                       strengthUnder:this.fullStrength*0.45,
                       image:tileArray[20],
-											extraCode:function(){
-												this.scatterAround('smallStick' , [0, 0, 0, 0, 1, 1, 2, 2,], 160, 128, 64, 65, 30, -20);
-                  			this.scatterAround('mediumStick', [0,0,0,0,0,0,1,2], 160, -96, 75, 7, 30, 10);
-                  			this.scatterAround('largeStick' , [0,0,0,0,0,1], 250, -200, 120, 0, 50, -24);
-											}.bind(this)
+                      extraCode:function(){
+                        this.scatterAround('smallStick' , [0, 0, 0, 0, 1, 1, 2, 2,], 160, 128, 64, 65, 30, -20);
+                        this.scatterAround('mediumStick', [0,0,0,0,0,0,1,2], 160, -96, 75, 7, 30, 10);
+                        this.scatterAround('largeStick' , [0,0,0,0,0,1], 250, -200, 120, 0, 50, -24);
+                      }.bind(this)
                     },
                     {
                       strengthUnder:this.fullStrength*0.4,
                       image:tileArray[21],
-											extraCode:function(){
-												this.scatterAround('smallStick' , [0, 0, 0, 0, 1, 1, 2, 2,], 160, 128, 64, 65, 30, -20);
-                  			this.scatterAround('mediumStick', [0,0,0,0,0,0,1,2], 160, -96, 75, 7, 30, 10);
-                  			this.scatterAround('largeStick' , [0,0,0,0,0,1], 250, -200, 120, 0, 50, -24);
-											}.bind(this)
+                      extraCode:function(){
+                        this.scatterAround('smallStick' , [0, 0, 0, 0, 1, 1, 2, 2,], 160, 128, 64, 65, 30, -20);
+                        this.scatterAround('mediumStick', [0,0,0,0,0,0,1,2], 160, -96, 75, 7, 30, 10);
+                        this.scatterAround('largeStick' , [0,0,0,0,0,1], 250, -200, 120, 0, 50, -24);
+                      }.bind(this)
                     },
                     {
                       strengthUnder:this.fullStrength*0.35,
                       image:tileArray[22],
-											extraCode:function(){
-												this.scatterAround('smallStick' , [0, 0, 0, 0, 1, 1, 2, 2,], 160, 128, 64, 65, 30, -20);
-                  			this.scatterAround('mediumStick', [0,0,0,0,0,0,1,2], 160, -96, 75, 7, 30, 10);
-                  			this.scatterAround('largeStick' , [0,0,0,0,0,1], 250, -200, 120, 0, 50, -24);
-											}.bind(this)
+                      extraCode:function(){
+                        this.scatterAround('smallStick' , [0, 0, 0, 0, 1, 1, 2, 2,], 160, 128, 64, 65, 30, -20);
+                        this.scatterAround('mediumStick', [0,0,0,0,0,0,1,2], 160, -96, 75, 7, 30, 10);
+                        this.scatterAround('largeStick' , [0,0,0,0,0,1], 250, -200, 120, 0, 50, -24);
+                      }.bind(this)
                     },
                     {
                       strengthUnder:this.fullStrength*0.2,
@@ -1754,7 +1753,6 @@ function gameLoad(ctx, cnv){
                       strengthUnder:this.fullStrength*-1,
                       image:tileArray[24],
                       extraCode:function(){
-                        console.log(this);
                         worldMap.mapIndex["clutter"][0].splice(worldMap.mapIndex["clutter"][0].indexOf(this), 1);
                       }.bind(this)
                     }
@@ -1788,7 +1786,6 @@ function gameLoad(ctx, cnv){
                             this.lastUnder = element;
                           }
                         }.bind(this))
-                        console.log(this);
                         if(this.lastUnder.image)this.image = this.lastUnder.image;
                         if(this.lastUnder.extraCode)this.lastUnder.extraCode();
                       }

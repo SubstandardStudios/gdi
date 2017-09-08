@@ -845,7 +845,7 @@ function tile(image, x, y, zHeight, shouldAddElements, size){
               var y = this.rect.coords3[1] + (Math.ceil(Math.random()*yWidthToScatter) - startOfBottomRange*2);
               break;
           }
-          worldMap.addOneElement(element, x, y);
+          worldMap.addOneElement(element, x, y, false);
         }
       }
     }.bind(this));
@@ -961,8 +961,11 @@ function gameMap(tileImage1, tileImage2, size){
     });
   }
   
-  this.addOneElement = function(element, x, y){
-    var newElement = new tile(chooseFrom(element.image), x, y, element.zHeight, false, element.size);
+  this.addOneElement = function(element, x, y, shouldRandomizeCoords){
+    if(typeof shouldRandomizeCoords == "undefined"){
+      shouldRandomizeCoords = true;
+    }
+    var newElement = new tile(chooseFrom(element.image), (shouldRandomizeCoords) ? x+60+Math.round(Math.random()*100) : x, (shouldRandomizeCoords) ? y+Math.round(Math.random()*32) : y, element.zHeight, false, element.size);
     
     if(element.cartesianAdjust){
       newElement.cartesianX = ((x + element.cartesianAdjust.x) / 128 + (y + element.cartesianAdjust.y) / 64) /2;

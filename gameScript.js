@@ -1648,8 +1648,8 @@ function gameLoad(ctx, cnv){
                 
                 
                 function onTreeSpawn(){
-                  this.scatterAround('smallStick' , [0, 0, 0, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3, 3, 4], 160, 128, 64, 65, 30, -20);
-                  this.scatterAround('mediumStick', [0,0,0,0,1,1,1,1,1,1,2], 160, -96, 75, 7, 30, 10);
+                  this.scatterAround('smallStick' , [0, 0, 0, 0, 1, 1, 2, 2,], 160, 128, 64, 65, 30, -20);
+                  this.scatterAround('mediumStick', [0,0,0,0,0,0,1,2], 160, -96, 75, 7, 30, 10);
                   //this.scatterAround('largeStick' , [0,0,0,0,0,1], 250, -200, 120, 0, 50, -24);
                   this.leaves = [];
                   this.leavesNumber = 7+Math.round(Math.random()*3);
@@ -1708,19 +1708,39 @@ function gameLoad(ctx, cnv){
                     },
                     {
                       strengthUnder:this.fullStrength*0.5,
-                      image:tileArray[19]
+                      image:tileArray[19],
+											extraCode:function(){
+												this.scatterAround('smallStick' , [0, 0, 0, 0, 1, 1, 2, 2,], 160, 128, 64, 65, 30, -20);
+                  			this.scatterAround('mediumStick', [0,0,0,0,0,0,1,2], 160, -96, 75, 7, 30, 10);
+                  			this.scatterAround('largeStick' , [0,0,0,0,0,1], 250, -200, 120, 0, 50, -24);
+											}.bind(this)
                     },
                     {
                       strengthUnder:this.fullStrength*0.45,
-                      image:tileArray[20]
+                      image:tileArray[20],
+											extraCode:function(){
+												this.scatterAround('smallStick' , [0, 0, 0, 0, 1, 1, 2, 2,], 160, 128, 64, 65, 30, -20);
+                  			this.scatterAround('mediumStick', [0,0,0,0,0,0,1,2], 160, -96, 75, 7, 30, 10);
+                  			this.scatterAround('largeStick' , [0,0,0,0,0,1], 250, -200, 120, 0, 50, -24);
+											}.bind(this)
                     },
                     {
                       strengthUnder:this.fullStrength*0.4,
-                      image:tileArray[21]
+                      image:tileArray[21],
+											extraCode:function(){
+												this.scatterAround('smallStick' , [0, 0, 0, 0, 1, 1, 2, 2,], 160, 128, 64, 65, 30, -20);
+                  			this.scatterAround('mediumStick', [0,0,0,0,0,0,1,2], 160, -96, 75, 7, 30, 10);
+                  			this.scatterAround('largeStick' , [0,0,0,0,0,1], 250, -200, 120, 0, 50, -24);
+											}.bind(this)
                     },
                     {
                       strengthUnder:this.fullStrength*0.35,
-                      image:tileArray[22]
+                      image:tileArray[22],
+											extraCode:function(){
+												this.scatterAround('smallStick' , [0, 0, 0, 0, 1, 1, 2, 2,], 160, 128, 64, 65, 30, -20);
+                  			this.scatterAround('mediumStick', [0,0,0,0,0,0,1,2], 160, -96, 75, 7, 30, 10);
+                  			this.scatterAround('largeStick' , [0,0,0,0,0,1], 250, -200, 120, 0, 50, -24);
+											}.bind(this)
                     },
                     {
                       strengthUnder:this.fullStrength*0.2,

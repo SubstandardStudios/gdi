@@ -1905,7 +1905,6 @@ function gameLoad(ctx, cnv){
                         //Oh almighty RNG God, blessed be thine name, gift ye servants all with good luck, and illustrious fame.
                         var randomness = Math.round(Math.random()*(this.inventory.tool.crafting.asTool.randomness*2))-this.inventory.tool.crafting.asTool.randomness;
                         if(this.inventory.material.crafting.asMaterial.craftableInto[this.inventory.currentCraftingGoal].difficulty && this.inventory.material.crafting.asMaterial.craftableInto[this.inventory.currentCraftingGoal].difficulty[this.inventory.tool.name.toLowerCase()]){
-                          console.log('Here!');
                           randomness = randomness - this.inventory.material.crafting.asMaterial.craftableInto[this.inventory.currentCraftingGoal].difficulty[this.inventory.tool.name.toLowerCase()];
                         }
                         

@@ -1520,7 +1520,7 @@ function gameLoad(ctx, cnv){
         if(playerModelCounter === 112){
           
           //Tile loading now!
-          var numberOfTileImages = 38;
+          var numberOfTileImages = 41;
           for(var i = 0; i < numberOfTileImages; i++){
             tileArray.push(new Image());
             
@@ -1740,7 +1740,9 @@ function gameLoad(ctx, cnv){
                       strengthUnder:this.fullStrength*0.35,
                       image:tileArray[22],
                       extraCode:function(){
-                        this.scatterAround('woodHunk' , [1,1,2,2,2,2,3], 250, -200, 120, 0, 50, -24);
+                        this.scatterAround('smallStick' , [2,2,3,3,3,4], 160, 128, 64, 65, 30, -20);
+                        this.scatterAround('mediumStick', [1,1,2,2,2,3], 160, -96, 75, 7, 30, 10);
+                        this.scatterAround('largeStick' , [0,0,1], 250, -200, 120, 0, 50, -24);
                       }.bind(this)
                     },
                     {
@@ -1754,6 +1756,7 @@ function gameLoad(ctx, cnv){
                       strengthUnder:this.fullStrength*0.05,
                       image:tileArray[24],
                       extraCode:function(){
+                        this.scatterAround('woodHunk' , [1,1,2,2,2,2,3], 250, -200, 120, 0, 50, -24);
                       }.bind(this)
                     },
                     {
@@ -1979,7 +1982,7 @@ function gameLoad(ctx, cnv){
                         $('#largeRockGUIUpperArea').append('<div class = genericButton id = combineButton style = margin:auto;margin-top:5px;width:80px;padding:5px;padding-bottom:0px;padding-top:2px;> Combine </div>');
 
                         $('#combineButton').click(function(){
-                          var materialSlotResemblance = this.inventory.material.crafting.asMaterial.resemblance[this.inventory.material.name.toLowerCase()];
+                          var materialSlotResemblance = this.inventory.material.crafting.asMaterial.resemblance[this.inventory.material.name[0].toLowerCase() + this.inventory.material.name.replace(/\s/g, '').substring(1,this.inventory.material.name.replace(/\s/g, '').length)];
                           if(this.inventory.tool.crafting.asMaterial && this.inventory.tool.crafting.asMaterial.combineableWith && this.inventory.tool.crafting.asMaterial.combineableWith[this.inventory.material.name[0].toLowerCase() + this.inventory.material.name.replace(/\s/g, '').substring(1,this.inventory.material.name.replace(/\s/g, '').length)])var newItem = this.inventory.tool.crafting.asMaterial.combineableWith[this.inventory.material.name[0].toLowerCase() + this.inventory.material.name.replace(/\s/g, '').substring(1,this.inventory.material.name.replace(/\s/g, '').length)];
                           else var newItem = this.inventory.material.crafting.asMaterial.combineableWith[this.inventory.tool.name[0].toLowerCase() + this.inventory.tool.name.replace(/\s/g, '').substring(1,this.inventory.tool.name.replace(/\s/g, '').length)];
 
@@ -2002,7 +2005,7 @@ function gameLoad(ctx, cnv){
                             },
                             parts:parts
                           }
-                          this.inventory.material.harvesting = newItem.harvesting;
+                          //this.inventory.material.harvesting = newItem.harvesting;
                           
                           this.inventory.material.crafting.asMaterial.resemblance[newItem.name.toLowerCase()] = Math.floor((materialSlotResemblance + this.inventory.tool.crafting.asMaterial.resemblance[this.inventory.tool.name[0].toLowerCase() + this.inventory.tool.name.replace(/\s/g, '').substring(1,this.inventory.tool.name.replace(/\s/g, '').length)])/2);
                           var overAmount = this.inventory.material.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal] - 70;
@@ -2092,6 +2095,7 @@ function gameLoad(ctx, cnv){
                   $('#largeRockGUI').css('top', cnv.height/2 - $('#largeRockGUI').height()/2 + 'px');
                   
                   makeDraggable('#largeRockGUI', ['#largeRockGUIMainArea']);
+                  return true;
                 }
                 
                 //This function is called when the small rock is clicked ^
@@ -2303,7 +2307,7 @@ function gameLoad(ctx, cnv){
                         malleability:25,
                         ductility:2,
                         materialType:'fibrous',
-                        length:'short',
+                        length:'medium',
                         craftableInto:{
                           grip:{
                             asMaterial:{
@@ -2420,9 +2424,102 @@ function gameLoad(ctx, cnv){
                         },
                         durability:100,
                         malleability:20,
-                        ductility:20,
+                        ductility:2,
                         materialType:'fibrous',
-                        length:'short',
+                        length:'long',
+                        craftableInto:{
+                          grip:{
+                            asMaterial:{
+                              length:'medium',
+                              combineableWith:{
+                                axeHead:{
+                                  name:'Poleaxe',
+                                  image:tileArray[38],
+                                  crafting:{
+                                    asTool:{
+                                      pointiness:0,
+                                      slashiness:5,
+                                      smashiness:1,
+                                      randomness:5,
+                                      easeOfUse:2,
+                                      throwable:false,
+                                      arcanis:.25,
+                                      materials:[],
+                                      statsIncreasedWithHigherQuality:{
+                                        easeOfUse:true,
+                                        arcanis:true,
+                                        pointiness:true,
+                                        smashiness:false,
+                                      }
+                                    }
+                                  },
+                                  harvesting:{
+                                    
+                                  }
+                                },
+                                blade:{
+                                  name:'Pike',
+                                  image:tileArray[39],
+                                  crafting:{
+                                    asTool:{
+                                      pointiness:3,
+                                      slashiness:3,
+                                      smashiness:0,
+                                      randomness:1,
+                                      easeOfUse:2,
+                                      throwable:true,
+                                      arcanis:.25,
+                                      materials:[],
+                                      statsIncreasedWithHigherQuality:{
+                                        easeOfUse:true,
+                                        arcanis:true,
+                                        pointiness:true,
+                                        smashiness:false,
+                                      }
+                                    }
+                                  },
+                                  harvesting:{
+                                    
+                                  }
+                                },
+                                point:{
+                                  name:'spear',
+                                  image:tileArray[40],
+                                  crafting:{
+                                    asTool:{
+                                      pointiness:5,
+                                      slashiness:0,
+                                      smashiness:1,
+                                      randomness:2,
+                                      easeOfUse:2,
+                                      throwable:true,
+                                      arcanis:.25,
+                                      materials:[],
+                                      statsIncreasedWithHigherQuality:{
+                                        easeOfUse:true,
+                                        arcanis:true,
+                                        pointiness:true,
+                                        smashiness:false,
+                                      }
+                                    }
+                                  },
+                                  harvesting:{
+                                    
+                                  }
+                                }
+                              }
+                            },
+                            asTool:{
+                              easeOfUse:2,
+                              arcanis:.5,
+                              statsIncreasedWithHigherQuality:{
+                                easeOfUse:true,
+                                arcanis:true
+                              }
+                            },
+                            image:tileArray[31]
+                          }
+                        }
                       }
                     }
                     this.crafting.asMaterial.resemblance.grip = 15+Math.floor(Math.random()*35);

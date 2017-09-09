@@ -1551,16 +1551,15 @@ function gameLoad(ctx, cnv){
                     var element = worldMap.elementsOnScreen[index];
                     if(isInside(mousePos, element.clickRect)){
                       var upperBound = {
-                        x:playerCharacter.overTiles[0].cartesianX + 4,
-                        y:playerCharacter.overTiles[0].cartesianY + 4,
+                        x:playerCharacter.overTiles[0].cartesianX + 2,
+                        y:playerCharacter.overTiles[0].cartesianY + 2,
                       }
                       var lowerBound = {
-                        x:playerCharacter.overTiles[0].cartesianX - 4,
-                        y:playerCharacter.overTiles[0].cartesianY - 4,
+                        x:playerCharacter.overTiles[0].cartesianX - 2,
+                        y:playerCharacter.overTiles[0].cartesianY - 2,
                       }
                       if((element.cartesianX > lowerBound.x && element.cartesianX < upperBound.x) && (element.cartesianY > lowerBound.y && element.cartesianY < upperBound.y)){
-                        element.onClick();
-                        break;
+                        if(element.onClick())break;
                       }
                     }
                   }
@@ -1639,14 +1638,16 @@ function gameLoad(ctx, cnv){
                 //These add the rocks and other enviromental elements
                 
                 worldMap.addElement('bigRock', [tileArray[2], tileArray[3]], 'clutter', 1.5, [onBigRockSpawn, undefined, bigRockClick], 32, undefined, undefined, undefined);
-                worldMap.addElement('smallRock', [tileArray[4]], 'clutter', .5, [, undefined, smallRockPickup], 10, {width:0, height:0, xAdjust:32, yAdjust:32}, undefined, undefined);
+                worldMap.addElement('smallRock', [tileArray[4]], 'clutter', .5, [, undefined, smallRockPickup], 10, {width:0, height:0, xAdjust:32, yAdjust:38}, undefined, undefined);
                 worldMap.addElement('tree', [tileArray[8]], 'clutter', 1, [onTreeSpawn, onTreeUpdate, onTreeClick], 32, {width:85, height:90, xAdjust:95, yAdjust:166}, undefined, {x:130, y:175});
                 //The sticks are defined here.
                 worldMap.addElement('smallStick' , [tileArray[25]], 'clutter', 0, [undefined, undefined, smallStickPickup] , 10, {width:0, height:0, xAdjust:32, yAdjust:32}, undefined, undefined);
                 worldMap.addElement('mediumStick', [tileArray[26]], 'clutter', 0, [undefined, undefined, mediumStickPickup], 10, {width:0, height:0, xAdjust:32, yAdjust:32}, undefined, undefined);
-                worldMap.addElement('largeStick' , [tileArray[27]], 'clutter', 0, [undefined, undefined, largeStickPickup] , 10, {width:0, height:0, xAdjust:32, yAdjust:64}, undefined, undefined);
+                worldMap.addElement('largeStick' , [tileArray[27]], 'clutter', 0, [undefined, undefined, largeStickPickup] , 10, {width:0, height:0, xAdjust:64, yAdjust:27}, undefined, undefined);
                 //End of stick definition.
-                
+                //Log
+                worldMap.addElement('woodHunk', [tileArray[28]], 'clutter', 0, [undefined, undefined, undefined], 32, undefined, undefined, undefined);
+                //End log
                 
                 
                 
@@ -1712,45 +1713,48 @@ function gameLoad(ctx, cnv){
                       strengthUnder:this.fullStrength*0.5,
                       image:tileArray[19],
                       extraCode:function(){
-                        this.scatterAround('smallStick' , [0, 0, 0, 0, 1, 1, 2, 2,], 160, 128, 64, 65, 30, -20);
-                        this.scatterAround('mediumStick', [0,0,0,0,0,0,1,2], 160, -96, 75, 7, 30, 10);
-                        this.scatterAround('largeStick' , [0,0,0,0,0,1], 250, -200, 120, 0, 50, -24);
+                        this.scatterAround('smallStick' , [2,2,3,3,3,4], 160, 128, 64, 65, 30, -20);
+                        this.scatterAround('mediumStick', [1,1,2,2,2,3], 160, -96, 75, 7, 30, 10);
+                        this.scatterAround('largeStick' , [0,0,1], 250, -200, 120, 0, 50, -24);
                       }.bind(this)
                     },
                     {
                       strengthUnder:this.fullStrength*0.45,
                       image:tileArray[20],
                       extraCode:function(){
-                        this.scatterAround('smallStick' , [0, 0, 0, 0, 1, 1, 2, 2,], 160, 128, 64, 65, 30, -20);
-                        this.scatterAround('mediumStick', [0,0,0,0,0,0,1,2], 160, -96, 75, 7, 30, 10);
-                        this.scatterAround('largeStick' , [0,0,0,0,0,1], 250, -200, 120, 0, 50, -24);
+                        this.scatterAround('smallStick' , [2,2,3,3,3,4], 160, 128, 64, 65, 30, -20);
+                        this.scatterAround('mediumStick', [1,1,2,2,2,3], 160, -96, 75, 7, 30, 10);
+                        this.scatterAround('largeStick' , [0,0,1], 250, -200, 120, 0, 50, -24);
                       }.bind(this)
                     },
                     {
                       strengthUnder:this.fullStrength*0.4,
                       image:tileArray[21],
                       extraCode:function(){
-                        this.scatterAround('smallStick' , [0, 0, 0, 0, 1, 1, 2, 2,], 160, 128, 64, 65, 30, -20);
-                        this.scatterAround('mediumStick', [0,0,0,0,0,0,1,2], 160, -96, 75, 7, 30, 10);
-                        this.scatterAround('largeStick' , [0,0,0,0,0,1], 250, -200, 120, 0, 50, -24);
+                        this.scatterAround('smallStick' , [2,2,3,3,3,4], 160, 128, 64, 65, 30, -20);
+                        this.scatterAround('mediumStick', [1,1,2,2,2,3], 160, -96, 75, 7, 30, 10);
+                        this.scatterAround('largeStick' , [0,0,1], 250, -200, 120, 0, 50, -24);
                       }.bind(this)
                     },
                     {
                       strengthUnder:this.fullStrength*0.35,
                       image:tileArray[22],
                       extraCode:function(){
-                        this.scatterAround('smallStick' , [0, 0, 0, 0, 1, 1, 2, 2,], 160, 128, 64, 65, 30, -20);
-                        this.scatterAround('mediumStick', [0,0,0,0,0,0,1,2], 160, -96, 75, 7, 30, 10);
-                        this.scatterAround('largeStick' , [0,0,0,0,0,1], 250, -200, 120, 0, 50, -24);
+                        this.scatterAround('woodHunk' , [1,1,2,2,2,2,3], 250, -200, 120, 0, 50, -24);
                       }.bind(this)
                     },
                     {
                       strengthUnder:this.fullStrength*0.2,
-                      image:tileArray[23]
+                      image:tileArray[23],
+                      extraCode:function(){
+                        this.scatterAround('woodHunk' , [1,1,2,2,2,2,3], 250, -200, 120, 0, 50, -24);
+                      }.bind(this)
                     },
                     {
                       strengthUnder:this.fullStrength*0.05,
-                      image:tileArray[24]
+                      image:tileArray[24],
+                      extraCode:function(){
+                      }.bind(this)
                     },
                     {
                       strengthUnder:this.fullStrength*-1,
@@ -1790,10 +1794,14 @@ function gameLoad(ctx, cnv){
                           }
                         }.bind(this))
                         if(this.lastUnder.image)this.image = this.lastUnder.image;
-                        if(this.lastUnder.extraCode)this.lastUnder.extraCode();
+                        if(this.lastUnder.extraCode && !(this.lastUnder.beenCalled))this.lastUnder.extraCode();
+                        this.lastUnder.beenCalled = true;
+                        
+                        return true;
                       }
                     }
                   }
+                  return false;
                 }
                 
                 function onBigRockSpawn(){
@@ -2157,7 +2165,9 @@ function gameLoad(ctx, cnv){
                   
                   if(playerCharacter.inventory.shove(this)){
                     worldMap.mapIndex['clutter'][0].splice(worldMap.mapIndex['clutter'][0].indexOf(this), 1);
+                    return true;
                   }
+                  else return false;
                 }//.image.src.replace(/tiles/i, 'inventoryIcons')
                 
                 
@@ -2196,7 +2206,8 @@ function gameLoad(ctx, cnv){
                                         easeOfUse:true,
                                         arcanis:true,
                                         pointiness:true,
-                                        smashiness:false
+                                        smashiness:false,
+                                        harvestingEffectiveness:true
                                       }
                                     }
                                   },
@@ -2220,7 +2231,8 @@ function gameLoad(ctx, cnv){
                                         easeOfUse:true,
                                         arcanis:true,
                                         pointiness:true,
-                                        smashiness:false
+                                        smashiness:false,
+                                        harvestingEffectiveness:true
                                       }
                                     }
                                   },
@@ -2244,7 +2256,8 @@ function gameLoad(ctx, cnv){
                                         easeOfUse:true,
                                         arcanis:true,
                                         pointiness:true,
-                                        smashiness:false
+                                        smashiness:false,
+                                        harvestingEffectiveness:true
                                       }
                                     }
                                   },
@@ -2272,7 +2285,9 @@ function gameLoad(ctx, cnv){
                   
                   if(playerCharacter.inventory.shove(this)){
                     worldMap.mapIndex['clutter'][0].splice(worldMap.mapIndex['clutter'][0].indexOf(this), 1);
+                    return true;
                   }
+                  else return false;
                 }
                 
                 
@@ -2310,7 +2325,8 @@ function gameLoad(ctx, cnv){
                                         easeOfUse:true,
                                         arcanis:true,
                                         pointiness:true,
-                                        smashiness:false
+                                        smashiness:false,
+                                        harvestingEffectiveness:true
                                       }
                                     }
                                   },
@@ -2334,7 +2350,8 @@ function gameLoad(ctx, cnv){
                                         easeOfUse:true,
                                         arcanis:true,
                                         pointiness:true,
-                                        smashiness:false
+                                        smashiness:false,
+                                        harvestingEffectiveness:true
                                       }
                                     }
                                   },
@@ -2358,7 +2375,8 @@ function gameLoad(ctx, cnv){
                                         easeOfUse:true,
                                         arcanis:true,
                                         pointiness:true,
-                                        smashiness:false
+                                        smashiness:false,
+                                        harvestingEffectiveness:true
                                       }
                                     }
                                   },
@@ -2386,7 +2404,9 @@ function gameLoad(ctx, cnv){
                   
                   if(playerCharacter.inventory.shove(this)){
                     worldMap.mapIndex['clutter'][0].splice(worldMap.mapIndex['clutter'][0].indexOf(this), 1);
+                    return true;
                   }
+                  else return false;
                 }
                 
                 
@@ -2410,7 +2430,9 @@ function gameLoad(ctx, cnv){
                   
                   if(playerCharacter.inventory.shove(this)){
                     worldMap.mapIndex['clutter'][0].splice(worldMap.mapIndex['clutter'][0].indexOf(this), 1);
+                    return true;
                   }
+                  else return false;
                 }
                 
                 //This adds a few tiles to said starting map

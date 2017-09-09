@@ -1251,7 +1251,7 @@ function character(){
             //The following code facilitates the drop function
             $('#drop' + encapsulationDevice).click(function(){
               if(playerCharacter.explanations){
-                $('#canvasCan').append('<div class = inGameWindow id = dropAlert' + encapsulationDevice + ' style = padding:5px;left:10px;top:10px;> <h5 style = margin:0px;> Click near the mortal to drop the ' + item.name + ' that is in their ' + encapsulationDevice.replace(/([A-Z])/g, ' $1').trim().capitalize() + '. </h5> </div>');
+                $('#canvasCan').append('<div class = inGameWindow id = dropAlert' + encapsulationDevice + ' style = padding:5px;left:10px;top:10px;> <h5 style = margin:0px;> Click near the mortal to drop the ' + item.name.toLowerCase() + ' that is in their ' + encapsulationDevice.replace(/([A-Z])/g, ' $1').trim().capitalize().toLowerCase() + '. </h5> </div>');
                 setTimeout(function(){
                   $('#dropAlert' + encapsulationDevice).fadeOut(3000, function(){
                     $(this).remove();
@@ -1284,7 +1284,7 @@ function character(){
                     worldMap.mapIndex['clutter'][0].push(item);
                     //Done with rock-sticking code.
 
-                    //These cleanup stuff setup to see if the character was click and to prevent him from picking up a rock while trying to put one down.
+                    //These clean up stuff setup to see if the character had clicked and to prevent him from picking up a rock while trying to put one down.
                     $('#canvasCan').off('click', dropOffAtClick);
                     playerCharacter.busy = false;
                     
@@ -1297,7 +1297,7 @@ function character(){
                     playerCharacter.inventoryUpdate();
                     //Done with inventory stuff, now we'll end the loop and the window
                     
-                    break;
+                    return;
                   }
                 }
               }
@@ -1904,18 +1904,23 @@ function gameLoad(ctx, cnv){
                         //randomness math here
                         //Oh almighty RNG God, blessed be thine name, gift ye servants all with good luck, and illustrious fame.
                         var randomness = Math.round(Math.random()*(this.inventory.tool.crafting.asTool.randomness*2))-this.inventory.tool.crafting.asTool.randomness;
+                        if(this.inventory.material.crafting.asMaterial.craftableInto[this.inventory.currentCraftingGoal].difficulty && this.inventory.material.crafting.asMaterial.craftableInto[this.inventory.currentCraftingGoal].difficulty[this.inventory.tool.name.toLowerCase()]){
+                          console.log('Here!');
+                          randomness = randomness - this.inventory.material.crafting.asMaterial.craftableInto[this.inventory.currentCraftingGoal].difficulty[this.inventory.tool.name.toLowerCase()];
+                        }
                         
                         //Durability math here
                         var newDurability = Math.ceil((this.inventory.tool.crafting.asTool.smashiness*((10-this.inventory.material.crafting.asMaterial.ductility)/100))*this.inventory.material.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal]);
-                        this.inventory.material.crafting.asMaterial.durability = this.inventory.material.crafting.asMaterial.durability - ((newDurability+randomness > 0) ? newDurability : newDurability+randomness);
+                        this.inventory.material.crafting.asMaterial.durability = this.inventory.material.crafting.asMaterial.durability - ((newDurability+randomness > 0) ? newDurability+randomness : 0);
                         
                         //Resemblance math here
                         var newResemblance = Math.ceil(((this.inventory.tool.crafting.asTool.pointiness*(this.inventory.material.crafting.asMaterial.malleability/100))*(100-this.inventory.material.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal])));
-                        newResemblance = newResemblance + randomness;
+                        newResemblance = (newResemblance + randomness < 0) ? 0 : newResemblance + randomness;
                         this.inventory.material.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal] = this.inventory.material.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal] + newResemblance;
                         
                         //Item destruction here
                         if(this.inventory.material.crafting.asMaterial.durability < 1 || !(typeof this.inventory.material.crafting.asMaterial.durability == 'number'))this.inventory.material = undefined;
+                        
                         //Crafting happens here
                         else if(this.inventory.material.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal] > 69){
                           
@@ -2117,23 +2122,31 @@ function gameLoad(ctx, cnv){
                               smashiness:3,
                               randomness:3,
                               materials:['fibrous', 'fleshy'],
+                              
                               statsIncreasedWithHigherQuality:{
                                 pointiness:true,
                                 smashiness:false
                               }
                             },
+                            difficulty:{
+                              rock:4
+                            },
                             image:tileArray[7]
                           },
                           point:{
                             asTool:{
-                              pointiness:.3,
-                              smashiness:3,
+                              pointiness:.75,
+                              smashiness:4,
                               randomness:3,
+                              
                               materials:['mineral'],
                               statsIncreasedWithHigherQuality:{
                                 pointiness:true,
                                 smashiness:false
                               }
+                            },
+                            difficulty:{
+                              rock:-2
                             },
                             image:tileArray[5]
                           },
@@ -2148,6 +2161,9 @@ function gameLoad(ctx, cnv){
                                 pointiness:true,
                                 smashiness:false
                               }
+                            },
+                            difficulty:{
+                              rock:6
                             },
                             image:tileArray[6]
                           }

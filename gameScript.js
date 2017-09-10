@@ -1269,8 +1269,7 @@ function character(){
                   var element = playerCharacter.overTiles[index];
 
                   if(isInside(mousePos, {x:element.x, y:element.y, width:element.image.width, height:element.image.height})){
-                    console.log(item);
-                    //The following code sticks the rock into the map system
+                    //The following code sticks the item into the map system
                     item.cartesianY = parseInt(element.cartesianY);
                     item.cartesianX = parseInt(element.cartesianX);
 
@@ -1846,13 +1845,13 @@ function gameLoad(ctx, cnv){
                   $('#largeRockGUI').append('<div id = largeRockGUIMainArea style = width:100%;height:100%;></div>');
                   $('#largeRockGUIMainArea').append('<div id = largeRockGUIUpperArea style = position:relative;text-align:center;width:100%;height:300px;></div>');
                   
+                  
                   if(!(this.inventory))this.inventory = {
                     tool:undefined,
-                    toolEncapsulationDevice:undefined,
                     material:undefined,
-                    materialEncapsulationDevice:undefined,
                     currentCraftingGoal:'point'
                   };
+                  
                   
                   this.updateInventory = function(){
                     $('#largeRockGUIUpperArea').empty();
@@ -1907,7 +1906,6 @@ function gameLoad(ctx, cnv){
                     $('#whackButton').click(function(){
                       if(this.inventory.material && this.inventory.tool){
                         if(!(this.inventory.tool.crafting.asTool) || !(this.inventory.tool.crafting.asTool.materials) || this.inventory.tool.crafting.asTool.materials.indexOf(this.inventory.material.crafting.asMaterial.materialType) == -1){
-                          console.log('Returned');
                           return;
                         }
                         
@@ -2020,6 +2018,7 @@ function gameLoad(ctx, cnv){
                             parts:parts
                           }
                           //this.inventory.material.harvesting = newItem.harvesting;
+                          //TODO onClick adoption from part specified in creation of object.
                           
                           this.inventory.material.crafting.asMaterial.resemblance[newItem.name.toLowerCase()] = Math.floor((materialSlotResemblance + this.inventory.tool.crafting.asMaterial.resemblance[this.inventory.tool.name[0].toLowerCase() + this.inventory.tool.name.replace(/\s/g, '').substring(1,this.inventory.tool.name.replace(/\s/g, '').length)])/2);
                           var overAmount = this.inventory.material.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal] - 70;
@@ -2087,9 +2086,8 @@ function gameLoad(ctx, cnv){
                             if(!(this.inventory[slot])){
                               
                               this.inventory[slot] = myItem;
-                              this.inventory[slot+'EncapsulationDevice'] = myItemEncapsulationDevice;
                               
-                              playerCharacter.inventory[myItemEncapsulationDevice]['holding'].splice(0, 1);
+                              playerCharacter.inventory[myItemEncapsulationDevice]['holding'] = [];
                               playerCharacter.inventoryUpdate();
                               
                               this.updateInventory();
@@ -2193,7 +2191,9 @@ function gameLoad(ctx, cnv){
                   if(!this.name)this.name = 'Rock';
                   
                   if(playerCharacter.inventory.shove(this)){
-                    worldMap.mapIndex['clutter'][0].splice(worldMap.mapIndex['clutter'][0].indexOf(this), 1);
+                    while(worldMap.mapIndex['clutter'][0].indexOf(this) !== -1){
+                      worldMap.mapIndex['clutter'][0].splice(worldMap.mapIndex['clutter'][0].indexOf(this), 1);
+                    }
                     return true;
                   }
                   else return false;
@@ -2313,7 +2313,9 @@ function gameLoad(ctx, cnv){
                   }
                   
                   if(playerCharacter.inventory.shove(this)){
-                    worldMap.mapIndex['clutter'][0].splice(worldMap.mapIndex['clutter'][0].indexOf(this), 1);
+                    while(worldMap.mapIndex['clutter'][0].indexOf(this) !== -1){
+                      worldMap.mapIndex['clutter'][0].splice(worldMap.mapIndex['clutter'][0].indexOf(this), 1);
+                    }
                     return true;
                   }
                   else return false;
@@ -2432,7 +2434,9 @@ function gameLoad(ctx, cnv){
                   }
                   
                   if(playerCharacter.inventory.shove(this)){
-                    worldMap.mapIndex['clutter'][0].splice(worldMap.mapIndex['clutter'][0].indexOf(this), 1);
+                    while(worldMap.mapIndex['clutter'][0].indexOf(this) !== -1){
+                      worldMap.mapIndex['clutter'][0].splice(worldMap.mapIndex['clutter'][0].indexOf(this), 1);
+                    }
                     return true;
                   }
                   else return false;
@@ -2508,7 +2512,7 @@ function gameLoad(ctx, cnv){
                                   }
                                 },
                                 point:{
-                                  name:'spear',
+                                  name:'Spear',
                                   image:tileArray[40],
                                   crafting:{
                                     asTool:{
@@ -2551,7 +2555,9 @@ function gameLoad(ctx, cnv){
                   }
                   
                   if(playerCharacter.inventory.shove(this)){
-                    worldMap.mapIndex['clutter'][0].splice(worldMap.mapIndex['clutter'][0].indexOf(this), 1);
+                    while(worldMap.mapIndex['clutter'][0].indexOf(this) !== -1){
+                      worldMap.mapIndex['clutter'][0].splice(worldMap.mapIndex['clutter'][0].indexOf(this), 1);
+                    }
                     return true;
                   }
                   else return false;

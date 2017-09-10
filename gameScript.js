@@ -1131,6 +1131,7 @@ function character(){
             if(playerCharacter.busy)return;
             
             function killFunction(){
+              if(this.id === 'thinHr')playerCharacter.busy = false;
               $('#canvasCan').off('mousemove', optionsBoxToMousePos);
               $('#optionsBox' + encapsulationDevice).off('mouseleave', killFunction)
               $('#optionsBox' + encapsulationDevice).remove();
@@ -1141,7 +1142,8 @@ function character(){
             
             
             //The following code facilitates that little box that appears when you press a number key or click on a hand.
-            $('#canvasCan').append('<div class = inGameWindow id = optionsBox' + encapsulationDevice + ' style = padding:5px;text-align:center;font-size:15px;width:100px;position:absolute;> </div>');
+            if(!$('#optionsBox' + encapsulationDevice).length){
+              $('#canvasCan').append('<div class = inGameWindow id = optionsBox' + encapsulationDevice + ' style = padding:5px;text-align:center;font-size:15px;width:100px;position:absolute;> </div>');
               $('#optionsBox' + encapsulationDevice).append('<div style = width:100%; id = drop' + encapsulationDevice + '> <h4 style = margin:0px;> Drop </h4> </div>');
               $('#optionsBox' + encapsulationDevice).append('<hr id = thinHr>');
               $('#optionsBox' + encapsulationDevice).append('<div style = width:100%; id = examine' + encapsulationDevice + '> <h4 style = margin:0px;> Examine </h4> </div>');
@@ -1157,7 +1159,7 @@ function character(){
               });
             
               $('#optionsBox' + encapsulationDevice).children().click(killFunction);
-            
+            }
             function optionsBoxToMousePos(event){
               var mousePos = getMousePos(cnv, event);
               $('#optionsBox' + encapsulationDevice).show();
@@ -1252,14 +1254,13 @@ function character(){
             $('#drop' + encapsulationDevice).click(function(){
               if(playerCharacter.explanations){
                 $('#canvasCan').append('<div class = inGameWindow id = dropAlert' + encapsulationDevice + ' style = padding:5px;left:10px;top:10px;> <h5 style = margin:0px;> Click near the mortal to drop the ' + item.name.toLowerCase() + ' that is in their ' + encapsulationDevice.replace(/([A-Z])/g, ' $1').trim().capitalize().toLowerCase() + '. </h5> </div>');
-                setTimeout(function(){
-                  $('#dropAlert' + encapsulationDevice).fadeOut(3000, function(){
-                    $(this).remove();
-                  });
-                }, 3000);
+                $('#dropAlert' + encapsulationDevice).fadeOut(3000, function(){
+                  $(this).remove();
+                });
               }
 
               function dropOffAtClick(event){
+                event.stopPropagation();
                 var mousePos = getMousePos(cnv, event);
                 mousePos.x = mousePos.x + cameraX;
                 mousePos.y = mousePos.y + cameraY;
@@ -1268,7 +1269,7 @@ function character(){
                   var element = playerCharacter.overTiles[index];
 
                   if(isInside(mousePos, {x:element.x, y:element.y, width:element.image.width, height:element.image.height})){
-
+                    console.log(item);
                     //The following code sticks the rock into the map system
                     item.cartesianY = parseInt(element.cartesianY);
                     item.cartesianX = parseInt(element.cartesianX);
@@ -1301,8 +1302,14 @@ function character(){
                   }
                 }
               }
-
-              setTimeout(function(){$('#canvasCan').on('click', dropOffAtClick);}, 10);
+              
+              function dropOffAtClickHolder(){
+                $('#canvasCan').on('click', dropOffAtClick);
+                $('#canvasCan').off('click', dropOffAtClickHolder);
+              };
+              
+              //setTimeout(function(){}, 10);
+              $('#canvasCan').on('click', dropOffAtClickHolder);
             });
             //That's the end of the drop function code.
             
@@ -1899,7 +1906,10 @@ function gameLoad(ctx, cnv){
                     $('#largeRockGUIUpperArea').append('<div class = genericButton id = whackButton style = margin:auto;width:80px;padding:5px;padding-bottom:0px;padding-top:2px;> Whack </div>');
                     $('#whackButton').click(function(){
                       if(this.inventory.material && this.inventory.tool){
-                        if(this.inventory.tool.crafting.asTool && this.inventory.tool.crafting.asTool.materials && this.inventory.tool.crafting.asTool.materials.indexOf(this.inventory.material.crafting.asMaterial.materialType) == -1)return;
+                        if(!(this.inventory.tool.crafting.asTool) || !(this.inventory.tool.crafting.asTool.materials) || this.inventory.tool.crafting.asTool.materials.indexOf(this.inventory.material.crafting.asMaterial.materialType) == -1){
+                          console.log('Returned');
+                          return;
+                        }
                         
                         //randomness math here
                         //Oh almighty RNG God, blessed be thine name, gift ye servants all with good luck, and illustrious fame.
@@ -2134,7 +2144,7 @@ function gameLoad(ctx, cnv){
                           },
                           point:{
                             asTool:{
-                              pointiness:.75,
+                              pointiness:.5,
                               smashiness:4,
                               randomness:3,
                               

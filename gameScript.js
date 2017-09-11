@@ -1080,8 +1080,8 @@ function character(){
   
   this.stats = {
     speed:3,
-    maxSight:25,
-    sight:25
+    maxSight:10,
+    sight:10
   };
   
   this.inventory = {

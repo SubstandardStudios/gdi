@@ -1492,9 +1492,18 @@ function startGame(){
   $('#settingsWindow').hide();
   
   $('#settingsTab').click(function(){
-    $('#settingsWindow').toggle();
+  	$('#settingsWindow').toggle();
   });
   $('#canvasCan').append('<div class = tabBottom id = mortalInfoTab style = right:120px;><img src="imgs/icons/mortalIcon.png" alt="Mortal Info" style = display:block;margin:auto;></div>');
+	
+	$('#canvasCan').append('<div class = inGameWindow id = infoWindow style = width:700px;height:500px;> <h3 style = margin-left:100px;margin-right:100px;margin-top:20px;> Information </h3> <h4 style = position:absolute;top:0px;right:15px; > Drag Me! </h4> <hr id = thinHr> </div>');
+	
+	$('#infoWindow').append('<div id = directoryView style = height:475;width:100px;border-right:1px solid black;></div>');
+	$('#infoWindow').hide();
+	
+	$('#mortalInfoTab').click(function(){
+  	$('#infoWindow').toggle();
+  });
   
   gameLoad(ctx, cnv);
 }

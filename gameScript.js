@@ -1499,7 +1499,7 @@ function startGame(){
 	$('#canvasCan').append('<div class = inGameWindow id = infoWindow style = width:700px;height:500px;> <h3 style = margin-left:100px;margin-right:100px;margin-top:20px;> Information </h3> <h4 style = position:absolute;top:0px;right:15px; > Drag Me! </h4> <hr id = thinHr> </div>');
 	
 	$('#infoWindow').append('<div id = directoryView style = height:475;width:100px;></div>');
-	$('#infoWindow').hide();
+	//$('#infoWindow').hide();
 	
 	$('#mortalInfoTab').click(function(){
   	$('#infoWindow').toggle();
@@ -2605,6 +2605,7 @@ function gameLoad(ctx, cnv){
                 
                 $('#settingsWindow').append('<div style=margin:auto;display:block;> <h4 style = margin-top:3px;margin-right:0px;float:left;display:block;>Camera Tracking(Alt):</h4> <input type = checkBox style=float:right; id = camTrackInput></div>');
                 
+								
                 $('#camTrackInput').on('change', function(){
                   playerCharacter.focusOn = !playerCharacter.focusOn;
                   $(this).prop('checked', playerCharacter.focusOn);

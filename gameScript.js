@@ -1935,6 +1935,7 @@ function gameLoad(ctx, cnv){
                           
                           this.inventory.material.name = this.inventory.currentCraftingGoal.replace(/([A-Z])/g, ' $1').trim().capitalize();
                           this.inventory.material.image = this.inventory.material.crafting.asMaterial.craftableInto[this.inventory.currentCraftingGoal].image;
+                          this.inventory.material.childrenShouldInheritRect = this.inventory.material.crafting.asMaterial.craftableInto[this.inventory.currentCraftingGoal].childrenShouldInheritRect;
                           
                           this.inventory.material.crafting.asTool = $.extend(true, {}, this.inventory.material.crafting.asMaterial.craftableInto[this.inventory.currentCraftingGoal].asTool);
                           
@@ -1995,9 +1996,15 @@ function gameLoad(ctx, cnv){
 
                         $('#combineButton').click(function(){
                           var materialSlotResemblance = this.inventory.material.crafting.asMaterial.resemblance[this.inventory.material.name[0].toLowerCase() + this.inventory.material.name.replace(/\s/g, '').substring(1,this.inventory.material.name.replace(/\s/g, '').length)];
+                          
                           if(this.inventory.tool.crafting.asMaterial && this.inventory.tool.crafting.asMaterial.combineableWith && this.inventory.tool.crafting.asMaterial.combineableWith[this.inventory.material.name[0].toLowerCase() + this.inventory.material.name.replace(/\s/g, '').substring(1,this.inventory.material.name.replace(/\s/g, '').length)])var newItem = this.inventory.tool.crafting.asMaterial.combineableWith[this.inventory.material.name[0].toLowerCase() + this.inventory.material.name.replace(/\s/g, '').substring(1,this.inventory.material.name.replace(/\s/g, '').length)];
                           else var newItem = this.inventory.material.crafting.asMaterial.combineableWith[this.inventory.tool.name[0].toLowerCase() + this.inventory.tool.name.replace(/\s/g, '').substring(1,this.inventory.tool.name.replace(/\s/g, '').length)];
-
+                          
+                          if(this.inventory.tool.childrenShouldInheritRect || this.inventory.material.childrenShouldInheritRect){
+                            //console.log('Got here!');
+                            var whichRectToInherit = (this.inventory.tool.childrenShouldInheritRect) ? this.inventory.tool.clickRect : this.inventory.material.clickRect;
+                          }
+                          
                           this.inventory.material.name = newItem.name;
                           this.inventory.material.image = newItem.image;
                           this.inventory.currentCraftingGoal = newItem.name.toLowerCase();
@@ -2022,6 +2029,8 @@ function gameLoad(ctx, cnv){
                           
                           this.inventory.material.crafting.asMaterial.resemblance[newItem.name.toLowerCase()] = Math.floor((materialSlotResemblance + this.inventory.tool.crafting.asMaterial.resemblance[this.inventory.tool.name[0].toLowerCase() + this.inventory.tool.name.replace(/\s/g, '').substring(1,this.inventory.tool.name.replace(/\s/g, '').length)])/2);
                           var overAmount = this.inventory.material.crafting.asMaterial.resemblance[this.inventory.currentCraftingGoal] - 70;
+                          
+                          if(whichRectToInherit)this.inventory.material.clickRect = whichRectToInherit;
                           
                           for(var stat in this.inventory.material.crafting.asTool.statsIncreasedWithHigherQuality){
                             var shouldIncrease = this.inventory.material.crafting.asTool.statsIncreasedWithHigherQuality[stat];
@@ -2216,6 +2225,7 @@ function gameLoad(ctx, cnv){
                         length:'short',
                         craftableInto:{
                           grip:{
+                            childrenShouldInheritRect:true,
                             asMaterial:{
                               length:'short',
                               combineableWith:{
@@ -2337,6 +2347,7 @@ function gameLoad(ctx, cnv){
                         length:'medium',
                         craftableInto:{
                           grip:{
+                            childrenShouldInheritRect:true,
                             asMaterial:{
                               length:'medium',
                               combineableWith:{
@@ -2458,6 +2469,7 @@ function gameLoad(ctx, cnv){
                         length:'long',
                         craftableInto:{
                           grip:{
+                            childrenShouldInheritRect:true,
                             asMaterial:{
                               length:'medium',
                               combineableWith:{

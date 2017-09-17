@@ -1,0 +1,7 @@
+@ECHO OFF
+SETLOCAL ENABLEEXTENSIONS ENABLEDELAYEDEXPANSION
+SET parent=%~dp0
+
+FOR %%X in (%parent%*.png) DO (
+	REN %%X !random!.png
+)

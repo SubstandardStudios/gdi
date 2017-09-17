@@ -213,6 +213,11 @@ h3 {
   height:65px;
 }
 
+.borderRightThin{
+  padding-right:10px;
+  border-right:2px solid black;
+}
+
 .borderedBoxThin{
   border:2px solid black;
   border-radius:25px;

@@ -1030,6 +1030,129 @@ function gameMap(tileImage1, tileImage2, size){
 //End of assisting functions section! :D
 
 function character(){
+  
+  this.information = {
+    internalData:{
+      currentDirectory:'home',
+      directoryPath:[]
+    },
+    home:{
+      entry:"This is the Information Interface, a subsidiary of Graphical Deity Interface. Within this interface, you can view all of the information held within the minds of your mortals. There also rests, within this Interface, a cache of information designed to assist your human in learning how to use the Graphical Deity Interface. Click on one of the entries on the left to continue.",
+      GDI:{
+        entry:"The contents of this subdirectory are designed to bolster the efficiency with which your human is able to use the Graphical Deity Interface.",
+        pickingThingsUp:{
+          image:'imgs/examinationIcons/30.png',
+          entry:"Greetings, human. If you came here because your deity wants you to urge their mortal to pick up something, but you haven't the slightest idea as to how to go about that, you're in luck. Simply get as close to whatever it is that you wish to pick up as possible, and then click on it with your mouse. This action will send a message through the aether and into the mind of your deity's mortal."
+        },
+        interacting:{
+          image:'imgs/icons/craftingBig.png',
+          entry:"Greetings, human. If you deity wishes to interact with, for example, a large rock, then ready your deity's mortal for interaction, and then click on this large rock, after getting your deity's mortal as close to it possible."
+        },
+        whacking:{
+          image:'imgs/examinationIcons/36.png',
+          entry:"Greetings, human. If your deity wishes to whack, for example, your deity's mortal's neighbor, ready your deity's mortal for whacking, and urge them to get as close as possible to their neighbor. Once they are within the general vicinity of your neighbor, click in his general direction, and your deity's mortal will be urged to whack him."
+        },
+        whatIsToCome:{
+          entry:"I, Introd, deity of guides and introductions, will soon urge my humans to add entries about the processes of moving and readying(and the process of readying in and of itself). Until then, O eager deities, cool your freaking jets. Gaaawd!"
+        }
+      },
+      mortal:{
+        entry:"The subdirectories of this entry represent all of the relevant information stored within the mind of your mortal.",
+        crafting:{
+          entry:"There are various types of crafting, most of which revolve around hitting things with other things. Anvil crafting is likely the easiest.",
+          anvil:{
+            entry:"Many different things can be used as anvils, to a varying degree of effectiveness. Large rocks, for example, are relatively easy to come by and make excellent anvils. Once one has located an anvil, they need only find two things to whack together, and can then begin crafting. Stones are excellent for this purpose.",
+
+            tools:{
+              entry:"Tools allow you to craft a greater number of things, or make the process of crafting things easier. Points, for example, are simple tools which allow one to craft axe heads much more easily, and axe heads are simple tools that allow one to carve sticks into handles. Handles can be combined with axe heads to make hatchets or axes, both of which are compound tools and either of which can be used to fell trees. Trees, when felled, produce long sticks, which are otherwise quite difficult to come by.",
+              simple:{
+                entry:"Simple tools have some uses, but gain many more when coupled with another of their kind.",
+                point:{
+                  image:'imgs/examinationIcons/5.png',
+                  entry:"This tool is a starting point for many aspiring craftsmen. Haha! See what I did there? Once one has fabricated a point, it can be used to easily craft an axe head. The point alongside other items, however, can be formed into a chisel, pickaxe, or spear, when combined with a small, medium, or long grip, respectively."
+                },
+                axeHead:{
+                  image:'imgs/examinationIcons/7.png',
+                  entry:"The axe head is a tool that can be used to create grips, which can be attached to other simple tools in order to create compound tools. Axe heads form hatchets, axes, and poleaxes when crafted with small grips, medium grips, and long grips, respectively."
+                },
+                blade:{
+                  image:'imgs/examinationIcons/6.png',
+                  entry:"A blade is, in essence, a sharpened rod that tapers off towards one end. The blade is the hardest to craft of all of the simple tools. To form the most useful blades, a chisel is needed. Blades form daggers, scythes, and pikes when combined with short, medium, and long grips, respectively."
+                },
+                grip:{
+                  image:'imgs/examinationIcons/29.png',
+                  entry:" In their usage, grips are beholden to handles, and handles are that which is held. It's rather handy to have a grip on this information, therefore, behold! Now that that's been handled, I'll have to hand it to you: trudging through all of that poor humor was no small feat, hands down. I can feel your grimace from here, Robbie. <br><br>" + 
+                  " Grips are generally hewn from fibrous materials such as wood. Sticks, for example, are often located beneath trees and can be turned into handles with very little hassle. Fibrous materials such as these sticks are most effectively carved through the use of hatchets, although in dire straits a simple axe head will suffice. <br><br>" + 
+                  " The length of the stick that one carves dictates the length of the grip that one ends up producing. <br><br>" +
+                  " What it is that is produced when one combines this grip with another simple tool, such as an axe head, depends upon the length of the grip. For example, when a grip of the shortest length is combined with an axe head, a hatchet is produced. But if a grip of much more sizeable dimensions is concatenated with an axe head, a poleax is created. <br><br>"
+                }
+              },
+              compound:{
+                entry:"Compound tools consist of a handle and a head.",
+                shortHandled:{
+                  entry:"Short handled tools are used primarily for crafting.",
+                  chisel:{
+                    image:'imgs/examinationIcons/34.png',
+                    entry:"Chisels make excellent stone crafting utensils. Combine a point with a short grip to create one."
+                  },
+                  hatchet:{
+                    image:'imgs/examinationIcons/32.png',
+                    entry:"In skilled hands, a good hatchet can produce beautiful woodwork. If you'd like to have a hatchet, so that you can try your hand at creating your own beautiful woodwork, combine an axe head with a short shaft."
+                  },
+                  dagger:{
+                    image:'imgs/examinationIcons/33.png',
+                    entry:"A dagger's short blade and handle are great for harvesting fleshy bits, but aren't quite long enough to be of any use in a battle. Nevertheless, if your neighbor happens to be otherwise occupied, I'm sure he won't notice... until it's too late."
+                  }
+                },
+                mediumHandled:{
+                  entry:"Medium handled tools are used primarily for harvesting.",
+                  pickAxe:{
+                    image:'imgs/examinationIcons/37.png',
+                    entry:"While this tool can be used for crafting, its medium sized handle means that it's better used smashing up rocks. A pickaxe is created through the combination of a point with a medium sized shaft."
+                  },
+                  axe:{
+                    image:'imgs/examinationIcons/35.png',
+                    entry:"This tool's medium sized handle offers a degree of leverage better used in the process of cutting down trees, instead of the process of cutting up trees. If you are so inclined, you can create an axe by combining an axe head with a medium sized shaft."
+                  },
+                  scythe:{
+                    image:'imgs/examinationIcons/36.png',
+                    entry:"The scythe is a tool that is quite useful for cutting up grass. Or one's neighbors. If you're especially eager to do either of those, you can make one via combining a blade and a medium sized shaft."
+                  }
+                },
+                longHandled:{
+                  entry:"Long handled tools make powerful weapons, as when equipped with one, its owner needn't be very close to their opponent in order to strike.",
+                  spear:{
+                    image:'imgs/examinationIcons/40.png',
+                    entry:"Made up of a point and a long shaft, and capable of being thrown or thrust about, the spear is a formidable weapon."
+                  },
+                  poleax:{
+                    image:'imgs/examinationIcons/38.png',
+                    entry:"Dude, it's a slashy bit on the end of a long pole. What's not to like? The slashy bit is, of course, an axe head. Unfortunately, the manner in which this slashy bit is slashy means that poleaxes aren't much good for poking through things or being thrown, but they are quite nice for slicing off appendages!"
+                  },
+                  pike:{
+                    image:'imgs/examinationIcons/39.png',
+                    entry:"The pike is a weapon which combines the throwing and thrusting power of a spear with the amputating slash of a poleax. Needless to say, it'd be great for killing your neighbors. It consists of a blade and a long shaft."
+                  }
+                }
+              }
+            },
+            resources:{
+              entry:"Resources are that which is turned into something else through the process of crafting, or in this case, anvil crafting.",
+              stones:{
+                image:'imgs/examinationIcons/4.png',
+                entry:"Stones are clusters of minerals. Larger ones can be used as simple anvils in a process known as anvil crafting, and small stones can be used as materials in this anvil crafting process. Incidentally, smaller stones are often found clustered around larger stones."
+              },
+              sticks:{
+                image:'imgs/examinationIcons/25.png',
+                entry:"Sticks are easily found underneath trees. Once they are located, they can be hewn, through a process known as anvil crafting, into grips. The length of these grips is dictated by the length of the stick they're hewn from, and the length of the grip in turn dictates what the union of the grip and another part produces. Unlike their smaller counterparts, long sticks are generally produced when one fells a tree. See the entry on grips for more information and some horrible wordplay."
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  
   this.lastFocusedOn = false;
   this.focusOn = false;
   
@@ -1495,14 +1618,15 @@ function startGame(){
   	$('#settingsWindow').toggle();
   });
   $('#canvasCan').append('<div class = tabBottom id = mortalInfoTab style = right:120px;><img src="imgs/icons/mortalIcon.png" alt="Mortal Info" style = display:block;margin:auto;></div>');
-	
-	$('#canvasCan').append('<div class = inGameWindow id = infoWindow style = width:700px;height:500px;> <h3 style = margin-left:100px;margin-right:100px;margin-top:20px;> Information </h3> <h4 style = position:absolute;top:0px;right:15px; > Drag Me! </h4> <hr id = thinHr> </div>');
-	
-	$('#infoWindow').append('<div id = directoryView style = height:475;width:100px;></div>');
-	//$('#infoWindow').hide();
-	
-	$('#mortalInfoTab').click(function(){
-  	$('#infoWindow').toggle();
+
+  $('#canvasCan').append('<div class = inGameWindow id = infoWindow style = width:700px;height:300px;> <h3 style = margin-left:100px;margin-right:100px;margin-top:20px;> Information </h3> <h4 style = position:absolute;top:0px;right:15px; > Drag Me! </h4> <hr id = thinHr> </div>');
+
+  $('#infoWindow').hide();
+  $('#infoWindow').css('left', cnv.width/2 - $('#infoWindow').width()/2 + 'px');
+  $('#infoWindow').css('top', cnv.height/2 - $('#infoWindow').height()/2 + 'px');
+
+  $('#mortalInfoTab').click(function(){
+  $('#infoWindow').toggle();
   });
   
   gameLoad(ctx, cnv);
@@ -2619,6 +2743,63 @@ function gameLoad(ctx, cnv){
                 });
                 
                 makeDraggable('#settingsWindow', ['#sightDiv']);
+                
+                
+                $('#infoWindow').append('<div class = borderRightThin id = directoryView style = height:86%;width:150px;display:inline-block;></div>');
+                $('#infoWindow').append('<div id = entryView style = height:86%;width:525px;display:inline-block;float:right;overflow-y:auto;></div>');
+                
+                function infoPageUpdate(){
+                  //Directory update code.
+                  $('#directoryView').empty();
+                  $('#directoryView').append('<h3>' + playerCharacter.information.internalData.currentDirectory.replace(/([A-Z])/g, ' $1').trim().capitalize() + '</h3>');
+                  
+                  var currentDirectoryObj = playerCharacter.information.home;
+                  playerCharacter.information.internalData.directoryPath.forEach(function(element){
+                    currentDirectoryObj = currentDirectoryObj[element];
+                  });
+                  
+                  
+                  $('#directoryView').append('<hr id = thinHr>');//----
+                  
+                  
+                  for(var sub in currentDirectoryObj){
+                    if(sub === 'entry')continue;
+                    if(sub === 'image'){
+                      $('#directoryView').append('<h1 style = margin-bottom:0px;margin-top:0px;><img src = ' + currentDirectoryObj[sub] + '></h1>');
+                      continue;
+                    }
+                    
+                    $('#directoryView').append('<p id = directory' + sub + '>' + sub.replace(/([A-Z])/g, ' $1').trim().capitalize() + '</p>');
+                    $('#directory' + sub).click(function(){
+                      var sub = this.id.substring(9, this.id.length);
+                      playerCharacter.information.internalData.currentDirectory = sub;
+                      playerCharacter.information.internalData.directoryPath.push(sub);
+                      infoPageUpdate();
+                    });
+                  }
+                  
+                  
+                  $('#directoryView').append('<hr id = thinHr>');//----
+                  
+                  
+                  $('#directoryView').append('<h3 id = upDirectory>' + "Up" + '</h3>');
+                  $('#upDirectory').click(function(){
+                    playerCharacter.information.internalData.directoryPath.splice(playerCharacter.information.internalData.directoryPath.length-1, 1);
+                    playerCharacter.information.internalData.currentDirectory = playerCharacter.information.internalData.directoryPath[playerCharacter.information.internalData.directoryPath.length-1]
+                    if(typeof playerCharacter.information.internalData.currentDirectory == 'undefined')playerCharacter.information.internalData.currentDirectory = 'home';
+                    infoPageUpdate();
+                  });
+                  //End of directory update code.
+                  
+                  //entry update code start
+                  $('#entryView').empty();
+                  $('#entryView').append('<p>' + currentDirectoryObj.entry + '</p>');
+                  //entry update code end.
+                }
+                
+                infoPageUpdate();
+                
+                makeDraggable('#infoWindow', []);
                 
                 playerCharacter.cameraFocus();
 

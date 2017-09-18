@@ -11,20 +11,18 @@ function roundToMaxOrMin(value, max, min){
   else return value;  
 }
 
-function makeDraggable(id, exceptions){
-  if(!exceptions)exceptions = [];
-  $(id).mousedown(function(event){
-    $(id).on('mousemove', function(event){
-      for(var index = 0; index < exceptions.length; index++){
-        if($(exceptions[index]).is(':hover'))return;
-      }
+function makeDraggable(whatToDragID, whatToMoveID){
+  if(!whatToMoveID)var whatToMoveID = '#' + $(whatToDragID).parent().attr('id');
+  console.log(whatToMoveID);
+  $(whatToDragID).mousedown(function(event){
+    $(whatToMoveID).on('mousemove', function(event){
       var mousePos = getMousePos(cnv, event);
-      $(id).css('left', mousePos.x - $(id).width()/2);
-      $(id).css('top', mousePos.y - $(id).height()/2);
+      $(whatToMoveID).css('left', mousePos.x - $(whatToMoveID).width()/2);
+      $(whatToMoveID).css('top', mousePos.y - $(whatToMoveID).height()/2);//
     });
   });
-  $(id).mouseup(function(event){
-    $(id).off('mousemove');
+  $(whatToMoveID).mouseup(function(event){
+    $(whatToMoveID).off('mousemove');
   });
 };
 
@@ -1112,7 +1110,7 @@ function character(){
                   },
                   axe:{
                     image:'imgs/examinationIcons/35.png',
-                    entry:"This tool's medium sized handle offers a degree of leverage better used in the process of cutting down trees, instead of the process of cutting up trees. If you are so inclined, you can create an axe by combining an axe head with a medium sized shaft."
+                    entry:"This tool's medium sized handle offers a degree of leverage better used in the process of cutting down trees, instead of cutting up trees. If you are so inclined, you can create an axe by combining an axe head with a medium sized shaft."
                   },
                   scythe:{
                     image:'imgs/examinationIcons/36.png',
@@ -1329,7 +1327,7 @@ function character(){
                 $('#nextSideButton' + encapsulationDevice).click(function(){
                   flipDiv(nextSide, whichSide);
                 });
-                $('#rightSideDiv' + encapsulationDevice).append('<h3 style = margin-top:10px;>' + whichSide.capitalize() + '</h3>');
+                $('#rightSideDiv' + encapsulationDevice).append('<div id = draggablePart><h3 style = margin-top:10px;>' + whichSide.capitalize() + '</h3></div>');
                 $('#rightSideDiv' + encapsulationDevice).append('<div id = rightSideDiv' + encapsulationDevice + 'statsDiv style=overflow:auto;height:165px;width:340px;margin-top:5px;></div>');
                 $('#rightSideDiv' + encapsulationDevice + 'statsDiv').append('<hr id = thinHr style = margin-top:0px;margin-bottom:0px;width:95%;>');
                 
@@ -1362,7 +1360,7 @@ function character(){
               }
               
               flipDiv('material', 'tool');
-              makeDraggable('#examineWindow' + encapsulationDevice, $('#settingsWindow' + encapsulationDevice).children());
+              makeDraggable('#draggablePart', '#examineWindow' + encapsulationDevice);
               
               var width = $('#examineWindow' + encapsulationDevice).width();
               var height = $('#examineWindow' + encapsulationDevice).height();
@@ -1611,7 +1609,7 @@ function startGame(){
   
   $('#canvasCan').append('<div class = tabBottom id = settingsTab style = right:10px;><img src="imgs/icons/settingsIcon.png" alt="Settings" style = display:block;margin:auto;></div>');
   
-  $('#canvasCan').append('<div class = inGameWindow id = settingsWindow> <h3 style = margin-left:100px;margin-right:100px;margin-top:20px;> Settings </h3> <h4 style = position:absolute;top:0px;right:15px; > Drag Me! </h4> <hr id = thinHr> </div>');
+  $('#canvasCan').append('<div class = inGameWindow id = settingsWindow> <div  id = settingsTitleBar> <h3 style = margin-left:100px;margin-right:100px;margin-top:20px;> Settings </h3> <h4 style = position:absolute;top:0px;right:15px; > Drag Me! </h4> <hr id = thinHr> </div> </div>');
   $('#settingsWindow').hide();
   
   $('#settingsTab').click(function(){
@@ -1619,7 +1617,7 @@ function startGame(){
   });
   $('#canvasCan').append('<div class = tabBottom id = mortalInfoTab style = right:120px;><img src="imgs/icons/mortalIcon.png" alt="Mortal Info" style = display:block;margin:auto;></div>');
 
-  $('#canvasCan').append('<div class = inGameWindow id = infoWindow style = width:700px;height:300px;> <h3 style = margin-left:100px;margin-right:100px;margin-top:20px;> Information </h3> <h4 style = position:absolute;top:0px;right:15px; > Drag Me! </h4> <hr id = thinHr> </div>');
+  $('#canvasCan').append('<div class = inGameWindow id = infoWindow style = width:700px;height:300px;><div id = infoWindowTitle> <h3 style = margin-left:100px;margin-right:100px;margin-top:20px;> Information </h3> <h4 style = position:absolute;top:0px;right:15px; > Drag Me! </h4> <hr id = thinHr> </div></div>');
 
   $('#infoWindow').hide();
   $('#infoWindow').css('left', cnv.width/2 - $('#infoWindow').width()/2 + 'px');
@@ -2735,14 +2733,14 @@ function gameLoad(ctx, cnv){
                   $(this).prop('checked', playerCharacter.focusOn);
                 });
                 
-                $('#settingsWindow').append('<div style=margin:auto;display:block;> <h4 style = margin-top:3px;margin-right:0px;float:left;display:block;>Explanations:</h4> <input type = checkBox style=float:right; id = explanationsInput></div>');
+                $('#settingsWindow').append('<div style=margin:auto;display:block;><h4 style = margin-top:3px;margin-right:0px;float:left;display:block;>Explanations:</h4> <input type = checkBox style=float:right; id = explanationsInput></div>');
                 $('#explanationsInput').prop('checked', true);
                 
                 $('#explanationsInput').on('change', function(){
                   playerCharacter.explanations = $(this).attr('checked');
                 });
                 
-                makeDraggable('#settingsWindow', ['#sightDiv']);
+                makeDraggable('#settingsTitleBar');
                 
                 
                 $('#infoWindow').append('<div class = borderRightThin id = directoryView style = height:86%;width:150px;display:inline-block;></div>');
@@ -2799,7 +2797,7 @@ function gameLoad(ctx, cnv){
                 
                 infoPageUpdate();
                 
-                makeDraggable('#infoWindow', []);
+                makeDraggable('#infoWindowTitle');
                 
                 playerCharacter.cameraFocus();
 

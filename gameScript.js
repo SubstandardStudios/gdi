@@ -1051,7 +1051,7 @@ function character(){
           entry:"Greetings, human. If your deity wishes to whack, for example, your deity's mortal's neighbor, ready your deity's mortal for whacking, and urge them to get as close as possible to their neighbor. Once they are within the general vicinity of your neighbor, click in his general direction, and your deity's mortal will be urged to whack him."
         },
         whatIsToCome:{
-          entry:"I, Introd, deity of guides and introductions, will soon urge my humans to add entries about the processes of moving and readying(and the process of readying in and of itself). Until then, O eager deities, cool your freaking jets. Gaaawd!"
+          entry:"I, Introd, deity of guides and introductions, will soon urge my humans to add entries about the processes of moving and readying(and the process of readying in and of itself). Until then, O eager deities, cool your freaking jets. Gaaawd! Heh. It's ironic. Get it? 'Cuz I'm a god?"
         }
       },
       mortal:{

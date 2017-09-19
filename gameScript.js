@@ -13,7 +13,6 @@ function roundToMaxOrMin(value, max, min){
 
 function makeDraggable(whatToDragID, whatToMoveID){
   if(!whatToMoveID)var whatToMoveID = '#' + $(whatToDragID).parent().attr('id');
-  console.log(whatToMoveID);
   $(whatToDragID).mousedown(function(event){
     $(whatToMoveID).on('mousemove', function(event){
       var mousePos = getMousePos(cnv, event);
@@ -1048,9 +1047,18 @@ function character(){
         },
         whacking:{
           image:'imgs/examinationIcons/36.png',
-          entry:"Greetings, human. If your deity wishes to whack, for example, your deity's mortal's neighbor, ready your deity's mortal for whacking, and urge them to get as close as possible to their neighbor. Once they are within the general vicinity of your neighbor, click in his general direction, and your deity's mortal will be urged to whack him."
+          entry:"Greetings, human. If your deity wishes to whack, for example, your deity's mortal's neighbor, ready your deity's mortal for whacking, and urge them to get as close as possible to their neighbor. Once they are within the general vicinity of your deity's mortal's neighbor, click in his general direction, and your deity's mortal will be urged to whack him."
+        },
+        seeing:{
+          image:'imgs/icons/craftingBig.png',
+          entry:"Greetings, human. If your deity has sent you here because you're not quite sure how to move the camera, or make it follow your character, you're in luck. Pressing the alt key will focus the camera on the player, or, if the camera is already focused on the player, unfocus it from the player so that you can view the player's general vicinity by clicking and dragging across the screen."
+        },
+        moving:{
+          image:'imgs/icons/craftingBig.png',
+          entry:"Greetings human. If you happen to be rather unsure about how one should go about moving around, then please allow me to enlighten you. Press the W key to go northward, the D key to go eastward, the S to go southwards, and the A to go westwards."
         },
         whatIsToCome:{
+          image:'imgs/icons/craftingBig.png',
           entry:"I, Introd, deity of guides and introductions, will soon urge my humans to add entries about the processes of moving and readying(and the process of readying in and of itself). Until then, O eager deities, cool your freaking jets. Gaaawd! Heh. It's ironic. Get it? 'Cuz I'm a god?"
         }
       },
@@ -1327,7 +1335,7 @@ function character(){
                 $('#nextSideButton' + encapsulationDevice).click(function(){
                   flipDiv(nextSide, whichSide);
                 });
-                $('#rightSideDiv' + encapsulationDevice).append('<div id = draggablePart><h3 style = margin-top:10px;>' + whichSide.capitalize() + '</h3></div>');
+                $('#rightSideDiv' + encapsulationDevice).append('<div id = draggablePart' + encapsulationDevice + '><h3 style = margin-top:10px;>' + whichSide.capitalize() + '</h3></div>');
                 $('#rightSideDiv' + encapsulationDevice).append('<div id = rightSideDiv' + encapsulationDevice + 'statsDiv style=overflow:auto;height:165px;width:340px;margin-top:5px;></div>');
                 $('#rightSideDiv' + encapsulationDevice + 'statsDiv').append('<hr id = thinHr style = margin-top:0px;margin-bottom:0px;width:95%;>');
                 
@@ -1360,7 +1368,7 @@ function character(){
               }
               
               flipDiv('material', 'tool');
-              makeDraggable('#draggablePart', '#examineWindow' + encapsulationDevice);
+              makeDraggable('#draggablePart' + encapsulationDevice, '#examineWindow' + encapsulationDevice);
               
               var width = $('#examineWindow' + encapsulationDevice).width();
               var height = $('#examineWindow' + encapsulationDevice).height();
@@ -1969,7 +1977,7 @@ function gameLoad(ctx, cnv){
                     }
                   }
                   
-                  $('#canvasCan').append('<div class = inGameWindow id = largeRockGUI style = width:350px;height:430px;padding:0px;> <h3 style = margin-left:100px;margin-right:100px;margin-top:10px;> Anvil </h3> <h4 style = position:absolute;top:0px;right:0px;margin:20px;margin-top:7px;margin-bottom:0px;font-size:12px; > Drag Me! </h4> <hr id = thinHr> </div>');
+                  $('#canvasCan').append('<div class = inGameWindow id = largeRockGUI style = width:350px;height:430px;padding:0px;><div id = largeRockTitle><h3 style = margin-left:100px;margin-right:100px;margin-top:10px;> Anvil </h3> <h4 style = position:absolute;top:0px;right:0px;margin:20px;margin-top:7px;margin-bottom:0px;font-size:12px; > Drag Me! </h4> <hr id = thinHr></div></div>');
                   
                   $('#largeRockGUI').data('shouldCloseOnMove', true);
                   
@@ -2132,7 +2140,6 @@ function gameLoad(ctx, cnv){
                           else var newItem = this.inventory.material.crafting.asMaterial.combineableWith[this.inventory.tool.name[0].toLowerCase() + this.inventory.tool.name.replace(/\s/g, '').substring(1,this.inventory.tool.name.replace(/\s/g, '').length)];
                           
                           if(this.inventory.tool.childrenShouldInheritRect || this.inventory.material.childrenShouldInheritRect){
-                            //console.log('Got here!');
                             var whichRectToInherit = (this.inventory.tool.childrenShouldInheritRect) ? this.inventory.tool.clickRect : this.inventory.material.clickRect;
                           }
                           
@@ -2246,7 +2253,7 @@ function gameLoad(ctx, cnv){
                   $('#largeRockGUI').css('left', cnv.width/2 - $('#largeRockGUI').width()/2 + 'px');
                   $('#largeRockGUI').css('top', cnv.height/2 - $('#largeRockGUI').height()/2 + 'px');
                   
-                  makeDraggable('#largeRockGUI', ['#largeRockGUIMainArea']);
+                  makeDraggable('#largeRockTitle', '#largeRockGUI');
                   return true;
                 }
                 

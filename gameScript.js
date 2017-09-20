@@ -1157,7 +1157,30 @@ function character(){
         }
       }
     }
-  }
+  };
+  
+  this.getIntent = function(){
+    this.intents = [];
+    console.log('Got called!');
+    this.intents.push(this.basicIntents);
+    for(var elementIndex in this.inventory){
+      var element = this.inventory[elementIndex];
+      if(element.type == 'hand'){
+        var intentsForThisHand = (element.holding[0]) ? (element.holding[0].intents || []) : [];
+        intentsForThisHand = intentsForThisHand.concat(['examine', 'drop', 'whack'])
+        //If the element the mortal is holding doesn't have any intents, it'll default to an empty array. Pretty cool, huh?
+        
+        console.log(intentsForThisHand);
+        //
+      }
+    }
+  };
+  
+  this.basicIntents = [
+    'examine',
+    'pickUp'
+  ];
+  this.intents = [];
   
   this.lastFocusedOn = false;
   this.focusOn = false;
@@ -1217,11 +1240,13 @@ function character(){
     "rightHand":{
       type:'hand',
       size:1,
+      intent:'interact',
       holding:[]
     },
     "leftHand":{
       type:'hand',
       size:1,
+      intent:'interact',
       holding:[]
     },
     shove:function(whatToShove){//A function that attempts to stick something into one of the player's hands. If the player's hands are full, it returns false.
@@ -1455,6 +1480,7 @@ function character(){
         spaceOut = spaceOut + 1;
       }
     }
+    this.getIntent();
   }
   
   this.inventoryUpdate();
@@ -1615,6 +1641,7 @@ function startGame(){
   var cnv = document.getElementById('gameCanvas');
   var ctx = cnv.getContext('2d');
   
+  //Settings
   $('#canvasCan').append('<div class = tabBottom id = settingsTab style = right:10px;><img src="imgs/icons/settingsIcon.png" alt="Settings" style = display:block;margin:auto;></div>');
   
   $('#canvasCan').append('<div class = inGameWindow id = settingsWindow> <div  id = settingsTitleBar> <h3 style = margin-left:100px;margin-right:100px;margin-top:20px;> Settings </h3> <h4 style = position:absolute;top:0px;right:15px; > Drag Me! </h4> <hr id = thinHr> </div> </div>');
@@ -1623,6 +1650,9 @@ function startGame(){
   $('#settingsTab').click(function(){
   	$('#settingsWindow').toggle();
   });
+  //End settings
+  
+  //\Info
   $('#canvasCan').append('<div class = tabBottom id = mortalInfoTab style = right:120px;><img src="imgs/icons/mortalIcon.png" alt="Mortal Info" style = display:block;margin:auto;></div>');
 
   $('#canvasCan').append('<div class = inGameWindow id = infoWindow style = width:700px;height:300px;><div id = infoWindowTitle> <h3 style = margin-left:100px;margin-right:100px;margin-top:20px;> Information </h3> <h4 style = position:absolute;top:0px;right:15px; > Drag Me! </h4> <hr id = thinHr> </div></div>');
@@ -1634,6 +1664,18 @@ function startGame(){
   $('#mortalInfoTab').click(function(){
   $('#infoWindow').toggle();
   });
+  //End Info
+  
+  //Readying
+  $('#canvasCan').append('<div class = tabBottom id = readyTab style = right:230px;><img src="imgs/icons/hand.png" alt="Settings" style = display:block;margin:auto;></div>');
+  
+  $('#canvasCan').append('<div class = inGameWindow id = readyWindow> <div  id = readyTitleBar> <h3 style = margin-left:100px;margin-right:100px;margin-top:20px;> Intent </h3> <h4 style = position:absolute;top:0px;right:15px; > Drag Me! </h4> <hr id = thinHr> </div> </div>');
+  $('#readyWindow').hide();
+  
+  $('#readyTab').click(function(){
+  	$('#readyWindow').toggle();
+  });
+  //End Readying
   
   gameLoad(ctx, cnv);
 }
@@ -1782,7 +1824,7 @@ function gameLoad(ctx, cnv){
                 
                 //These add the rocks and other enviromental elements
                 
-                worldMap.addElement('bigRock', [tileArray[2], tileArray[3]], 'clutter', 1.5, [onBigRockSpawn, undefined, bigRockClick], 32, undefined, undefined, undefined);
+                worldMap.addElement('bigRock', [tileArray[2], tileArray[3]], 'clutter', 1.5, [onBigRockSpawn, undefined, bigRockClick], 32, {width:50, height:45, xAdjust:7, yAdjust:10}, undefined, undefined);
                 worldMap.addElement('smallRock', [tileArray[4]], 'clutter', .5, [, undefined, smallRockPickup], 10, {width:0, height:0, xAdjust:32, yAdjust:38}, undefined, undefined);
                 worldMap.addElement('tree', [tileArray[8]], 'clutter', 1, [onTreeSpawn, onTreeUpdate, onTreeClick], 32, {width:85, height:90, xAdjust:95, yAdjust:166}, undefined, {x:130, y:175});
                 //The sticks are defined here.
@@ -1926,7 +1968,7 @@ function gameLoad(ctx, cnv){
                   ctx.globalAlpha = 1;
                 }
                 
-                function onTreeClick(){
+                function onTreeClick(intent){
                   for(var encapsulationDevice in playerCharacter.inventory){
                     for(var itemIndex in playerCharacter.inventory[encapsulationDevice].holding){
                       var item = playerCharacter.inventory[encapsulationDevice].holding[itemIndex];
@@ -1956,7 +1998,7 @@ function gameLoad(ctx, cnv){
                   this.scatterAround('smallRock', [1, 1, 2, 2, 2, 3, 3, 3, 3, 3, 3, 4], 80, 32, 32, 32, 4, 0);
                 }
                 
-                function bigRockClick(){
+                function bigRockClick(intent){
                   if(playerCharacter.busy)return;
                   playerCharacter.busy = true;
                   
@@ -2258,7 +2300,7 @@ function gameLoad(ctx, cnv){
                 }
                 
                 //This function is called when the small rock is clicked ^
-                function smallRockPickup(){
+                function smallRockPickup(intent){
                   if(!this.crafting){
                     this.crafting = {
                       asMaterial:{//A stone is a material
@@ -2348,7 +2390,7 @@ function gameLoad(ctx, cnv){
                 
                 
                 
-                function smallStickPickup() {
+                function smallStickPickup(intent) {
                   if(!this.name)this.name = 'Stick';
                   
                   if(!this.crafting){
@@ -2470,7 +2512,7 @@ function gameLoad(ctx, cnv){
                 }
                 
                 
-                function mediumStickPickup(){
+                function mediumStickPickup(intent){
                   if(!this.name)this.name = 'Stick';
                   
 				  if(!this.crafting){
@@ -2592,7 +2634,7 @@ function gameLoad(ctx, cnv){
                 }
                 
                 
-                function largeStickPickup() {
+                function largeStickPickup(intent) {
                   if(!this.name)this.name = 'Stick';
                   
                   if(!this.crafting){
@@ -2750,6 +2792,7 @@ function gameLoad(ctx, cnv){
                 makeDraggable('#settingsTitleBar');
                 
                 
+                //INFO WINDOW
                 $('#infoWindow').append('<div class = borderRightThin id = directoryView style = height:86%;width:150px;display:inline-block;></div>');
                 $('#infoWindow').append('<div id = entryView style = height:86%;width:525px;display:inline-block;float:right;overflow-y:auto;></div>');
                 
@@ -2766,15 +2809,15 @@ function gameLoad(ctx, cnv){
                   
                   $('#directoryView').append('<hr id = thinHr>');//----
                   
-                  
+                  $('#directoryView').append('<div id = directoryOptionsDiv style = max-height:205px;width:107%;overflow:auto;></div>');
                   for(var sub in currentDirectoryObj){
                     if(sub === 'entry')continue;
                     if(sub === 'image'){
-                      $('#directoryView').append('<h1 style = margin-bottom:0px;margin-top:0px;><img src = ' + currentDirectoryObj[sub] + '></h1>');
+                      $('#directoryOptionsDiv').append('<h1 style = margin-bottom:0px;margin-top:0px;><img src = ' + currentDirectoryObj[sub] + '></h1>');
                       continue;
                     }
                     
-                    $('#directoryView').append('<p id = directory' + sub + '>' + sub.replace(/([A-Z])/g, ' $1').trim().capitalize() + '</p>');
+                    $('#directoryOptionsDiv').append('<p id = directory' + sub + '>' + sub.replace(/([A-Z])/g, ' $1').trim().capitalize() + '</p>');
                     $('#directory' + sub).click(function(){
                       var sub = this.id.substring(9, this.id.length);
                       playerCharacter.information.internalData.currentDirectory = sub;

@@ -687,7 +687,7 @@ function placeContent(){
   
   
   
-  addLeftBox('Quick Test', 'testBox', 'Test the Graphical Deity Interface', function(){
+  addLeftBox('Enter Realm', 'testBox', 'Use the Graphical Deity Interface!', function(){
     characterSelectionScreen.toggleOff();
     DarkWaves(startGame);
   });

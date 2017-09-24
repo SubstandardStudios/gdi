@@ -1160,27 +1160,69 @@ function character(){
   };
   
   this.getIntent = function(){
-    this.intents = [];
-    console.log('Got called!');
-    this.intents.push(this.basicIntents);
+    this.intents = {};
+    
     for(var elementIndex in this.inventory){
       var element = this.inventory[elementIndex];
       if(element.type == 'hand'){
-        var intentsForThisHand = (element.holding[0]) ? (element.holding[0].intents || []) : [];
-        intentsForThisHand = intentsForThisHand.concat(['examine', 'drop', 'whack'])
-        //If the element the mortal is holding doesn't have any intents, it'll default to an empty array. Pretty cool, huh?
+        if(element.holding[0]){
+          var intentsForThisHand = (element.holding[0]) ? (element.holding[0].intents || []) : [];
+          //If the element the mortal is holding doesn't have any intents, it'll default to  an empty array. Pretty cool, huh?
+
+          intentsForThisHand = intentsForThisHand.concat(['examine', 'examineContents', 'drop', 'whack', 'interact'])
+          //And then we stick in the four default intents that every item has.
+          
+          this.intents[elementIndex] = intentsForThisHand;
+        }
         
-        console.log(intentsForThisHand);
-        //
+        else if(!element.holding[0]){
+          this.intents[elementIndex] = this.basicIntents;
+        }
       }
+    }
+    
+    $('#readyWindow').children().slice(1).remove();
+    
+    var count = 0;
+    
+    for(var hand in this.intents){
+      count = count + 1;
+      $('#readyWindow').append('<h4>' + hand.replace(/([A-Z])/g, ' $1').trim().capitalize() + ': ' + '<div id = ' + hand + 'intentPicker ' + 'class = genericButton style = margin-top:-5px;padding-left:5px;padding-right:5px;width:auto;float:right;>' + this.inventory[hand].intent.replace(/([A-Z])/g, ' $1').trim().capitalize() + '<div class = genericButton style = position:relative;margin-left:5px;top:-2px;padding:1px;display:inline-block;font-size:10px;height:9px;width:auto;>' + 'v' + '</div>' +'</div>' + '</h4>');
+      $('#' + hand + 'intentPicker').css('position', 'absolute');
+      $('#' + hand + 'intentPicker').css('right', '5px');
+      $('#' + hand + 'intentPicker').css('top', 25 + 40*count + 'px');
+      $('#' + hand + 'intentPicker').css('background', 'url(imgs/fillerPixelArt/WoodenPlank.gif)');
+                                         
+      $('#' + hand + 'intentPicker').mouseenter(function(){
+        $(this).children().not('h4').not('div').remove();
+        $(this).append('<hr id = thinHr>');
+        $(this).css('height', 'auto');
+        $(this).css('z-index', '10');
+        playerCharacter.intents[hand].forEach(function(element){
+          
+          $(this).append('<p style = font-size:13px; id = intentPickerFor' + element + ' > ' + element.replace(/([A-Z])/g, ' $1').trim().capitalize() + '</p>');
+          $('#' + 'intentPickerFor' + element).data('hand', $(this).attr('id').substring(0, $(this).attr('id').length - 12));
+          
+          $('#' + 'intentPickerFor' + element).click(function(){
+            var hand = $(this).data('hand');
+            playerCharacter.inventory[hand].intent = $(this).attr('id').substring(15);
+            playerCharacter.getIntent();
+          });
+        }.bind(this));
+      });
+      $('#' + hand + 'intentPicker').mouseleave(function(){
+        $(this).css('z-index', '0');
+        $(this).children().not('h4').not('div').remove();
+      });
     }
   };
   
   this.basicIntents = [
+    'interact',
     'examine',
     'pickUp'
   ];
-  this.intents = [];
+  this.intents = {};
   
   this.lastFocusedOn = false;
   this.focusOn = false;
@@ -1675,6 +1717,7 @@ function startGame(){
   $('#readyTab').click(function(){
   	$('#readyWindow').toggle();
   });
+  makeDraggable('#readyTitleBar', '#readyWindow');
   //End Readying
   
   gameLoad(ctx, cnv);

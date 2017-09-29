@@ -1056,8 +1056,8 @@ function placeContent(){
     
     function drawScene(){
       
-      triangleRotDegree = (triangleRotDegree + .01) % 360;
-      squareRotDegree = (squareRotDegree + .01) % 360;
+      triangleRotDegree = (triangleRotDegree + 1) % 360;
+      squareRotDegree = (squareRotDegree + 7) % 360;
       
       gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);//Now we give the GL a little bit o' information about the size of our 'lil canvas.
       gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);//Clearing viewpoint.
@@ -1073,9 +1073,9 @@ function placeContent(){
       //This moves us to the left hand side.
       
       //Throw in the rotation
-      mat4.rotateX(mvMatrix, mvMatrix, triangleRotDegree);
-      mat4.rotateY(mvMatrix, mvMatrix, triangleRotDegree);
-      mat4.rotateZ(mvMatrix, mvMatrix, triangleRotDegree);
+      //mat4.rotateX(mvMatrix, mvMatrix, triangleRotDegree);
+      mat4.rotateY(mvMatrix, mvMatrix, degToRad(triangleRotDegree));
+      //mat4.rotateZ(mvMatrix, mvMatrix, triangleRotDegree);
       
       gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexPositionBuffer);//Specify current buffer.
       gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, triangleVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
@@ -1098,9 +1098,9 @@ function placeContent(){
       
       mat4.translate(mvMatrix, mvMatrix, [3.0, 0.0, 0.0]);//Let's move over viewpoint over a bit, shall we?
       
-      mat4.rotateX(mvMatrix, mvMatrix, squareRotDegree);
-      mat4.rotateY(mvMatrix, mvMatrix, squareRotDegree);
-      mat4.rotateZ(mvMatrix, mvMatrix, squareRotDegree);
+      mat4.rotateX(mvMatrix, mvMatrix, degToRad(squareRotDegree));
+      mat4.rotateY(mvMatrix, mvMatrix, degToRad(90));
+      //mat4.rotateZ(mvMatrix, mvMatrix, squareRotDegree);
       //Rotate square by it's rotation degree
       
       gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer);//Let the system know that we're talking about our squareVertexPositionBuffer, ya know?
@@ -1124,7 +1124,7 @@ function placeContent(){
     initShaders();
     initBuffers();
 
-    gl.clearColor(0.0, 0.0, 0.0, 1.0);
+    gl.clearColor(0.0, 0.0, 0.0, 0.0);
     gl.enable(gl.DEPTH_TEST);
 
     drawScene();

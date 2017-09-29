@@ -11,6 +11,10 @@ function roundToMaxOrMin(value, max, min){
   else return value;  
 }
 
+function degToRad(degrees) {
+  return degrees * Math.PI / 180;
+}
+
 function makeDraggable(whatToDragID, whatToMoveID){
   if(!whatToMoveID)var whatToMoveID = '#' + $(whatToDragID).parent().attr('id');
   $(whatToDragID).mousedown(function(event){

@@ -982,8 +982,8 @@ function placeContent(){
     function initGL(canvas){
       try{
         gl = canvas.getContext('webgl');
-        gl.viewportWidth = canvas.width;//TODO: Add an event listener that
-        gl.viewportHeight = canvas.height;//resets these on window resize.
+        gl.viewportWidth = canvas.width;
+        gl.viewportHeight = canvas.height;
       } catch(e){ 
       }
       if(!gl){
@@ -1119,7 +1119,14 @@ function placeContent(){
       setTimeout(drawScene, 17);
     }
     
+    //$("#craftingCanvas").css('margin-top', '0px');
+    $('#craftingTitleBar').css('margin-bottom', '2px');
+    
     var canvas = document.getElementById("craftingCanvas");
+    
+    canvas.width = $('#craftingMainArea').width();
+    canvas.height = $('#craftingMainArea').height() - $('#craftingTitleBar').height() - 7;
+    
     initGL(canvas);
     initShaders();
     initBuffers();

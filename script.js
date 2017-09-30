@@ -908,6 +908,8 @@ function placeContent(){
     addMainArea('crafting', 'Crafting');
     $('#craftingMainArea').append(' <canvas id="craftingCanvas" style="border: none;" width="500" height="500"></canvas>');
     
+    //Actual webGL stuff:
+    
     function setMatrixUniforms() {
       gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, false, pMatrix);
       gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, mvMatrix);
@@ -1003,26 +1005,44 @@ function placeContent(){
       gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexPositionBuffer);//Sets ARRAY_BUFFER to what we're playing with and says that ARRAY_BUFFER is triangleVertexPositionBuffer
       
       var vertices = [//These
-        0.0,  1.0,  0.0,//Make up
-        -1.0, -1.0,  0.0,//Our
-        1.0, -1.0,  0.0//Triangle,
+        //Left side
+        0.0, 1.0, 0.0,
+        1.0, -1.0, 1.0,
+        1.0, -1.0, -1.0,
+        //Right side
+        0.0, 1.0, 0.0,
+        -1.0, -1.0, -1.0,
+        -1.0, -1.0, 1.0,
+        //Middle side
+        0.0, 1.0, 0.0,
+        -1.0, -1.0, 1.0,
+        1.0, -1.0, 1.0
+        
       ];//'Kay?
       
       gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);//Then, it sticks all of this information into our main buffer, and tell our main buffer to draw 'em statically
       
       triangleVertexPositionBuffer.itemSize = 3;//Amount per item
-      triangleVertexPositionBuffer.numItems = 3;//Number of items
+      triangleVertexPositionBuffer.numItems = 9;//Number of items
       
       triangleVertexColorBuffer = gl.createBuffer();
       gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexColorBuffer);
       var colors = [
-          1.0, 0.0, 0.0, 1.0,
-          0.0, 1.0, 0.0, 1.0,
-          0.0, 0.0, 1.0, 1.0
+        1.0, 0.0, 0.0, 1.0,
+        0.0, 1.0, 0.0, 1.0,
+        0.0, 0.0, 1.0, 1.0,
+        //Right side
+        1.0, 0.0, 0.0, 1.0,
+        0.0, 1.0, 0.0, 1.0,
+        0.0, 0.0, 1.0, 1.0,
+        //Middle Side
+        1.0, 0.0, 0.0, 1.0,
+        0.0, 0.0, 1.0, 1.0,
+        0.0, 1.0, 0.0, 1.0,
       ];
       gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
       triangleVertexColorBuffer.itemSize = 4;
-      triangleVertexColorBuffer.numItems = 3;
+      triangleVertexColorBuffer.numItems = 9;
 
       
       squareVertexPositionBuffer = gl.createBuffer();//This makes a new buffer and assigns it to SquareVertexPositionBuffer
@@ -1069,8 +1089,11 @@ function placeContent(){
       mat4.identity(mvMatrix);
       //This sets our content to the center of our screen.
       
-      mat4.translate(mvMatrix, mvMatrix, [0, 0.0, -7.0]);
+      mat4.translate(mvMatrix, mvMatrix, [0.0, 0.0, -7.0]);
       //This moves us to the left hand side.
+      
+      //var mvMatrixSaved = mat4.create();
+      //mat4.copy(mvMatrixSaved, mvMatrix);
       
       //Throw in the rotation
       //mat4.rotateX(mvMatrix, mvMatrix, triangleRotDegree);
@@ -1088,13 +1111,15 @@ function placeContent(){
       setMatrixUniforms();
       //Move our model view and projection matrix out of our JavaScript namespace and into our graphics card
       
-      gl.drawArrays(gl.TRIANGLES, 0, triangleVertexPositionBuffer.numItems)
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, triangleVertexPositionBuffer.numItems)
       //Draw our triangle array as a triangle, started at zero and going up to triVerPosBuf.numItems
       
       
       //Now, the square.
       //mat4.rotateY(mvMatrix, mvMatrix, triangleRotDegree*-1);
       //Unrotate from triangle
+      
+      //mat4.copy(mvMatrix, mvMatrixSaved);
       
       mat4.translate(mvMatrix, mvMatrix, [3.0, 0.0, 0.0]);//Let's move over viewpoint over a bit, shall we?
       
@@ -1118,7 +1143,16 @@ function placeContent(){
       
       setTimeout(drawScene, 17);
     }
+    //
     
+    //Beginning of model class system:
+    
+    function model(verticesArray, colorsArray, drawingType, translation){
+      
+    }
+    
+    
+    //
     //$("#craftingCanvas").css('margin-top', '0px');
     $('#craftingTitleBar').css('margin-bottom', '2px');
     
@@ -1137,7 +1171,7 @@ function placeContent(){
     drawScene();
   });
   
-  addLeftBox('Scrying', 'scrying', 'Send messages across the aether and towards other deities', function(){
+  addLeftBox('Scrying', 'scrying', 'Send and recieve messages from across the aether.', function(){
     addMainArea('scrying', 'Scrying');
   });
 }

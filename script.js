@@ -1003,6 +1003,19 @@ function placeContent(){
 				}
 			});
 
+			element.continuousTranslations.forEach(function(element){
+				element.degree = element.degree + element.rate;
+				if(element.degree > element.max || element.degree < element.min)element.rate = element.rate * -1;
+
+				element.axis.forEach(function(axis, index){
+					if(axis){
+						var justOneAxis = [0, 0, 0];
+						justOneAxis[index] = element.degree;
+						mat4.translate(mvMatrix, mvMatrix, justOneAxis);
+					}
+				});
+			});
+
       element.continuousRotations.forEach(function(rotation){
       	rotation.degree = (rotation.degree + rotation.rate) % 360;
       	mat4.rotate(mvMatrix, mvMatrix, degToRad(rotation.degree), rotation.axes);
@@ -1020,7 +1033,7 @@ function placeContent(){
       //Move our model view and projection matrix out of our JavaScript namespace and into our graphics card
       
       gl.drawArrays(gl[element.drawingType], 0, element.vertexPositionBuffer.numItems);
-      //Draw our triangle array as a triangle, started at zero and going up to triVerPosBuf.numItems
+      //Draw our model using it's specified type, starting at zero and going up to the amount of vertexes it has.
     }
 
     
@@ -1046,7 +1059,13 @@ function placeContent(){
 
       	drawModel(element);
 
+      	if(element.subModels.length > 0){
+					var mvMatrixSavedPerElement = mat4.create();//We'll save the viewpoint so that if a model needs a clean matrix it can have it.
+					mat4.copy(mvMatrixSavedPerElement, mvMatrix);//As stated above.
+      	}
+
       	element.subModels.forEach(function(model){
+      		mat4.copy(mvMatrix, mvMatrixSavedPerElement);
       		drawModel(model);
       	})
     	}
@@ -1096,6 +1115,7 @@ function placeContent(){
 
     	//And now for our movement type stuffs.
     	this.translations = [0, 0, 0];
+
     	this.rotations = [
     		{
     			axis:[1, 0, 0],
@@ -1110,14 +1130,35 @@ function placeContent(){
     			degree:0
     		}
     	];
+
     	//this.scales = [];
-    	this.continuousTranslations = [];
+
+    	this.continuousTranslations = [
+    	{
+    		axis:[1, 0, 0]
+    	},
+    	{
+    		axis:[0, 1, 0]
+    	},
+    	{
+    		axis:[0, 0, 1]
+    	}
+    	];
+    	this.continuousTranslations.forEach(function(element){
+    		element.degree = 0;
+    		element.rate = 0;
+    		element.max = 0;
+    		element.min = 0;
+    	});
+
     	this.continuousRotations = [{
-    		axes:[0, 0, 0],//A hollow rotation is then
-    		degree:0,//			added so that the loop in 
+    		axes:[0, 0, 0],//A hollow rotation is stuck
+    		degree:0,//			in here so that the loop in 
     		rate:0// 				this.newContinuousRotation works.
     	}];
+
     	this.subModels = [];
+
 
     	this.newTranslation = function(matrix){
     		matrix.forEach(function(element, index){
@@ -1135,6 +1176,16 @@ function placeContent(){
     			}.bind(this));
     		}.bind(this));
     	};
+
+    	this.newContinuousTranslation = function(axes, rate, min, max){
+    		this.continuousTranslations.forEach(function(element){
+    			if(axes[element.axis.indexOf(1)]){
+    				element.rate = element.rate + rate;
+    				element.min = min;
+    				element.max = max;
+    			}
+    		});
+    	}
 
 			this.newContinuousRotation = function(axes, rate){
 				this.continuousRotations.forEach(function(rotation){
@@ -1237,26 +1288,30 @@ function placeContent(){
 
 
     //Square defined here!
-    var square = new model();
-	  square.verticesArray = [//These are the coordinates for the square. Amazing, innit?
-	    1.0,  1.0,  0.0,
-	    -1.0,  1.0,  0.0,
-	    1.0, -1.0,  0.0,
-	    -1.0, -1.0,  0.0
-	  ];
-	  square.colorsArray = (function(){ //This is a loop that returns an array filled with pale blue color values.
-			colors = [];
-			for (var i=0; i < 4; i++) { //Generate array for colors using loop 'cuz they're all the same.
-				colors = colors.concat([0.5, 0.5, 1.0, 1.0]);
-			}
-			return colors;
-	  })();
+    for(var x = 0; x < 50; x++){
 
-    square.startUp(triangle.subModels);
+	    var square = new model();
+		  square.verticesArray = [//These are the coordinates for the square. Amazing, innit?
+		    0.02,  0.02,  0.02,
+		    -0.02,  0.02,  0.02,
+		    0.02, -0.02,  0.02,
+		    -0.02, -0.02,  0.02
+		  ];
+		  square.colorsArray = (function(){ //This is a loop that returns an array filled with pale blue color values.
+				colors = [];
+				for (var i=0; i < 4; i++) { //Generate array for colors using loop 'cuz they're all the same.
+					colors = colors.concat([0.5, 0.5, 1.0, 0.5]);
+				}
+				return colors;
+		  })();
 
-    square.newTranslation([3, 0, 0.0]);
-    square.newRotation([0, 1, 0], 90);
-    square.newContinuousRotation([0, 0, 1], 150);
+	    square.startUp(triangle.subModels);
+
+	    square.newTranslation([Math.random()*4-2, Math.random()*1-0.5, Math.random()*4-2]);
+	    square.newContinuousTranslation([1, 1, 1], Math.round(Math.random()*7)*0.01, -1, 1);
+	    square.newRotation([0, 1, 0], 90);
+	    square.newContinuousRotation([1, 1, 1], Math.round(Math.random()*10)+10);
+  	}
     //End of square definition
 
 

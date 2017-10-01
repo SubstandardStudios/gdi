@@ -992,181 +992,276 @@ function placeContent(){
         alert("Failure. Failure. Failure. WebGL. Failure. Failure.");
       }
     }
-    
-    var triangleVertexPositionBuffer;
-    var triangleVertexColorBuffer;
-    
-    var squareVertexPositionBuffer;
-    var squareVertexColorBuffer;
-    
-    function initBuffers(){
-      
-      triangleVertexPositionBuffer = gl.createBuffer();//Assigns triangleVertexPositionBufer to an empty buffer.
-      gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexPositionBuffer);//Sets ARRAY_BUFFER to what we're playing with and says that ARRAY_BUFFER is triangleVertexPositionBuffer
-      
-      var vertices = [//These
-        //Left side
-        0.0, 1.0, 0.0,
-        1.0, -1.0, 1.0,
-        1.0, -1.0, -1.0,
-        //Right side
-        0.0, 1.0, 0.0,
-        -1.0, -1.0, -1.0,
-        -1.0, -1.0, 1.0,
-        //Middle side
-        0.0, 1.0, 0.0,
-        -1.0, -1.0, 1.0,
-        1.0, -1.0, 1.0
-        
-      ];//'Kay?
-      
-      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);//Then, it sticks all of this information into our main buffer, and tell our main buffer to draw 'em statically
-      
-      triangleVertexPositionBuffer.itemSize = 3;//Amount per item
-      triangleVertexPositionBuffer.numItems = 9;//Number of items
-      
-      triangleVertexColorBuffer = gl.createBuffer();
-      gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexColorBuffer);
-      var colors = [
-        1.0, 0.0, 0.0, 1.0,
-        0.0, 1.0, 0.0, 1.0,
-        0.0, 0.0, 1.0, 1.0,
-        //Right side
-        1.0, 0.0, 0.0, 1.0,
-        0.0, 1.0, 0.0, 1.0,
-        0.0, 0.0, 1.0, 1.0,
-        //Middle Side
-        1.0, 0.0, 0.0, 1.0,
-        0.0, 0.0, 1.0, 1.0,
-        0.0, 1.0, 0.0, 1.0,
-      ];
-      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
-      triangleVertexColorBuffer.itemSize = 4;
-      triangleVertexColorBuffer.numItems = 9;
 
+    function drawModel(element){
+			
+			if(element.translations)mat4.translate(mvMatrix, mvMatrix, element.translations);
+
+			element.rotations.forEach(function(rotation){
+				if(rotation.degree){
+					mat4.rotate(mvMatrix, mvMatrix, degToRad(rotation.degree), rotation.axis);
+				}
+			});
+
+      element.continuousRotations.forEach(function(rotation){
+      	rotation.degree = (rotation.degree + rotation.rate) % 360;
+      	mat4.rotate(mvMatrix, mvMatrix, degToRad(rotation.degree), rotation.axes);
+      })
       
-      squareVertexPositionBuffer = gl.createBuffer();//This makes a new buffer and assigns it to SquareVertexPositionBuffer
-      gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer);//This tells the system that the ARRAY_BUFFER is squareVertex, and that's what we're currently playing with.
+      gl.bindBuffer(gl.ARRAY_BUFFER, element.vertexPositionBuffer);//Specify current buffer.
+      gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, element.vertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+      //Preparing element.vertexPositionBuffer as a set of vertexes that can be drawn.
       
-      var vertices = [//These are the coordinates for the square. Amazing, innit?
-        1.0,  1.0,  0.0,
-        -1.0,  1.0,  0.0,
-        1.0, -1.0,  0.0,
-        -1.0, -1.0,  0.0
-      ];
-      
-      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);//These stick our vertices into the buffer, and tell the buffer to draw our vertices statically.
-      
-      squareVertexPositionBuffer.itemSize = 3;//Amount per item
-      squareVertexPositionBuffer.numItems = 4;//Number of items.
-      
-      squareVertexColorBuffer = gl.createBuffer();
-      gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexColorBuffer);
-      colors = []
-      for (var i=0; i < 4; i++) { //Generate array for colors using loop 'cuz they're all the same.
-        colors = colors.concat([0.5, 0.5, 1.0, 1.0]);
-      }
-      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
-      squareVertexColorBuffer.itemSize = 4;
-      squareVertexColorBuffer.numItems = 4;
-    }
-    
-    var triangleRotDegree = 0;
-    var squareRotDegree = 0;
-    
-    function drawScene(){
-      
-      triangleRotDegree = (triangleRotDegree + 1) % 360;
-      squareRotDegree = (squareRotDegree + 7) % 360;
-      
-      gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);//Now we give the GL a little bit o' information about the size of our 'lil canvas.
-      gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);//Clearing viewpoint.
-      
-      mat4.perspective(pMatrix, 45, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0);
-      //This says:  Field of view, ratio of width/height, min closeness to camera, max closeness to camera, and then projection Matrix.
-      //All of which dictate our perspective.
-      
-      mat4.identity(mvMatrix);
-      //This sets our content to the center of our screen.
-      
-      mat4.translate(mvMatrix, mvMatrix, [0.0, 0.0, -7.0]);
-      //This moves us to the left hand side.
-      
-      //var mvMatrixSaved = mat4.create();
-      //mat4.copy(mvMatrixSaved, mvMatrix);
-      
-      //Throw in the rotation
-      //mat4.rotateX(mvMatrix, mvMatrix, triangleRotDegree);
-      mat4.rotateY(mvMatrix, mvMatrix, degToRad(triangleRotDegree));
-      //mat4.rotateZ(mvMatrix, mvMatrix, triangleRotDegree);
-      
-      gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexPositionBuffer);//Specify current buffer.
-      gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, triangleVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
-      //Preparing triangleVertexPositionBuffer as a set of vertexes that can be drawn.
-      
-      gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexColorBuffer);//Give the system a heads up, because we want to mess with the colors for the triangle now.
-      gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, triangleVertexColorBuffer.itemSize, gl.FLOAT, false, 0, 0);
+      gl.bindBuffer(gl.ARRAY_BUFFER, element.vertexColorBuffer);//Give the system a heads up, because we want to mess with the colors for the triangle now.
+      gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, element.vertexColorBuffer.itemSize, gl.FLOAT, false, 0, 0);
       //Link 'em with the colors in the graphics card, tell 'em that there are four floats for each vertex.
       
       setMatrixUniforms();
       //Move our model view and projection matrix out of our JavaScript namespace and into our graphics card
       
-      gl.drawArrays(gl.TRIANGLE_STRIP, 0, triangleVertexPositionBuffer.numItems)
+      gl.drawArrays(gl[element.drawingType], 0, element.vertexPositionBuffer.numItems);
       //Draw our triangle array as a triangle, started at zero and going up to triVerPosBuf.numItems
+    }
+
+    
+    function drawScene(){
       
+      gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);//Now we give the GL a little bit o' information about the size of our canvas.
+      gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);//Clearing viewpoint.
       
-      //Now, the square.
-      //mat4.rotateY(mvMatrix, mvMatrix, triangleRotDegree*-1);
-      //Unrotate from triangle
+      mat4.perspective(pMatrix, 45, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0);
+      //Params are: projection Matrix, Field of view, ratio of width/height, min closeness to camera, max closeness to camera
+      //All of which dictate our perspective.
       
-      //mat4.copy(mvMatrix, mvMatrixSaved);
-      
-      mat4.translate(mvMatrix, mvMatrix, [3.0, 0.0, 0.0]);//Let's move over viewpoint over a bit, shall we?
-      
-      mat4.rotateX(mvMatrix, mvMatrix, degToRad(squareRotDegree));
-      mat4.rotateY(mvMatrix, mvMatrix, degToRad(90));
-      //mat4.rotateZ(mvMatrix, mvMatrix, squareRotDegree);
-      //Rotate square by it's rotation degree
-      
-      gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer);//Let the system know that we're talking about our squareVertexPositionBuffer, ya know?
-      gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, squareVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
-      //Now we let the system know that the array of vertices is, indeed, an array of vertices. Go figure.
-      
-      gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexColorBuffer);//Tell the system that we're talking about the array of colors for the square,
-      gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, squareVertexColorBuffer.itemSize, gl.FLOAT, false, 0, 0);
-      //And link our array of vertex colors for the square with the variables in the shader code, and then let them know that there are four floating point values for each vertex in the array.
-      
-      setMatrixUniforms();
-      //We've moved over the mvMatrix, so we're going to need to move that data back into the graphics card again.
-      
-      gl.drawArrays(gl.TRIANGLE_STRIP, 0, squareVertexPositionBuffer.numItems)
+      mat4.identity(mvMatrix);
+      //This sets our content to the center of our screen.
+
+      var mvMatrixSaved = mat4.create();//We'll save the viewpoint so that if a model needs a clean matrix it can have it.
+	    mat4.copy(mvMatrixSaved, mvMatrix);//As stated above.
+
+      //This loops through our modelArray, drawing each model.
+      for(var elementIndex = 0; elementIndex < modelArray.length; elementIndex++){
+      	var element = modelArray[elementIndex];
+      	mat4.copy(mvMatrix, mvMatrixSaved);//This grabs a clean slate for the model that we're about to draw.
+
+      	drawModel(element);
+
+      	element.subModels.forEach(function(model){
+      		drawModel(model);
+      	})
+    	}
       
       setTimeout(drawScene, 17);
     }
-    //
     
-    //Beginning of model class system:
-    
-    function model(verticesArray, colorsArray, drawingType, translation){
-      
-    }
-    
-    
-    //
-    //$("#craftingCanvas").css('margin-top', '0px');
-    $('#craftingTitleBar').css('margin-bottom', '2px');
-    
-    var canvas = document.getElementById("craftingCanvas");
-    
-    canvas.width = $('#craftingMainArea').width();
-    canvas.height = $('#craftingMainArea').height() - $('#craftingTitleBar').height() - 7;
-    
-    initGL(canvas);
-    initShaders();
-    initBuffers();
 
-    gl.clearColor(0.0, 0.0, 0.0, 0.0);
-    gl.enable(gl.DEPTH_TEST);
+
+    //Initializing GL
+
+
+		$('#craftingTitleBar').css('margin-bottom', '2px');
+
+		var canvas = document.getElementById("craftingCanvas");
+
+		canvas.width = $('#craftingMainArea').width();
+		canvas.height = $('#craftingMainArea').height() - $('#craftingTitleBar').height() - 7;
+
+		initGL(canvas);
+
+		initShaders();
+
+		gl.clearColor(0.0, 0.0, 0.0, 0.0);
+		gl.enable(gl.DEPTH_TEST);
+
+
+		//End of GL initialization
+
+
+
+    //Beginning of model class system:
+
+
+    var modelArray = [];
+
+    
+    function model(){
+    	//Variables passed to the model. We associate them all directly with our object so you can edit 'em later.
+    	this.valuesNeeded = ['verticesArray', 'colorsArray'];
+
+    	this.verticesArray; //This is for the positions of the vertexes,
+    	this.colorsArray;	//And this is for the colors of our vertexes.
+    	//That's it for our vertex based arrays.
+    	this.drawingType = 'TRIANGLE_STRIP';
+    	//That's it for our drawing type stuffs.
+
+    	//And now for our movement type stuffs.
+    	this.translations = [0, 0, 0];
+    	this.rotations = [
+    		{
+    			axis:[1, 0, 0],
+    			degree:0
+    		},
+    		{
+    			axis:[0, 1, 0],
+    			degree:0
+    		},
+    		{
+    			axis:[0, 0, 1],
+    			degree:0
+    		}
+    	];
+    	//this.scales = [];
+    	this.continuousTranslations = [];
+    	this.continuousRotations = [{
+    		axes:[0, 0, 0],//A hollow rotation is then
+    		degree:0,//			added so that the loop in 
+    		rate:0// 				this.newContinuousRotation works.
+    	}];
+    	this.subModels = [];
+
+    	this.newTranslation = function(matrix){
+    		matrix.forEach(function(element, index){
+    			this.translations[index] = this.translations[index] + element;
+    		}.bind(this));
+    	};
+
+    	this.newRotation = function(axes, degree){
+    		axes.forEach(function(axis, index){//Let's loop through each axis.
+    			if(axis == 0)return;//Ones that are zero are to be ignored
+    			this.rotations.forEach(function(rotation){//And then loop through all three of our rotations
+    				if(rotation.axis[index] !== 0){ //And if it's axis is included in the axes given to us,
+    					rotation.degree = rotation.degree + degree; //degree should affect it.
+    				}
+    			}.bind(this));
+    		}.bind(this));
+    	};
+
+			this.newContinuousRotation = function(axes, rate){
+				this.continuousRotations.forEach(function(rotation){
+					rotation.axes.forEach(function(axis, index){
+						if(axes[index] !== 0){
+							if(axes[index] == axis){
+								axes[index] = 0;
+								rotation.rate = rotation.rate + rate
+							}
+							else {
+								var justOneAxis = [0.0, 0.0, 0.0];
+								justOneAxis[index] = axes[index]
+								this.continuousRotations.push({
+									axes:justOneAxis,
+									degree:0,
+									rate:rate
+								});
+							}
+						}
+					}.bind(this));
+				}.bind(this));
+    	};
+    	//That's it for our movement type stuffs.
+
+    	//Internal variables
+    	this.vertexPositionBuffer;
+    	this.vertexColorBuffer;
+    	//That's it for vertex based stuffs.
+    	this.rotationDegree = 0;
+    	//That's it for translation stuffs.
+
+    	this.startUp = function(whereTo){
+    		if(!whereTo)whereTo = modelArray;
+
+				this.vertexPositionBuffer = gl.createBuffer();//Assigns triangleVertexPositionBufer to an empty buffer.
+				gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexPositionBuffer);//Sets ARRAY_BUFFER to what we're playing with and says that ARRAY_BUFFER is triangleVertexPositionBuffer
+
+				gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.verticesArray), gl.STATIC_DRAW);//Then, it sticks all of this information into our main buffer, and tell our main buffer to draw 'em statically
+
+				this.vertexPositionBuffer.itemSize = 3;//Amount per item
+				this.vertexPositionBuffer.numItems = this.verticesArray.length / this.vertexPositionBuffer.itemSize;//Number of items
+
+
+				this.vertexColorBuffer = gl.createBuffer();
+				gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexColorBuffer);
+
+				gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.colorsArray), gl.STATIC_DRAW);
+
+				this.vertexColorBuffer.itemSize = 4;
+				this.vertexColorBuffer.numItems = this.colorsArray.length / this.vertexColorBuffer.itemSize;
+
+
+    		whereTo.push(this);
+    	};
+    }
+
+    //End of model class system.
+
+
+
+    //Start of model definition
+
+
+    //Start of triangle definition
+    var triangle = new model();
+    triangle.verticesArray = [//Vertex positions
+			//Left side
+	    0.0, 1.0, 0.0,
+	    1.0, -1.0, 1.0,
+	    1.0, -1.0, -1.0,
+	    //Right side
+	    0.0, 1.0, 0.0,
+	    -1.0, -1.0, -1.0,
+	    -1.0, -1.0, 1.0,
+	    //Middle side
+	    0.0, 1.0, 0.0,
+	    -1.0, -1.0, 1.0,
+	    1.0, -1.0, 1.0
+	    //We won't bother with the bottom
+		];
+  	triangle.colorsArray = [//Color positions
+		  1.0, 0.0, 0.0, 1.0,
+      0.0, 1.0, 0.0, 1.0,
+      0.0, 0.0, 1.0, 1.0,
+      //Right side
+      1.0, 0.0, 0.0, 1.0,
+      0.0, 1.0, 0.0, 1.0,
+      0.0, 0.0, 1.0, 1.0,
+      //Middle Side
+      1.0, 0.0, 0.0, 1.0,
+      0.0, 0.0, 1.0, 1.0,
+      0.0, 1.0, 0.0, 1.0
+		];
+
+		triangle.newTranslation([0.0, 0.0, -7.0]);
+		triangle.newContinuousRotation([0, 1, 0], 1);
+    
+    triangle.startUp();
+    //End of triangle definition
+
+
+    //Square defined here!
+    var square = new model();
+	  square.verticesArray = [//These are the coordinates for the square. Amazing, innit?
+	    1.0,  1.0,  0.0,
+	    -1.0,  1.0,  0.0,
+	    1.0, -1.0,  0.0,
+	    -1.0, -1.0,  0.0
+	  ];
+	  square.colorsArray = (function(){ //This is a loop that returns an array filled with pale blue color values.
+			colors = [];
+			for (var i=0; i < 4; i++) { //Generate array for colors using loop 'cuz they're all the same.
+				colors = colors.concat([0.5, 0.5, 1.0, 1.0]);
+			}
+			return colors;
+	  })();
+
+    square.startUp(triangle.subModels);
+
+    square.newTranslation([3, 0, 0.0]);
+    square.newRotation([0, 1, 0], 90);
+    square.newContinuousRotation([0, 0, 1], 150);
+    //End of square definition
+
+
+    //End of model definition
+
 
     drawScene();
   });

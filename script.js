@@ -1326,8 +1326,21 @@ function placeContent(){
   });
   
   addLeftBox('Test Barter', 'barter', 'Pretend to trade with a hell gnome.', function(){
-    var name = nameFromRace('Hell Gnome');
-    addMainArea('barter', name);
+    function addItemBox(title, img, x, y){
+      $('#barterMainArea').append('<div class = borderedBox style = position:absolute;left:' + x + ';top:' + y + ';height:75px;width:75px;><p style = margin-top:5px;margin-left:5px>' + title + '</p></div>');
+    }
+    
+    var swords = [
+      'katana',
+      'sickle',
+      'hunting knife',
+      'scythe',
+      'sharp bat'
+    ];
+    
+    addMainArea('barter', swords[Math.ceil(Math.random()*4)]);
+    
+    
   });
 }
 

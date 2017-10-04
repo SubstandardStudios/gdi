@@ -1324,6 +1324,11 @@ function placeContent(){
   addLeftBox('Scrying', 'scrying', 'Send and recieve messages from across the aether.', function(){
     addMainArea('scrying', 'Scrying');
   });
+  
+  addLeftBox('Test Barter', 'barter', 'Pretend to trade with a hell gnome.', function(){
+    var name = nameFromRace('Hell Gnome');
+    addMainArea('barter', name);
+  });
 }
 
 //END OF CHARACTER SELECTION SCREEN CODE!--------------------------------------------------------------------------------------------

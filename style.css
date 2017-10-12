@@ -115,30 +115,17 @@ h3 {
   margin-top:10px;
 }
 
-.inner {
-    margin: 0 auto;
-    margin-bottom: 15px;
-    border: 2px solid black;
-    border-radius: 25px;
-    display: table;
-    overflow:hidden;
-    height: 250px;
-    width: 200px;
-    padding: 10px;
-    /*background-color:Burlywood;*/
-    background:url('imgs/fillerPixelArt/StoneTile.gif');
-}
-
 .godBox{
-  width:50%;
+  width:20%;
   border:3px solid black;
   border-radius:25px;
   
   margin:auto;
   margin-top:5px;
-  margin-bottom:10 px;
+  margin-bottom:10px;
   display:block;
   
+  font-size:20px;
   text-align:center;
   padding:5px;
   }
@@ -155,31 +142,6 @@ h3 {
   padding-top:0px;
   
   background:url('imgs/fillerPixelArt/WoodenPlank.gif');
-}
-
-.outer {
-    margin: auto;
-  
-    /*margin-top: 50px; */
-    border: 2px solid black;
-    border-radius: 25px;
-    display: table;
-    width: 700px;
-    
-    padding: 15px;
-    /*background-color:LightGray;*/
-}
-
-.outermost {
-    margin: auto;
-    margin-top:50px;
-    border: 2px solid black;
-    border-radius: 25px;
-    display: table;
-    width:740px;
-    padding: 20px;
-    padding-bottom:0px;
-    /*background-color:Burlywood;*/
 }
 
 #canvasCan {
@@ -452,4 +414,3 @@ body::-webkit-scrollbar-track {
  border-radius:10px;
  border: 2px solid black;
 }
-

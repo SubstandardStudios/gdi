@@ -1334,6 +1334,9 @@ function placeContent(){
       },
       {name:'Dver Xandrin',
        greeting:'Eggs, eggs, eggs, eggs'
+      },
+      {name:'Kraft',
+       greeting:'Ooga Booga!'
       }
     ];
     
@@ -1342,8 +1345,14 @@ function placeContent(){
     gods.forEach(function(element){
       counter = counter + 1
       $('#scryingMainArea').append('<div class = godBox id = ' + counter + '>' + element.name + '<br>' + '</div>');
-      
-    
+      $('#' + counter).click(function(){
+        $('.godBox').remove();
+        $('#scryingTitleBar').css('height', 'auto');
+        $('#scryingTitleBar').css('padding-bottom', '15px')
+        $('#scryingTitleBar').append(element.greeting)
+        
+        
+      });
     });
   });
   
@@ -1354,7 +1363,7 @@ function placeContent(){
       $('#tradingMainArea').append(title);
     }
     
-    makeBox('Andy is cool - Cedric Hutchings');
+    makeBox('\'Andy is cool\' - Cedric Hutchings');
   });
 }
 

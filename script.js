@@ -1324,6 +1324,27 @@ function placeContent(){
   
   addLeftBox('Scrying', 'scrying', 'Send and recieve messages from across the aether.', function(){
     addMainArea('scrying', 'Scrying');
+    
+    var gods = [
+      {name:'Erebus',
+       greeting:'Look! A new FRIEND!'
+      },
+      {name:'Julius',
+       greeting:'OooO oWOOo oohoo owOhoo oOoO. Oh, hello. Did you enjoy my whale song?'
+      },
+      {name:'Dver Xandrin',
+       greeting:'Eggs, eggs, eggs, eggs'
+      }
+    ];
+    
+    
+    var counter = 0
+    gods.forEach(function(element){
+      counter = counter + 1
+      $('#scryingMainArea').append('<div class = godBox id = ' + counter + '>' + element.name + '<br>' + '</div>');
+      
+    
+    });
   });
   
   addLeftBox('Trading', 'trading', 'Make deals with gnomes... FROM HELL!', function(){
@@ -1333,7 +1354,7 @@ function placeContent(){
       $('#tradingMainArea').append(title);
     }
     
-    makeBox('Andy is cool');
+    makeBox('Andy is cool - Cedric Hutchings');
   });
 }
 

@@ -1321,26 +1321,19 @@ function placeContent(){
     drawScene();
   });
   
+  
   addLeftBox('Scrying', 'scrying', 'Send and recieve messages from across the aether.', function(){
     addMainArea('scrying', 'Scrying');
   });
   
-  addLeftBox('Test Barter', 'barter', 'Pretend to trade with a hell gnome.', function(){
-    function addItemBox(title, img, x, y){
-      $('#barterMainArea').append('<div class = borderedBox style = position:absolute;left:' + x + ';top:' + y + ';height:75px;width:75px;><p style = margin-top:5px;margin-left:5px>' + title + '</p></div>');
+  addLeftBox('Trading', 'trading', 'Make deals with gnomes... FROM HELL!', function(){
+    addMainArea('trading', 'Trading');
+    
+    function makeBox(title){
+      $('#tradingMainArea').append(title);
     }
     
-    var swords = [
-      'katana',
-      'sickle',
-      'hunting knife',
-      'scythe',
-      'sharp bat'
-    ];
-    
-    addMainArea('barter', swords[Math.ceil(Math.random()*4)]);
-    
-    
+    makeBox('Andy is cool');
   });
 }
 

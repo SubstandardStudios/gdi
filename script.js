@@ -1349,7 +1349,10 @@ function placeContent(){
         $('.godBox').remove();
         $('#scryingTitleBar').css('height', 'auto');
         $('#scryingTitleBar').css('padding-bottom', '15px')
-        $('#scryingTitleBar').append(element.greeting)
+        $('#scryingMainArea').append('<div class = textBox id = ' + '>' + element.greeting + '</div>' + '<div class = backButton id =' + '>' + 'Back' + '</div>')
+        $('#backButton').click(function(){
+        $('.backButoon').remove()
+        })
         
         
       });

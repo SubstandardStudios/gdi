@@ -1357,10 +1357,14 @@ function placeContent(){
     	$('#godName' + index).click(function(){
     		$('.godBox').remove();
     		$('#scryingTitleBar').html('<h3 style = text-align:center;font-size:45px;margin-top:5px;margin-bottom:5px;>' + 'Cedric is a moron.' + '</h3>')
+    		$('#scryingMainArea').append(('<div style = text-align:center;font-size:25px;margin-top:0px;margin-bottom:0px; class = backButton>' + '\<-' + '</div>'))
+    		$('.backButton').click(function(){
+    			$('scrying').click()
+    		})
 			});
 		});
     
-    
+    //<- or <=
   });
   
   addLeftBox('Trading', 'trading', 'Make deals with gnomes... FROM HELL!', function(){

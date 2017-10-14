@@ -1336,27 +1336,31 @@ function placeContent(){
        greeting:'Eggs, eggs, eggs, eggs'
       },
       {name:'Kraft',
-       greeting:'Ooga Booga!'
+       greeting:'Why hello there. You have contacted the great Lord Kraft, kneel and recieve your boon.'
+      },
+      {name:'Merriam',
+       greeting:''
+      },
+      {name:'Bobert',
+       greeting:''
+      },
+      {name:'Yacob',
+       greeting:''
+      },
+      {name:'Cedran	& Parth',
+       greeting:''
       }
+
     ];
+    gods.forEach(function(element, index){
+    	$('#scryingMainArea').append('<div id = godName' + index + ' class = godBox>' + element.name + '</div>');
+    	$('#godName' + index).click(function(){
+    		$('.godBox').remove();
+    		$('#scryingTitleBar').html('<h3 style = text-align:center;font-size:45px;margin-top:5px;margin-bottom:5px;>' + 'Cedric is a moron.' + '</h3>')
+			});
+		});
     
     
-    var counter = 0
-    gods.forEach(function(element){
-      counter = counter + 1
-      $('#scryingMainArea').append('<div class = godBox id = ' + counter + '>' + element.name + '<br>' + '</div>');
-      $('#' + counter).click(function(){
-        $('.godBox').remove();
-        $('#scryingTitleBar').css('height', 'auto');
-        $('#scryingTitleBar').css('padding-bottom', '15px')
-        $('#scryingMainArea').append('<div class = textBox id = ' + '>' + element.greeting + '</div>' + '<div class = backButton id =' + '>' + 'Back' + '</div>')
-        $('#backButton').click(function(){
-        $('.backButoon').remove()
-        })
-        
-        
-      });
-    });
   });
   
   addLeftBox('Trading', 'trading', 'Make deals with gnomes... FROM HELL!', function(){
@@ -1366,7 +1370,7 @@ function placeContent(){
       $('#tradingMainArea').append(title);
     }
     
-    makeBox('\'Andy is cool\' - Cedric Hutchings');
+    makeBox('\'Cedric is a moron!\' - Cedric Hutchings');
   });
 }
 
